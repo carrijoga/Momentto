@@ -2,7 +2,8 @@
 
 import { useRef } from "react"
 import { useTheme } from "next-themes"
-import { Globe, Sun, Moon, Monitor, Check } from "lucide-react"
+import { Globe, Sun, Moon, Monitor, Check, ScrollText } from "lucide-react"
+import Link from "next/link"
 import { SettingsIcon, type SettingsIconHandle } from "@/components/ui/settings"
 import { BellIcon, type BellIconHandle } from "@/components/ui/bell"
 import { useLanguage } from "@/lib/language-context"
@@ -94,6 +95,17 @@ export function FloatingControls() {
               </button>
             </div>
           </div>
+
+          <Separator className="my-2.5" />
+
+          {/* Changelog */}
+          <Link
+            href="/changelog"
+            className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+          >
+            <ScrollText className="size-3.5" />
+            <span>Changelog</span>
+          </Link>
 
           <Separator className="my-2.5" />
 
