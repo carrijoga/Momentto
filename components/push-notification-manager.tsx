@@ -58,7 +58,10 @@ export function PushNotificationManager() {
       })
       setSubscription(sub)
       const serialized = JSON.parse(JSON.stringify(sub))
-      await subscribeUser(serialized)
+      const result = await subscribeUser(serialized)
+      if (!result.success) {
+        console.error("subscribeUser failed:", result.error)
+      }
     } catch (err) {
       console.error("Failed to subscribe:", err)
     } finally {
