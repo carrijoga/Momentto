@@ -106,7 +106,7 @@ export function HomeScreen({ onStart }: { onStart: () => void }) {
       {scattered.map(({ Icon, top, left, right, bottom, size, opacity, duration, delay }, i) => (
         <div
           key={i}
-          className="absolute pointer-events-none hidden sm:block"
+          className="absolute pointer-events-none"
           style={{
             top,
             left,

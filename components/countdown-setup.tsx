@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import { useState, useRef } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { format } from "date-fns"
 import { ptBR, enUS } from "date-fns/locale"
 import { CalendarIcon, Clock, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star, House } from "lucide-react"
@@ -127,6 +128,7 @@ export function CountdownSetup({
   const [date, setDate]                       = useState<Date | undefined>(
     initialDate ? new Date(initialDate + "T00:00:00") : undefined
   )
+  const isMobile = useIsMobile()
   const [calendarOpen, setCalendarOpen]       = useState(false)
   const [timeEnabled, setTimeEnabled]         = useState(!!initialTime)
   const [hour, setHour]                       = useState(initialTime ? initialTime.split(":")[0] : "12")
@@ -226,6 +228,7 @@ export function CountdownSetup({
                       setSelectedCategory(cat.id)
                       const ref = iconRef.current as AirplaneIconHandle | null
                       ref?.startAnimation?.()
+                      setTimeout(() => setStep(2), 150)
                     }}
                     onMouseEnter={() => {
                       const ref = iconRef.current as AirplaneIconHandle | null
@@ -251,20 +254,7 @@ export function CountdownSetup({
                 )
               })}
             </div>
-            <button
-              onClick={() => { if (selectedCategory) setStep(2) }}
-              disabled={!selectedCategory}
-              className={cn(
-                "mt-8 w-full rounded-xl py-3.5 text-sm font-semibold transition-all duration-150",
-                "animate-in fade-in slide-in-from-bottom-2 duration-300",
-                selectedCategory
-                  ? "bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98]"
-                  : "cursor-not-allowed bg-secondary text-muted-foreground"
-              )}
-              style={{ animationDelay: "200ms" }}
-            >
-              {labels.continue}
-            </button>
+
           </div>
         ) : (
           /* Step 2: Title & Date */
@@ -283,7 +273,7 @@ export function CountdownSetup({
               {/* Title input */}
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
                 <label htmlFor="event-title" className="mb-2 block text-sm font-medium text-foreground">
-                  {labels.eventName}
+                  {labels.eventName} *
                 </label>
                 <input
                   id="event-title"
@@ -301,44 +291,68 @@ export function CountdownSetup({
                 style={{ animationDelay: "60ms" }}
               >
                 <label className="mb-2 block text-sm font-medium text-foreground">
-                  {labels.when}
+                  {labels.when} *
                 </label>
-                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      className={cn(
-                        "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-left",
-                        "flex items-center gap-2 transition-colors",
-                        date ? "text-foreground" : "text-muted-foreground",
-                        "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
-                        "hover:border-primary/50"
-                      )}
-                    >
-                      <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
-                      {date ? format(date, "dd/MM/yyyy") : labels.pickDate}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-0"
-                    align="start"
-                    side="bottom"
-                    avoidCollisions={false}
-                    sideOffset={4}
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={(d) => {
-                        setDate(d)
-                        setCalendarOpen(false)
+                {isMobile ? (
+                  <div className="relative">
+                    <CalendarIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      type="date"
+                      min={format(today, "yyyy-MM-dd")}
+                      value={date ? format(date, "yyyy-MM-dd") : ""}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setDate(new Date(e.target.value + "T00:00:00"))
+                        } else {
+                          setDate(undefined)
+                        }
                       }}
-                      disabled={(d) => d < today}
-                      locale={language === "pt" ? ptBR : enUS}
-                      fixedWeeks
-                      initialFocus
+                      className={cn(
+                        "w-full rounded-xl border border-border bg-card pl-10 pr-4 py-3 text-sm transition-colors",
+                        "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
+                        date ? "text-foreground" : "text-muted-foreground"
+                      )}
                     />
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                ) : (
+                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        className={cn(
+                          "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-left",
+                          "flex items-center gap-2 transition-colors",
+                          date ? "text-foreground" : "text-muted-foreground",
+                          "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
+                          "hover:border-primary/50"
+                        )}
+                      >
+                        <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
+                        {date ? format(date, "dd/MM/yyyy") : labels.pickDate}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto p-0"
+                      align="start"
+                      side="bottom"
+                      avoidCollisions={false}
+                      sideOffset={4}
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(d) => {
+                          setDate(d)
+                          setCalendarOpen(false)
+                        }}
+                        disabled={(d) => d < today}
+                        locale={language === "pt" ? ptBR : enUS}
+                        fixedWeeks
+                        initialFocus
+                        className="[--cell-size:--spacing(7)] p-2 text-sm"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
               </div>
 
               {/* Optional time picker */}

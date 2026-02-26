@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import pkg from "@/package.json"
 import NumberFlow from "@number-flow/react"
 import Confetti from "react-confetti-boom"
 import { Pencil, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star } from "lucide-react"
@@ -239,22 +240,22 @@ export function CountdownDisplay({
             {/* Edit button */}
             <button
               onClick={onEdit}
-              className="flex items-center gap-2 rounded-full bg-card border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground sm:gap-2 sm:px-4"
               aria-label={language === "pt" ? "Editar" : "Edit"}
             >
-              <Pencil className="size-3.5" />
-              {language === "pt" ? "Editar" : "Edit"}
+              <Pencil className="size-3.5 shrink-0" />
+              <span className="hidden sm:inline">{language === "pt" ? "Editar" : "Edit"}</span>
             </button>
             {/* Reset button */}
             <button
               onMouseEnter={() => resetRef.current?.startAnimation()}
               onMouseLeave={() => resetRef.current?.stopAnimation()}
               onClick={onReset}
-              className="flex items-center gap-2 rounded-full bg-card border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:gap-2 sm:px-4"
               aria-label={language === "pt" ? "Nova contagem" : "New countdown"}
             >
-              <RotateCCWIcon ref={resetRef} size={14} />
-              {language === "pt" ? "Nova contagem" : "New countdown"}
+              <RotateCCWIcon ref={resetRef} size={14} className="shrink-0" />
+              <span className="hidden sm:inline">{language === "pt" ? "Nova contagem" : "New countdown"}</span>
             </button>
           </div>
         </div>
@@ -341,6 +342,7 @@ export function CountdownDisplay({
         >
           carrijoga
         </a>
+        {" "}·{" "}v{pkg.version}
       </footer>
     </div>
   )

@@ -89,7 +89,7 @@ export default function Home() {
       <InstallPrompt />
       {!mounted ? (
         <div className="flex min-h-dvh items-center justify-center">
-          <Spinner size="md" />
+          <Spinner />
         </div>
       ) : data && !editMode ? (
         <CountdownDisplay

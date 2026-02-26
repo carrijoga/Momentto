@@ -21,6 +21,7 @@ function renderMarkdown(md: string) {
   const elements: React.ReactNode[] = []
   let listItems: string[] = []
   let key = 0
+  let seenSection = false
 
   function flushList() {
     if (listItems.length === 0) return
@@ -47,6 +48,7 @@ function renderMarkdown(md: string) {
     }
 
     if (trimmed.startsWith("## ")) {
+      seenSection = true
       flushList()
       const heading = trimmed.replace("## ", "")
       const icon = getSectionIcon(heading)
@@ -71,7 +73,8 @@ function renderMarkdown(md: string) {
       continue
     }
 
-    // Paragraph
+    // Paragraph — only render after the first ## section (avoid duplicating the description)
+    if (!seenSection) continue
     flushList()
     elements.push(
       <p key={key++} className="text-sm leading-relaxed text-muted-foreground">
