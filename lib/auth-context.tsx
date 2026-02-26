@@ -73,17 +73,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     init()
 
-    const supabase = getSupabaseBrowserClient()
-    const { data: listener } = supabase.auth.onAuthStateChange((event: string, session: { user?: { id: string } } | null) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        const uid = session.user.id
-        setState({ status: "authenticated", userId: uid })
-        syncPendingOps(uid).catch(console.error)
-      }
-      if (event === "SIGNED_OUT") {
-        setState({ status: "error", message: "Sessão encerrada." })
-      }
-    })
+    let listener: { subscription: { unsubscribe: () => void } } | undefined
+
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const { data } = supabase.auth.onAuthStateChange((event: string, session: { user?: { id: string } } | null) => {
+        if (event === "SIGNED_IN" && session?.user) {
+          const uid = session.user.id
+          setState({ status: "authenticated", userId: uid })
+          syncPendingOps(uid).catch(console.error)
+        }
+        if (event === "SIGNED_OUT") {
+          setState({ status: "error", message: "Sessão encerrada." })
+        }
+      })
+      listener = data
+    } catch {
+      // Supabase env vars not available yet — listener will be set up on retry
+    }
 
     // When connectivity returns while in local mode, retry auth
     const handleOnline = () => {
@@ -97,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.addEventListener("online", handleOnline)
 
     return () => {
-      listener.subscription.unsubscribe()
+      listener?.subscription.unsubscribe()
       window.removeEventListener("online", handleOnline)
     }
   }, [init])
