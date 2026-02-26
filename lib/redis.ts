@@ -1,6 +1,14 @@
 import { Redis } from "@upstash/redis"
 
-export const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
-})
+function createRedis() {
+  const url = process.env.KV_REST_API_URL
+  const token = process.env.KV_REST_API_TOKEN
+
+  if (!url || !token) {
+    return null
+  }
+
+  return new Redis({ url, token })
+}
+
+export const redis = createRedis()
