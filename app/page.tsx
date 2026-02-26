@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { CountdownSetup } from "@/components/countdown-setup"
 import { CountdownDisplay } from "@/components/countdown-display"
+import { HomeScreen } from "@/components/home-screen"
 import { FloatingControls } from "@/components/floating-controls"
 import { Spinner } from "@/components/ui/spinner"
 import { InstallPrompt } from "@/components/install-prompt"
@@ -38,6 +39,7 @@ function loadData(): CountdownData | null {
 export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [data, setData] = useState<CountdownData | null>(null)
+  const [showHome, setShowHome] = useState(true)
   // When editing, go back to step 2 (date/title) keeping the category
   const [editMode, setEditMode] = useState(false)
 
@@ -45,6 +47,7 @@ export default function Home() {
     localStorage.removeItem(LEGACY_KEY)
     const saved = loadData()
     setData(saved)
+    if (saved) setShowHome(false)
     setMounted(true)
   }, [])
 
@@ -67,6 +70,7 @@ export default function Home() {
     localStorage.removeItem(STORAGE_KEY)
     setData(null)
     setEditMode(false)
+    setShowHome(true)
   }
 
   return (
@@ -87,6 +91,8 @@ export default function Home() {
           onEdit={handleEdit}
           onReset={handleReset}
         />
+      ) : showHome && !editMode ? (
+        <HomeScreen onStart={() => setShowHome(false)} />
       ) : (
         <CountdownSetup
           initialCategory={editMode && data ? data.category : undefined}
