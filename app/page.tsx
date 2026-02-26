@@ -73,9 +73,19 @@ export default function Home() {
     setShowHome(true)
   }
 
+  function handleBack() {
+    if (editMode) {
+      setEditMode(false)
+    } else {
+      setShowHome(true)
+    }
+  }
+
+  const showControls = mounted && !(showHome && !editMode)
+
   return (
     <>
-      <FloatingControls />
+      {showControls && <FloatingControls />}
       <InstallPrompt />
       {!mounted ? (
         <div className="flex min-h-dvh items-center justify-center">
@@ -100,6 +110,7 @@ export default function Home() {
           initialDate={editMode && data ? data.date : undefined}
           initialTime={editMode && data ? data.time : undefined}
           onComplete={handleSetupComplete}
+          onBack={handleBack}
         />
       )}
     </>

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import { format } from "date-fns"
 import { ptBR, enUS } from "date-fns/locale"
-import { CalendarIcon, Clock, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star } from "lucide-react"
+import { CalendarIcon, Clock, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star, House } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -23,6 +23,7 @@ interface CountdownData {
 
 interface CountdownSetupProps {
   onComplete: (data: CountdownData) => void
+  onBack?: () => void
   initialCategory?: string
   initialTitle?: string
   initialDate?: string
@@ -111,6 +112,7 @@ const MINUTES = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart
 
 export function CountdownSetup({
   onComplete,
+  onBack,
   initialCategory,
   initialTitle = "",
   initialDate,
@@ -162,6 +164,7 @@ export function CountdownSetup({
 
   const labels = {
     title:     language === "pt" ? "Contagem Regressiva"                   : "Countdown",
+    home:      language === "pt" ? "Início"                                : "Home",
     step1Sub:  language === "pt" ? "Escolha o motivo da sua contagem"      : "Choose the reason for your countdown",
     step2Sub:  language === "pt" ? "Diga mais sobre esse momento especial" : "Tell us more about this special moment",
     eventName: language === "pt" ? "Qual o nome do evento?"                : "What is the event name?",
@@ -177,6 +180,17 @@ export function CountdownSetup({
   return (
     <div className="flex min-h-dvh items-center justify-center p-4">
       <div className="w-full max-w-lg">
+        {/* Back to home button */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground animate-in fade-in duration-300"
+          >
+            <House className="size-4" />
+            <span>{labels.home}</span>
+          </button>
+        )}
+
         {/* Header */}
         <div className="mb-10 text-center animate-in fade-in slide-in-from-top-4 duration-300">
           <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">
