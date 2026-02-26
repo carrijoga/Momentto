@@ -1,9 +1,7 @@
 "use server"
 
 import webpush from "web-push"
-import { redis } from "@/lib/redis"
-
-const SUBSCRIPTION_KEY = "push-subscription"
+import { getSupabaseServerClient } from "@/lib/supabase/server"
 
 function initWebPush(): boolean {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
@@ -22,10 +20,18 @@ function initWebPush(): boolean {
 
 export async function subscribeUser(sub: PushSubscription) {
   try {
-    if (!redis) {
-      return { success: false, error: "Redis not configured" }
-    }
-    await redis.set(SUBSCRIPTION_KEY, JSON.stringify(sub))
+    const supabase = await getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: "Not authenticated" }
+
+    const { error } = await supabase
+      .from("push_subscriptions")
+      .upsert(
+        { user_id: user.id, subscription: sub, updated_at: new Date().toISOString() },
+        { onConflict: "user_id" }
+      )
+
+    if (error) return { success: false, error: error.message }
     return { success: true }
   } catch (error) {
     console.error("subscribeUser error:", error)
@@ -35,10 +41,16 @@ export async function subscribeUser(sub: PushSubscription) {
 
 export async function unsubscribeUser() {
   try {
-    if (!redis) {
-      return { success: false, error: "Redis not configured" }
-    }
-    await redis.del(SUBSCRIPTION_KEY)
+    const supabase = await getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: "Not authenticated" }
+
+    const { error } = await supabase
+      .from("push_subscriptions")
+      .delete()
+      .eq("user_id", user.id)
+
+    if (error) return { success: false, error: error.message }
     return { success: true }
   } catch (error) {
     console.error("unsubscribeUser error:", error)
@@ -52,24 +64,23 @@ export async function sendNotification(title: string, body: string) {
     return { success: false, error: "VAPID keys not configured" }
   }
 
-  let raw: string | null
   try {
-    if (!redis) {
-      return { success: false, error: "Redis not configured" }
+    const supabase = await getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: "Not authenticated" }
+
+    const { data, error } = await supabase
+      .from("push_subscriptions")
+      .select("subscription")
+      .eq("user_id", user.id)
+      .single()
+
+    if (error || !data) {
+      return { success: false, error: "No subscription found" }
     }
-    raw = await redis.get<string>(SUBSCRIPTION_KEY)
-  } catch (error) {
-    console.error("Redis get error:", error)
-    return { success: false, error: `Redis error: ${String(error)}` }
-  }
 
-  if (!raw) {
-    return { success: false, error: "No subscription found" }
-  }
+    const subscription = data.subscription
 
-  const subscription = typeof raw === "string" ? JSON.parse(raw) : raw
-
-  try {
     await webpush.sendNotification(
       subscription,
       JSON.stringify({

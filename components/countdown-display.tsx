@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import pkg from "@/package.json"
 import NumberFlow from "@number-flow/react"
 import Confetti from "react-confetti-boom"
+import Link from "next/link"
 import { Pencil, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star } from "lucide-react"
 import { RotateCCWIcon, type RotateCCWIconHandle } from "@/components/ui/rotate-ccw"
 import { PartyPopperIcon, type PartyPopperIconHandle } from "@/components/ui/party-popper"
@@ -120,25 +121,24 @@ const categoryLabels: Record<string, { pt: string; en: string }> = {
   outro: { pt: "Outro", en: "Other" },
 }
 
+import type { CountdownEntry } from "@/lib/types"
+
 interface CountdownDisplayProps {
-  category: string
-  title: string
-  date: string
-  time?: string
-  createdAt: string
+  entry: CountdownEntry
   onReset: () => void
   onEdit: () => void
+  onShareGenerated?: (updated: CountdownEntry) => void
+  isPublic?: boolean
 }
 
 export function CountdownDisplay({
-  category,
-  title,
-  date,
-  time,
-  createdAt,
+  entry,
   onReset,
   onEdit,
+  isPublic = false,
 }: CountdownDisplayProps) {
+  const { category, title, date, created_at: createdAt } = entry
+  const time = entry.time ?? undefined
   const { language } = useLanguage()
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft(date, time))
   const [showConfetti, setShowConfetti] = useState(false)
@@ -159,7 +159,7 @@ export function CountdownDisplay({
       next.seconds === 0
     ) {
       setShowConfetti(true)
-      if (!notificationSentRef.current) {
+      if (!notificationSentRef.current && !isPublic) {
         notificationSentRef.current = true
         sendNotification(
           title,
@@ -237,26 +237,35 @@ export function CountdownDisplay({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {/* Edit button */}
-            <button
-              onClick={onEdit}
-              className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground sm:gap-2 sm:px-4"
-              aria-label={language === "pt" ? "Editar" : "Edit"}
-            >
-              <Pencil className="size-3.5 shrink-0" />
-              <span className="hidden sm:inline">{language === "pt" ? "Editar" : "Edit"}</span>
-            </button>
-            {/* Reset button */}
-            <button
-              onMouseEnter={() => resetRef.current?.startAnimation()}
-              onMouseLeave={() => resetRef.current?.stopAnimation()}
-              onClick={onReset}
-              className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:gap-2 sm:px-4"
-              aria-label={language === "pt" ? "Nova contagem" : "New countdown"}
-            >
-              <RotateCCWIcon ref={resetRef} size={14} className="shrink-0" />
-              <span className="hidden sm:inline">{language === "pt" ? "Nova contagem" : "New countdown"}</span>
-            </button>
+            {!isPublic && (
+              <>
+                {/* Edit button */}
+                <button
+                  onClick={onEdit}
+                  className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground sm:gap-2 sm:px-4"
+                  aria-label={language === "pt" ? "Editar" : "Edit"}
+                >
+                  <Pencil className="size-3.5 shrink-0" />
+                  <span className="hidden sm:inline">{language === "pt" ? "Editar" : "Edit"}</span>
+                </button>
+                {/* Back to list button */}
+                <button
+                  onMouseEnter={() => resetRef.current?.startAnimation()}
+                  onMouseLeave={() => resetRef.current?.stopAnimation()}
+                  onClick={onReset}
+                  className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:gap-2 sm:px-4"
+                  aria-label={language === "pt" ? "Voltar" : "Back"}
+                >
+                  <RotateCCWIcon ref={resetRef} size={14} className="shrink-0" />
+                  <span className="hidden sm:inline">{language === "pt" ? "Voltar" : "Back"}</span>
+                </button>
+              </>
+            )}
+            {isPublic && (
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                {language === "pt" ? "Visualização pública" : "Public view"}
+              </span>
+            )}
           </div>
         </div>
 
@@ -328,6 +337,18 @@ export function CountdownDisplay({
           </div>
         )}
       </div>
+
+      {/* Public CTA */}
+      {isPublic && (
+        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Link
+            href="/"
+            className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 whitespace-nowrap"
+          >
+            {language === "pt" ? "Criar a minha contagem →" : "Create my own countdown →"}
+          </Link>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="fixed bottom-4 text-xs text-muted-foreground">

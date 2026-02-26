@@ -1,13 +1,16 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { useTheme } from "next-themes"
-import { Globe, Sun, Moon, Monitor, Check, ScrollText } from "lucide-react"
+import { Globe, Sun, Moon, Monitor, Check, ScrollText, Share2 } from "lucide-react"
 import Link from "next/link"
 import { SettingsIcon, type SettingsIconHandle } from "@/components/ui/settings"
 import { BellIcon, type BellIconHandle } from "@/components/ui/bell"
 import { useLanguage } from "@/lib/language-context"
 import { usePushNotifications } from "@/hooks/use-push-notifications"
+import { useActiveCountdown } from "@/lib/active-countdown-context"
+import { ShareModal } from "@/components/share-modal"
+import type { CountdownEntry } from "@/lib/types"
 import {
   Popover,
   PopoverContent,
@@ -21,15 +24,27 @@ const themes = [
   { value: "system", label: "Sistema", labelEn: "System", Icon: Monitor },
 ]
 
-export function FloatingControls() {
+export function FloatingControls({ onShareGenerated }: { onShareGenerated?: (updated: CountdownEntry) => void }) {
   const { theme, setTheme } = useTheme()
   const { language, setLanguage } = useLanguage()
   const settingsRef = useRef<SettingsIconHandle>(null)
   const bellRef = useRef<BellIconHandle>(null)
   const { isSupported, subscription, loading, subscribeToPush, unsubscribeFromPush } = usePushNotifications()
+  const { activeCountdown, setActiveCountdown } = useActiveCountdown()
+  const [shareOpen, setShareOpen] = useState(false)
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2">
+      {/* Share button — only when viewing a countdown */}
+      {activeCountdown && (
+        <button
+          onClick={() => setShareOpen(true)}
+          className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg transition-all hover:border-primary/50 hover:text-foreground hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={language === "pt" ? "Compartilhar" : "Share"}
+        >
+          <Share2 size={18} />
+        </button>
+      )}
       {isSupported && (
         <button
           onClick={subscription ? unsubscribeFromPush : subscribeToPush}
@@ -136,6 +151,18 @@ export function FloatingControls() {
           </div>
         </PopoverContent>
       </Popover>
+
+      {/* Share modal */}
+      {shareOpen && activeCountdown && (
+        <ShareModal
+          entry={activeCountdown}
+          onClose={() => setShareOpen(false)}
+          onShareGenerated={(updated) => {
+            setActiveCountdown(updated)
+            onShareGenerated?.(updated)
+          }}
+        />
+      )}
     </div>
   )
 }

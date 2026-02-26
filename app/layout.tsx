@@ -4,6 +4,10 @@ import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LanguageProvider } from "@/lib/language-context"
+import { AuthProvider } from "@/lib/auth-context"
+import { ActiveCountdownProvider } from "@/lib/active-countdown-context"
+import { ConnectivityProvider } from "@/lib/connectivity-context"
+import { OfflineBanner } from "@/components/offline-banner"
 import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({
@@ -41,7 +45,14 @@ export default function RootLayout({
           storageKey="mytrip-theme"
         >
           <LanguageProvider>
-            {children}
+            <AuthProvider>
+              <ConnectivityProvider>
+                <ActiveCountdownProvider>
+                  <OfflineBanner />
+                  {children}
+                </ActiveCountdownProvider>
+              </ConnectivityProvider>
+            </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
         <Analytics />

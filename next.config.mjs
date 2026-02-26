@@ -1,3 +1,5 @@
+import withPWA from "next-pwa"
+
 let userConfig = undefined
 try {
   userConfig = await import('./v0-user-next.config')
@@ -13,6 +15,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  turbopack: {},
   experimental: {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
@@ -63,4 +66,13 @@ function mergeConfig(nextConfig, userConfig) {
   }
 }
 
-export default nextConfig
+const pwa = withPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+  customWorkerDir: "worker",
+  buildExcludes: [/middleware-manifest\.json$/],
+})
+
+export default pwa(nextConfig)

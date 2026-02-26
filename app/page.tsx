@@ -1,121 +1,245 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { CountdownSetup } from "@/components/countdown-setup"
 import { CountdownDisplay } from "@/components/countdown-display"
 import { HomeScreen } from "@/components/home-screen"
+import { CountdownList } from "@/components/countdown-list"
 import { FloatingControls } from "@/components/floating-controls"
 import { Spinner } from "@/components/ui/spinner"
 import { InstallPrompt } from "@/components/install-prompt"
+import { useAuth } from "@/lib/auth-context"
+import { useActiveCountdown } from "@/lib/active-countdown-context"
+import { useLanguage } from "@/lib/language-context"
+import {
+  fetchCountdowns,
+  createCountdown,
+  updateCountdown,
+  deleteCountdown,
+} from "@/lib/countdowns"
+import { getAllCountdownsFromDB, migrateLegacyCache } from "@/lib/db"
+import type { CountdownEntry } from "@/lib/types"
 
-interface CountdownData {
-  category: string
-  title: string
-  date: string
-  time?: string
-  createdAt: string
-}
+type View = "list" | "setup" | "display"
 
-const STORAGE_KEY = "countdown-data"
-const LEGACY_KEY = "targetDate"
-
-function loadData(): CountdownData | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as CountdownData
-      if (parsed.category && parsed.title && parsed.date && parsed.createdAt) {
-        return parsed
-      }
-    }
-  } catch {
-    // ignore
-  }
-  // Clean up legacy key
-  localStorage.removeItem(LEGACY_KEY)
-  return null
-}
+const LEGACY_KEY = "countdown-data"
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false)
-  const [data, setData] = useState<CountdownData | null>(null)
-  const [showHome, setShowHome] = useState(true)
-  // When editing, go back to step 2 (date/title) keeping the category
-  const [editMode, setEditMode] = useState(false)
+  const { userId, loading: authLoading, error: authError, isLocalMode, retry } = useAuth()
+  const { setActiveCountdown } = useActiveCountdown()
+  const { language } = useLanguage()
 
-  useEffect(() => {
-    localStorage.removeItem(LEGACY_KEY)
-    const saved = loadData()
-    setData(saved)
-    if (saved) setShowHome(false)
-    setMounted(true)
+  const [mounted, setMounted] = useState(false)
+  const [view, setView] = useState<View>("list")
+  const [countdowns, setCountdowns] = useState<CountdownEntry[]>([])
+  const [loadingData, setLoadingData] = useState(false)
+  const [editingEntry, setEditingEntry] = useState<CountdownEntry | null>(null)
+  const [displayEntry, setDisplayEntry] = useState<CountdownEntry | null>(null)
+
+  // ── Load countdowns from Supabase once authenticated ──────────────────────
+  const loadCountdowns = useCallback(async () => {
+    setLoadingData(true)
+    try {
+      const entries = await fetchCountdowns()
+      setCountdowns(entries)
+
+      // Migrate legacy single-countdown format
+      try {
+        const raw = localStorage.getItem(LEGACY_KEY)
+        if (raw) {
+          const legacy = JSON.parse(raw)
+          if (
+            legacy?.category &&
+            legacy?.title &&
+            legacy?.date &&
+            !entries.some((e) => e.title === legacy.title && e.date === legacy.date)
+          ) {
+            const created = await createCountdown({
+              category: legacy.category,
+              title: legacy.title,
+              date: legacy.date,
+              time: legacy.time ?? null,
+              created_at: legacy.createdAt ?? new Date().toISOString(),
+            })
+            setCountdowns((prev) => [created, ...prev])
+          }
+          localStorage.removeItem(LEGACY_KEY)
+        }
+      } catch {
+        // ignore migration errors
+      }
+    } catch {
+      const cached = await getAllCountdownsFromDB()
+      if (cached.length > 0) setCountdowns(cached)
+    } finally {
+      setLoadingData(false)
+    }
   }, [])
 
-  function handleSetupComplete(incoming: CountdownData) {
-    // Preserve original createdAt if editing
-    const final: CountdownData = {
-      ...incoming,
-      createdAt: editMode && data ? data.createdAt : incoming.createdAt,
+  useEffect(() => {
+    setMounted(true)
+    // Migrate localStorage cache → IDB (one-time)
+    migrateLegacyCache().then(async () => {
+      const cached = await getAllCountdownsFromDB()
+      if (cached.length > 0) setCountdowns(cached)
+    }).catch(console.error)
+  }, [])
+
+  // Re-fetch after a sync completes (temp IDs replaced with real ones)
+  useEffect(() => {
+    const handleSynced = () => loadCountdowns()
+    window.addEventListener("countdowns-synced", handleSynced)
+    return () => window.removeEventListener("countdowns-synced", handleSynced)
+  }, [loadCountdowns])
+
+  useEffect(() => {
+    if (userId || isLocalMode) loadCountdowns()
+  }, [userId, isLocalMode, loadCountdowns])
+
+  // ── Navigation helpers ────────────────────────────────────────────────────
+  function openDisplay(entry: CountdownEntry) {
+    setDisplayEntry(entry)
+    setActiveCountdown(entry)
+    setView("display")
+  }
+
+  function openSetup(entry?: CountdownEntry) {
+    setEditingEntry(entry ?? null)
+    setView("setup")
+  }
+
+  function goToList() {
+    setDisplayEntry(null)
+    setEditingEntry(null)
+    setActiveCountdown(null)
+    setView("list")
+  }
+
+  // ── Setup completion ──────────────────────────────────────────────────────
+  async function handleSetupComplete(incoming: {
+    category: string
+    title: string
+    date: string
+    time?: string
+    createdAt: string
+  }) {
+    try {
+      if (editingEntry) {
+        const updated = await updateCountdown(editingEntry.id, {
+          category: incoming.category,
+          title: incoming.title,
+          date: incoming.date,
+          time: incoming.time ?? null,
+        })
+        setCountdowns((prev) =>
+          prev.map((c) => (c.id === editingEntry.id ? updated : c))
+        )
+        openDisplay(updated)
+      } else {
+        const created = await createCountdown({
+          category: incoming.category,
+          title: incoming.title,
+          date: incoming.date,
+          time: incoming.time ?? null,
+          created_at: incoming.createdAt,
+        })
+        setCountdowns((prev) => [created, ...prev])
+        openDisplay(created)
+      }
+    } catch (e) {
+      console.error("Failed to save countdown:", e)
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(final))
-    setData(final)
-    setEditMode(false)
   }
 
-  function handleEdit() {
-    setEditMode(true)
-  }
-
-  function handleReset() {
-    localStorage.removeItem(STORAGE_KEY)
-    setData(null)
-    setEditMode(false)
-    setShowHome(true)
-  }
-
-  function handleBack() {
-    if (editMode) {
-      setEditMode(false)
-    } else {
-      setShowHome(true)
+  // ── Delete ────────────────────────────────────────────────────────────────
+  async function handleDelete(id: string) {
+    try {
+      await deleteCountdown(id)
+      setCountdowns((prev) => prev.filter((c) => c.id !== id))
+      if (displayEntry?.id === id) goToList()
+    } catch (e) {
+      console.error("Failed to delete countdown:", e)
     }
   }
 
-  const showControls = mounted && !(showHome && !editMode)
+  // ── Share link patch ──────────────────────────────────────────────────────
+  function handleShareGenerated(updated: CountdownEntry) {
+    setCountdowns((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
+    setDisplayEntry(updated)
+    setActiveCountdown(updated)
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  const isLoading = !mounted || (authLoading && !isLocalMode) || (loadingData && countdowns.length === 0)
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (authError && !isLocalMode) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          {language === "pt"
+            ? "Não foi possível iniciar a sessão."
+            : "Could not start session."}
+        </p>
+        <p className="rounded-lg bg-destructive/10 px-4 py-2 text-xs font-mono text-destructive">
+          {authError}
+        </p>
+        <button
+          onClick={retry}
+          className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
+        >
+          {language === "pt" ? "Tentar novamente" : "Retry"}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <>
-      {showControls && <FloatingControls />}
+      <FloatingControls onShareGenerated={handleShareGenerated} />
       <InstallPrompt />
-      {!mounted ? (
-        <div className="flex min-h-dvh items-center justify-center">
-          <Spinner />
-        </div>
-      ) : data && !editMode ? (
-        <CountdownDisplay
-          category={data.category}
-          title={data.title}
-          date={data.date}
-          time={data.time}
-          createdAt={data.createdAt}
-          onEdit={handleEdit}
-          onReset={handleReset}
-        />
-      ) : showHome && !editMode ? (
-        <HomeScreen onStart={() => setShowHome(false)} />
-      ) : (
+
+      {view === "list" && (
+        countdowns.length === 0 ? (
+          <HomeScreen onStart={() => openSetup()} />
+        ) : (
+          <CountdownList
+            countdowns={countdowns}
+            onOpen={openDisplay}
+            onNew={() => openSetup()}
+            onDelete={handleDelete}
+          />
+        )
+      )}
+
+      {view === "setup" && (
         <CountdownSetup
-          initialCategory={editMode && data ? data.category : undefined}
-          initialTitle={editMode && data ? data.title : undefined}
-          initialDate={editMode && data ? data.date : undefined}
-          initialTime={editMode && data ? data.time : undefined}
+          initialCategory={editingEntry?.category}
+          initialTitle={editingEntry?.title}
+          initialDate={editingEntry?.date}
+          initialTime={editingEntry?.time ?? undefined}
           onComplete={handleSetupComplete}
-          onBack={handleBack}
+          onBack={goToList}
+        />
+      )}
+
+      {view === "display" && displayEntry && (
+        <CountdownDisplay
+          key={displayEntry.id}
+          entry={displayEntry}
+          onEdit={() => openSetup(displayEntry)}
+          onReset={goToList}
         />
       )}
     </>
   )
 }
-
 
 
