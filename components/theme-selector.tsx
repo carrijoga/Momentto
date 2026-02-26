@@ -2,7 +2,7 @@
 
 import { useTheme as useNextTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
-import { Check, Palette } from "lucide-react"
+import { Palette } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,27 +25,17 @@ export function ColorThemeSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="shadow-custom"
-        >
+        <Button variant="outline" size="icon">
           <Palette className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 shadow-custom-lg">
+      <DropdownMenuContent className="w-40">
         <DropdownMenuLabel>Theme</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-          {themes.map((themeOption) => (
-            <DropdownMenuRadioItem
-              key={themeOption.value}
-              value={themeOption.value}
-            >
-              <div className="flex items-center gap-2">
-                <span>{themeOption.name}</span>
-                {theme === themeOption.value && <Check className="h-4 w-4 ml-auto" />}
-              </div>
+          {themes.map((t) => (
+            <DropdownMenuRadioItem key={t.value} value={t.value}>
+              {t.name}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
@@ -53,4 +43,3 @@ export function ColorThemeSelector() {
     </DropdownMenu>
   )
 }
-

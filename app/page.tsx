@@ -1,89 +1,104 @@
 "use client"
 
-import { useState } from "react"
-import CountdownClock from "@/components/countdown-clock"
-import { DatePicker } from "@/components/date-picker"
-import { motion } from "framer-motion"
-import { Toaster } from "sonner"
-import { ColorThemeSelector } from "@/components/theme-selector"
-import { Button } from "@/components/ui/button"
-import { Globe } from "lucide-react"
-import { useLanguage } from "@/lib/language-context"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { useEffect, useState } from "react"
+import { CountdownSetup } from "@/components/countdown-setup"
+import { CountdownDisplay } from "@/components/countdown-display"
+import { FloatingControls } from "@/components/floating-controls"
+import { Spinner } from "@/components/ui/spinner"
+import { InstallPrompt } from "@/components/install-prompt"
+
+interface CountdownData {
+  category: string
+  title: string
+  date: string
+  time?: string
+  createdAt: string
+}
+
+const STORAGE_KEY = "countdown-data"
+const LEGACY_KEY = "targetDate"
+
+function loadData(): CountdownData | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as CountdownData
+      if (parsed.category && parsed.title && parsed.date && parsed.createdAt) {
+        return parsed
+      }
+    }
+  } catch {
+    // ignore
+  }
+  // Clean up legacy key
+  localStorage.removeItem(LEGACY_KEY)
+  return null
+}
 
 export default function Home() {
-  const [targetDate, setTargetDate] = useState<string>(new Date().toISOString())
-  const { setLanguage } = useLanguage()
+  const [mounted, setMounted] = useState(false)
+  const [data, setData] = useState<CountdownData | null>(null)
+  // When editing, go back to step 2 (date/title) keeping the category
+  const [editMode, setEditMode] = useState(false)
 
-  const handleDateChange = (date: Date) => {
-    setTargetDate(date.toISOString())
+  useEffect(() => {
+    localStorage.removeItem(LEGACY_KEY)
+    const saved = loadData()
+    setData(saved)
+    setMounted(true)
+  }, [])
+
+  function handleSetupComplete(incoming: CountdownData) {
+    // Preserve original createdAt if editing
+    const final: CountdownData = {
+      ...incoming,
+      createdAt: editMode && data ? data.createdAt : incoming.createdAt,
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(final))
+    setData(final)
+    setEditMode(false)
   }
 
-  const isCurrentDate = () => {
-    const today = new Date()
-    const target = new Date(targetDate)
-    return today.toDateString() === target.toDateString()
+  function handleEdit() {
+    setEditMode(true)
+  }
+
+  function handleReset() {
+    localStorage.removeItem(STORAGE_KEY)
+    setData(null)
+    setEditMode(false)
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-between p-4 relative">
-      <div className="absolute top-4 right-4 flex gap-2">
-        <ColorThemeSelector />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="shadow-custom">
-              <Globe className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="shadow-custom-lg">
-            <DropdownMenuItem onClick={() => setLanguage("pt")}>
-              Português
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLanguage("en")}>
-              English
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="max-w-3xl w-full text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8"
-          >
-            <h1 className="text-3xl font-bold mb-4 flex items-center justify-center gap-2 drop-shadow-custom">
-              <span role="img" aria-label="hourglass" className="text-3xl">
-                ✈️
-              </span>
-              Tempo Restante para Viajar
-            </h1>
-            <p className="text-muted-foreground mb-1 drop-shadow-custom-sm">Selecione uma data para sua viagem</p>
-            <div className="max-w-xs mx-auto shadow-custom-lg rounded-lg">
-              <DatePicker onDateChange={handleDateChange} />
-            </div>
-          </motion.div>
-
-          {!isCurrentDate() && <CountdownClock targetDate={targetDate} />}
+    <>
+      <FloatingControls />
+      <InstallPrompt />
+      {!mounted ? (
+        <div className="flex min-h-dvh items-center justify-center">
+          <Spinner size="md" />
         </div>
-      </div>
-      <motion.div
-        className="text-muted-foreground text-sm py-4 drop-shadow-custom-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.7 }}
-        transition={{ delay: 1, duration: 1 }}
-      >
-        <p>Desenvolvido com ❤️ por <a href="https://github.com/carrijoga" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 transition-colors">carrijoga</a></p>
-      </motion.div>
-      <Toaster richColors position="bottom-center" />
-    </div>
+      ) : data && !editMode ? (
+        <CountdownDisplay
+          category={data.category}
+          title={data.title}
+          date={data.date}
+          time={data.time}
+          createdAt={data.createdAt}
+          onEdit={handleEdit}
+          onReset={handleReset}
+        />
+      ) : (
+        <CountdownSetup
+          initialCategory={editMode && data ? data.category : undefined}
+          initialTitle={editMode && data ? data.title : undefined}
+          initialDate={editMode && data ? data.date : undefined}
+          initialTime={editMode && data ? data.time : undefined}
+          onComplete={handleSetupComplete}
+        />
+      )}
+    </>
   )
 }
+
+
 
