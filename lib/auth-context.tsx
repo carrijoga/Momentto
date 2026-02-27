@@ -46,6 +46,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: sessionData } = await supabase.auth.getSession()
       if (sessionData.session?.user) {
         const user = sessionData.session.user
+
+        // After a redirect-based login (magic link / OAuth) the page fully reloads,
+        // so prevUserIdRef is lost. We persist the anonymous ID in sessionStorage
+        // before the redirect and recover it here to still run the migration.
+        const storedAnonId = sessionStorage.getItem("_anon_uid")
+        if (
+          storedAnonId &&
+          storedAnonId !== user.id &&
+          !(user.is_anonymous ?? false)
+        ) {
+          try {
+            await migrateLocalData(storedAnonId, user.id)
+            await migrateAnonymousCountdowns(storedAnonId, user.id)
+          } catch (err) {
+            console.error("Migration error (post-redirect):", err)
+          }
+          sessionStorage.removeItem("_anon_uid")
+        }
+
         prevUserIdRef.current = user.id
         setState({
           status: "authenticated",
@@ -73,6 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const newUser = data.user
+      // Persist the anonymous ID so it survives a future redirect-based login
+      sessionStorage.setItem("_anon_uid", newUser.id)
       prevUserIdRef.current = newUser.id
       setState({ status: "authenticated", userId: newUser.id, isAnonymous: true, email: null })
       // Drain any ops queued while offline
@@ -102,15 +123,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const user = session.user
           const newId = user.id
           const oldId = prevUserIdRef.current
+          // Also check sessionStorage in case prevUserIdRef was reset by a page reload
+          const storedAnonId = sessionStorage.getItem("_anon_uid")
+          const effectiveOldId =
+            oldId && oldId !== newId
+              ? oldId
+              : storedAnonId && storedAnonId !== newId
+                ? storedAnonId
+                : null
 
           // Anonymous → named account transition: migrate data
-          if (oldId && oldId !== newId) {
+          if (effectiveOldId && !(user.is_anonymous ?? false)) {
             try {
-              await migrateLocalData(oldId, newId)
-              await migrateAnonymousCountdowns(oldId, newId)
+              await migrateLocalData(effectiveOldId, newId)
+              await migrateAnonymousCountdowns(effectiveOldId, newId)
             } catch (err) {
               console.error("Migration error:", err)
             }
+            sessionStorage.removeItem("_anon_uid")
           }
 
           prevUserIdRef.current = newId
