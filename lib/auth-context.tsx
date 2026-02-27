@@ -47,10 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (sessionData.session?.user) {
         const user = sessionData.session.user
 
-        // After a redirect-based login (magic link / OAuth) the page fully reloads,
-        // so prevUserIdRef is lost. We persist the anonymous ID in sessionStorage
-        // before the redirect and recover it here to still run the migration.
-        const storedAnonId = sessionStorage.getItem("_anon_uid")
+        // After a redirect-based login (magic link / OAuth) the page fully reloads
+        // or opens in a new tab, so prevUserIdRef is lost. We persist the anonymous
+        // ID in localStorage (shared across tabs) and recover it here to run migration.
+        const storedAnonId = localStorage.getItem("_anon_uid")
         if (
           storedAnonId &&
           storedAnonId !== user.id &&
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           } catch (err) {
             console.error("Migration error (post-redirect):", err)
           }
-          sessionStorage.removeItem("_anon_uid")
+          localStorage.removeItem("_anon_uid")
         }
 
         prevUserIdRef.current = user.id
@@ -92,8 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const newUser = data.user
-      // Persist the anonymous ID so it survives a future redirect-based login
-      sessionStorage.setItem("_anon_uid", newUser.id)
+      // Persist the anonymous ID across tabs so a magic-link new tab can migrate
+      localStorage.setItem("_anon_uid", newUser.id)
       prevUserIdRef.current = newUser.id
       setState({ status: "authenticated", userId: newUser.id, isAnonymous: true, email: null })
       // Drain any ops queued while offline
@@ -109,6 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     const supabase = getSupabaseBrowserClient()
     await supabase.auth.signOut()
+    // Clear any stale anonymous ID so it doesn't interfere after sign-out
+    localStorage.removeItem("_anon_uid")
     // init() will create a fresh anonymous session
     await init()
   }, [init])
@@ -123,8 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const user = session.user
           const newId = user.id
           const oldId = prevUserIdRef.current
-          // Also check sessionStorage in case prevUserIdRef was reset by a page reload
-          const storedAnonId = sessionStorage.getItem("_anon_uid")
+          // Also check localStorage in case prevUserIdRef was reset (page reload / new tab)
+          const storedAnonId = localStorage.getItem("_anon_uid")
           const effectiveOldId =
             oldId && oldId !== newId
               ? oldId
@@ -140,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             } catch (err) {
               console.error("Migration error:", err)
             }
-            sessionStorage.removeItem("_anon_uid")
+            localStorage.removeItem("_anon_uid")
           }
 
           prevUserIdRef.current = newId
