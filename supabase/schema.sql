@@ -16,7 +16,14 @@ create table if not exists public.countdowns (
   expires_at  timestamptz
 );
 
--- 2. push_subscriptions table
+-- 2. user_preferences table
+create table if not exists public.user_preferences (
+  user_id    uuid primary key references auth.users,
+  accent_hue integer not null default 165,
+  updated_at timestamptz not null default now()
+);
+
+-- 3. push_subscriptions table
 create table if not exists public.push_subscriptions (
   id           uuid primary key default gen_random_uuid(),
   user_id      uuid references auth.users unique not null,
@@ -30,6 +37,7 @@ create table if not exists public.push_subscriptions (
 
 alter table public.countdowns        enable row level security;
 alter table public.push_subscriptions enable row level security;
+alter table public.user_preferences   enable row level security;
 
 -- countdowns: owner can do everything
 create policy "countdowns_owner_all"
@@ -40,6 +48,13 @@ create policy "countdowns_owner_all"
 
 -- NOTE: Public share reads are handled server-side with SERVICE_ROLE_KEY.
 -- No public RLS policy needed — avoids exposing all shared countdowns via SDK.
+
+-- user_preferences: owner can do everything
+create policy "user_preferences_owner_all"
+  on public.user_preferences
+  for all
+  using  (user_id = auth.uid())
+  with check (user_id = auth.uid());
 
 -- push_subscriptions: owner can do everything
 create policy "push_subscriptions_owner_all"

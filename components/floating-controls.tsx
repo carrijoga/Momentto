@@ -2,13 +2,15 @@
 
 import { useRef, useState } from "react"
 import { useTheme } from "next-themes"
-import { Globe, Sun, Moon, Monitor, Check, ScrollText, Share2 } from "lucide-react"
+import { Globe, Sun, Moon, Monitor, Check, ScrollText, Share2, UserRound, LogOut } from "lucide-react"
 import Link from "next/link"
 import { SettingsIcon, type SettingsIconHandle } from "@/components/ui/settings"
-import { BellIcon, type BellIconHandle } from "@/components/ui/bell"
+import { BellIcon } from "@/components/ui/bell"
 import { useLanguage } from "@/lib/language-context"
+import { useAccentColor, useAccentColorServerSync } from "@/lib/accent-color-context"
 import { usePushNotifications } from "@/hooks/use-push-notifications"
 import { useActiveCountdown } from "@/lib/active-countdown-context"
+import { useAuth } from "@/lib/auth-context"
 import { ShareModal } from "@/components/share-modal"
 import type { CountdownEntry } from "@/lib/types"
 import {
@@ -27,60 +29,91 @@ const themes = [
 export function FloatingControls({ onShareGenerated }: { onShareGenerated?: (updated: CountdownEntry) => void }) {
   const { theme, setTheme } = useTheme()
   const { language, setLanguage } = useLanguage()
+  const { accentHue, setAccentHue, colors } = useAccentColor()
   const settingsRef = useRef<SettingsIconHandle>(null)
-  const bellRef = useRef<BellIconHandle>(null)
   const { isSupported, subscription, loading, subscribeToPush, unsubscribeFromPush } = usePushNotifications()
   const { activeCountdown, setActiveCountdown } = useActiveCountdown()
+  const { isAnonymous, userEmail, signOut, userId } = useAuth()
   const [shareOpen, setShareOpen] = useState(false)
+
+  // Sync server-saved accent color when user is authenticated
+  useAccentColorServerSync(userId)
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2">
-      {/* Share button — only when viewing a countdown */}
-      {activeCountdown && (
-        <button
-          onClick={() => setShareOpen(true)}
-          className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg transition-all hover:border-primary/50 hover:text-foreground hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label={language === "pt" ? "Compartilhar" : "Share"}
-        >
-          <Share2 size={18} />
-        </button>
-      )}
-      {isSupported && (
-        <button
-          onClick={subscription ? unsubscribeFromPush : subscribeToPush}
-          disabled={loading}
-          onMouseEnter={() => bellRef.current?.startAnimation()}
-          onMouseLeave={() => bellRef.current?.stopAnimation()}
-          className={`flex size-11 items-center justify-center rounded-full border border-border bg-card shadow-lg transition-all hover:border-primary/50 hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 ${
-            subscription
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          aria-label={
-            subscription
-              ? language === "pt" ? "Desativar notificações" : "Disable notifications"
-              : language === "pt" ? "Ativar notificações" : "Enable notifications"
-          }
-        >
-          <BellIcon ref={bellRef} size={18} />
-        </button>
-      )}
       <Popover>
         <PopoverTrigger asChild>
           <button
-            onMouseEnter={() => settingsRef.current?.startAnimation()}
-            onMouseLeave={() => settingsRef.current?.stopAnimation()}
-            className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg transition-all hover:border-primary/50 hover:text-foreground hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Configurações"
+            onMouseEnter={() => {
+              if (isAnonymous) settingsRef.current?.startAnimation()
+            }}
+            onMouseLeave={() => {
+              if (isAnonymous) settingsRef.current?.stopAnimation()
+            }}
+            className={`flex size-11 items-center justify-center rounded-full border bg-card shadow-lg transition-all hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              isAnonymous
+                ? "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                : "border-primary/40 text-primary hover:border-primary"
+            }`}
+            aria-label={language === "pt" ? "Menu" : "Menu"}
           >
-            <SettingsIcon ref={settingsRef} size={18} />
+            {isAnonymous ? (
+              <SettingsIcon ref={settingsRef} size={18} />
+            ) : (
+              <UserRound size={18} />
+            )}
           </button>
         </PopoverTrigger>
         <PopoverContent
           side="top"
           align="end"
-          className="w-52 p-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
+          className="w-56 p-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
         >
+          {/* Account */}
+          {isAnonymous ? (
+            <Link
+              href="/login"
+              className="mb-2 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+            >
+              <UserRound className="size-3.5" />
+              {language === "pt" ? "Entrar para sincronizar" : "Sign in to sync"}
+            </Link>
+          ) : (
+            <>
+              <p className="mb-2 truncate text-xs font-medium text-foreground">{userEmail}</p>
+              <button
+                onClick={signOut}
+                className="mb-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+              >
+                <LogOut className="size-3.5" />
+                {language === "pt" ? "Sair" : "Sign out"}
+              </button>
+            </>
+          )}
+
+          {isSupported && (
+            <>
+              <Separator className="my-2" />
+              <button
+                onClick={subscription ? unsubscribeFromPush : subscribeToPush}
+                disabled={loading}
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground disabled:opacity-50"
+                aria-label={
+                  subscription
+                    ? language === "pt" ? "Desativar notificações" : "Disable notifications"
+                    : language === "pt" ? "Ativar notificações" : "Enable notifications"
+                }
+              >
+                <BellIcon className={subscription ? "text-primary" : ""} size={14} />
+                {subscription
+                  ? language === "pt" ? "Notificações ativas" : "Notifications on"
+                  : language === "pt" ? "Ativar notificações" : "Enable notifications"}
+              </button>
+            </>
+          )}
+
+          <Separator className="my-2.5" />
+
           {/* Language */}
           <div className="mb-2.5">
             <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
@@ -124,6 +157,31 @@ export function FloatingControls({ onShareGenerated }: { onShareGenerated?: (upd
 
           <Separator className="my-2.5" />
 
+          {/* Accent color */}
+          <div className="mb-2.5">
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+              {language === "pt" ? "Cor de destaque" : "Accent color"}
+            </p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {colors.map((color) => (
+                <button
+                  key={color.hue}
+                  title={language === "pt" ? color.label : color.labelEn}
+                  onClick={() => setAccentHue(color.hue, userId)}
+                  className="group relative flex h-7 w-full items-center justify-center rounded-lg transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  style={{ backgroundColor: color.swatch }}
+                  aria-label={language === "pt" ? color.label : color.labelEn}
+                >
+                  {accentHue === color.hue && (
+                    <Check className="size-3 text-white drop-shadow" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Separator className="my-2.5" />
+
           {/* Theme */}
           <div>
             <p className="mb-1.5 text-xs font-medium text-muted-foreground">
@@ -151,6 +209,17 @@ export function FloatingControls({ onShareGenerated }: { onShareGenerated?: (upd
           </div>
         </PopoverContent>
       </Popover>
+
+      {/* Share button — only when viewing a countdown */}
+      {activeCountdown && (
+        <button
+          onClick={() => setShareOpen(true)}
+          className="flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg transition-all hover:border-primary/50 hover:text-foreground hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={language === "pt" ? "Compartilhar" : "Share"}
+        >
+          <Share2 size={18} />
+        </button>
+      )}
 
       {/* Share modal */}
       {shareOpen && activeCountdown && (

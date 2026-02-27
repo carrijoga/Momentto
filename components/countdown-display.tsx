@@ -35,7 +35,7 @@ function calculateTimeLeft(targetDate: string, targetTime?: string): TimeLeft {
   }
 
   const totalMs = diff
-  const totalDays = Math.floor(totalMs / 86400000)
+  const totalDays = Math.ceil(totalMs / 86400000)
 
   // Calculate months properly
   const nowDate = new Date(now)
@@ -96,7 +96,7 @@ function TimeUnit({ value, label, index }: { value: number; label: string; index
       className="flex flex-col items-center animate-in fade-in zoom-in-90 duration-500"
       style={{ animationDelay: `${index * 80}ms` }}
     >
-      <div className="relative flex size-20 items-center justify-center rounded-2xl bg-card border border-border font-mono font-bold tabular-nums tracking-tight text-foreground sm:size-28">
+      <div className="relative flex size-20 items-center justify-center rounded-2xl bg-card border border-border border-primary font-mono font-bold tabular-nums tracking-tight text-foreground sm:size-28 ">
         <span className="text-3xl sm:text-5xl">
           <NumberFlow value={value} format={{ minimumIntegerDigits: 2 }} />
         </span>

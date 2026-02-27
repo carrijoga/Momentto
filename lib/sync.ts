@@ -4,10 +4,27 @@ import {
   removePendingOp,
   upsertCountdownToDB,
   removeCountdownFromDB,
+  getAllCountdownsFromDB,
 } from "@/lib/db"
 import type { CountdownEntry } from "@/lib/types"
 
 let isSyncing = false
+
+/**
+ * Updates the user_id of all local IDB entries that belonged to an anonymous
+ * session so they are correctly attributed to the new named account.
+ */
+export async function migrateLocalData(
+  oldUserId: string,
+  newUserId: string
+): Promise<void> {
+  const all = await getAllCountdownsFromDB()
+  for (const entry of all) {
+    if (!entry.user_id || entry.user_id === oldUserId) {
+      await upsertCountdownToDB({ ...entry, user_id: newUserId })
+    }
+  }
+}
 
 export async function syncPendingOps(userId: string): Promise<void> {
   if (isSyncing) return

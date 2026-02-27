@@ -13,7 +13,7 @@ export default async function SharedCountdownPage({ params }: Props) {
 
   const { data, error } = await supabase
     .from("countdowns")
-    .select("*")
+    .select("id, share_id, category, title, date, time, created_at, expires_at")
     .eq("share_id", shareId)
     .single()
 
@@ -22,7 +22,16 @@ export default async function SharedCountdownPage({ params }: Props) {
     return <ExpiredScreen />
   }
 
-  const entry = data as CountdownEntry
+  const entry: CountdownEntry = {
+    id: data.id,
+    share_id: data.share_id,
+    category: data.category,
+    title: data.title,
+    date: data.date,
+    time: data.time ?? null,
+    created_at: data.created_at,
+    expires_at: data.expires_at ?? null,
+  }
 
   // Lazy expiry check
   if (entry.expires_at && new Date(entry.expires_at) < new Date()) {

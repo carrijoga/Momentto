@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Cake,
   Baby,
@@ -10,7 +10,6 @@ import {
   Star,
   Trash2,
   Share2,
-  ArrowRight,
   Plus,
 } from "lucide-react"
 import { AirplaneIcon } from "@/components/ui/airplane"
@@ -75,11 +74,31 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
   const { language } = useLanguage()
   const [shareTarget, setShareTarget] = useState<CountdownEntry | null>(null)
   const [local, setLocal] = useState<CountdownEntry[]>(countdowns)
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
+  // Tracks IDs removed locally so the parent-sync effect never re-adds them
+  const removedRef = useRef<Set<string>>(new Set())
 
-  // Sync when parent array changes (new entries, deletions, or external updates)
+  // Sync when parent array changes — skip any locally removed items
   useEffect(() => {
-    setLocal(countdowns)
+    setLocal(countdowns.filter((c) => !removedRef.current.has(c.id)))
   }, [countdowns])
+
+  function handleDelete(id: string) {
+    // Kick off exit animation
+    setDeletingIds((prev) => new Set(prev).add(id))
+    setTimeout(() => {
+      // Remove from local state immediately after animation finishes
+      removedRef.current.add(id)
+      setLocal((prev) => prev.filter((c) => c.id !== id))
+      setDeletingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+      // Notify parent (may trigger async DB delete)
+      onDelete(id)
+    }, 320)
+  }
 
   async function handleShare(entry: CountdownEntry) {
     // If no share_id yet, generate one before opening modal
@@ -103,83 +122,125 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
       language === "pt"
         ? n === 0 ? "Hoje!" : n === 1 ? "1 dia" : `${n} dias`
         : n === 0 ? "Today!" : n === 1 ? "1 day" : `${n} days`,
-    open:   language === "pt" ? "Abrir"    : "Open",
     share:  language === "pt" ? "Compartilhar" : "Share",
     delete: language === "pt" ? "Excluir"  : "Delete",
   }
 
   return (
-    <div className="min-h-dvh px-4 pb-28 pt-6 sm:p-6">
+    <div className="min-h-dvh px-4 pb-28 pt-6 sm:px-6 sm:pt-8">
       {/* Header */}
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-5xl">
         <h1 className="mb-8 text-2xl font-bold tracking-tight text-foreground animate-in fade-in slide-in-from-top-4 duration-500">
           {labels.title}
         </h1>
 
-        {/* Grid */}
-        <div className="flex flex-col gap-3">
+        {/* Gallery Grid */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {(local.length > 0 ? local : countdowns).map((entry, i) => {
             const days = getDaysRemaining(entry.date)
             const catLabel = (categoryLabels[entry.category] ?? categoryLabels.outro)[language]
             const isFinished = days === 0
 
+            const isDeleting = deletingIds.has(entry.id)
+
             return (
               <div
                 key={entry.id}
-                className="group relative flex flex-col rounded-2xl border border-border bg-card transition-all duration-200 hover:border-primary/40 hover:shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-500"
-                style={{ animationDelay: `${i * 60}ms` }}
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 ease-in-out hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 animate-in fade-in zoom-in-95 duration-500 cursor-pointer"
+                style={{
+                  animationDelay: `${i * 60}ms`,
+                  opacity: isDeleting ? 0 : undefined,
+                  transform: isDeleting ? "scale(0.88)" : undefined,
+                  pointerEvents: isDeleting ? "none" : undefined,
+                }}
+                onClick={() => !isDeleting && onOpen(entry)}
               >
-                {/* Main row */}
-                <div className="flex items-center gap-3 p-4">
-                  {/* Category icon */}
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <CategoryIcon id={entry.category} className="size-4" />
+                {/* Top accent bar */}
+                <div
+                  className={`h-1 w-full ${
+                    isFinished
+                      ? "bg-primary"
+                      : days <= 7
+                      ? "bg-amber-500"
+                      : "bg-primary/30"
+                  }`}
+                />
+
+                {/* Card body */}
+                <div className="flex flex-1 flex-col p-3.5 sm:p-4">
+                  {/* Category + actions row */}
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-primary">
+                      <CategoryIcon id={entry.category} className="size-3" />
+                      <span className="text-[10px] font-medium uppercase tracking-wider leading-none">
+                        {catLabel}
+                      </span>
+                    </div>
+
+                    {/* Hover actions */}
+                    <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleShare(entry) }}
+                        className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                        aria-label={labels.share}
+                      >
+                        <Share2 className="size-3" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDelete(entry.id) }}
+                        className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        aria-label={labels.delete}
+                      >
+                        <Trash2 className="size-3" />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Info */}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-foreground leading-snug">{entry.title}</p>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {catLabel} · {formatDate(entry.date, language)}
+                  {/* Days counter — hero element */}
+                  <div className="mb-3 flex flex-col items-center py-2">
+                    <span
+                      className={`text-4xl font-bold tabular-nums tracking-tight sm:text-5xl ${
+                        isFinished
+                          ? "text-primary"
+                          : days <= 7
+                          ? "text-amber-600 dark:text-amber-400"
+                          : "text-foreground"
+                      }`}
+                    >
+                      {isFinished ? "🎉" : days}
+                    </span>
+                    <span className="mt-0.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                      {isFinished
+                        ? (language === "pt" ? "Chegou!" : "It's here!")
+                        : labels.days(days).replace(/^\d+\s*/, "")}
+                    </span>
+                  </div>
+
+                  {/* Title + date */}
+                  <div className="mt-auto text-center">
+                    <p className="truncate text-sm font-semibold text-foreground leading-snug">
+                      {entry.title}
                     </p>
-                  </div>
-
-                  {/* Days badge */}
-                  <div
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                      isFinished
-                        ? "bg-primary/15 text-primary"
-                        : days <= 7
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                        : "bg-secondary text-secondary-foreground"
-                    }`}
-                  >
-                    {labels.days(days)}
+                    <p className="mt-1 truncate text-[11px] text-muted-foreground">
+                      {formatDate(entry.date, language)}
+                    </p>
                   </div>
                 </div>
 
-                {/* Actions row — always visible on mobile, show on hover on desktop */}
-                <div className="flex items-center gap-1 border-t border-border/60 px-3 py-2 sm:border-0 sm:px-3 sm:py-1 sm:opacity-0 sm:transition-opacity sm:duration-200 sm:group-hover:opacity-100">
+                {/* Mobile actions row */}
+                <div className="flex items-center border-t border-border/60 sm:hidden">
                   <button
-                    onClick={() => handleShare(entry)}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:flex-none sm:size-8 sm:p-0"
+                    onClick={(e) => { e.stopPropagation(); handleShare(entry) }}
+                    className="flex flex-1 items-center justify-center gap-1 py-2.5 text-[11px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                   >
-                    <Share2 className="size-3.5 shrink-0" />
-                    <span className="sm:hidden">{labels.share}</span>
+                    <Share2 className="size-3" />
                   </button>
+                  <div className="h-4 w-px bg-border/60" />
                   <button
-                    onClick={() => onDelete(entry.id)}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive sm:flex-none sm:size-8 sm:p-0"
+                    onClick={(e) => { e.stopPropagation(); handleDelete(entry.id) }}
+                    className="flex flex-1 items-center justify-center gap-1 py-2.5 text-[11px] text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                   >
-                    <Trash2 className="size-3.5 shrink-0" />
-                    <span className="sm:hidden">{labels.delete}</span>
-                  </button>
-                  <button
-                    onClick={() => onOpen(entry)}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10 sm:flex-none sm:size-8 sm:p-0"
-                  >
-                    <ArrowRight className="size-3.5 shrink-0" />
-                    <span className="sm:hidden">{labels.open}</span>
+                    <Trash2 className="size-3" />
                   </button>
                 </div>
               </div>

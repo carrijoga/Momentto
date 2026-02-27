@@ -4,31 +4,39 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   useCallback,
   type ReactNode,
 } from "react"
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
-import { syncPendingOps } from "@/lib/sync"
+import { syncPendingOps, migrateLocalData } from "@/lib/sync"
+import { migrateAnonymousCountdowns } from "@/app/actions"
 
 type AuthState =
   | { status: "loading" }
-  | { status: "authenticated"; userId: string }
+  | { status: "authenticated"; userId: string; isAnonymous: boolean; email: string | null }
   | { status: "local" }   // offline, no session yet
   | { status: "error"; message: string }
 
 type AuthContextType = {
   userId: string | null
+  userEmail: string | null
   loading: boolean
   isLocalMode: boolean
+  isAnonymous: boolean
   error: string | null
   retry: () => void
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({ status: "loading" })
+  // Captures the anonymous userId before a named sign-in completes
+  const prevUserIdRef = useRef<string | null>(null)
 
   const init = useCallback(async () => {
     setState({ status: "loading" })
@@ -37,9 +45,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const { data: sessionData } = await supabase.auth.getSession()
       if (sessionData.session?.user) {
-        const existingUserId = sessionData.session.user.id
-        setState({ status: "authenticated", userId: existingUserId })
-        syncPendingOps(existingUserId).catch(console.error)
+        const user = sessionData.session.user
+        prevUserIdRef.current = user.id
+        setState({
+          status: "authenticated",
+          userId: user.id,
+          isAnonymous: user.is_anonymous ?? false,
+          email: user.email ?? null,
+        })
+        syncPendingOps(user.id).catch(console.error)
         return
       }
 
@@ -58,10 +72,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      const newUserId = data.user.id
-      setState({ status: "authenticated", userId: newUserId })
+      const newUser = data.user
+      prevUserIdRef.current = newUser.id
+      setState({ status: "authenticated", userId: newUser.id, isAnonymous: true, email: null })
       // Drain any ops queued while offline
-      syncPendingOps(newUserId).catch(console.error)
+      syncPendingOps(newUser.id).catch(console.error)
     } catch (e) {
       setState({
         status: "error",
@@ -70,20 +85,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const signOut = useCallback(async () => {
+    const supabase = getSupabaseBrowserClient()
+    await supabase.auth.signOut()
+    // init() will create a fresh anonymous session
+    await init()
+  }, [init])
+
   useEffect(() => {
     init()
 
     const supabase = getSupabaseBrowserClient()
-    const { data: listener } = supabase.auth.onAuthStateChange((event: string, session: { user?: { id: string } } | null) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        const uid = session.user.id
-        setState({ status: "authenticated", userId: uid })
-        syncPendingOps(uid).catch(console.error)
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (event: AuthChangeEvent, session: Session | null) => {
+        if (event === "SIGNED_IN" && session?.user) {
+          const user = session.user
+          const newId = user.id
+          const oldId = prevUserIdRef.current
+
+          // Anonymous → named account transition: migrate data
+          if (oldId && oldId !== newId) {
+            try {
+              await migrateLocalData(oldId, newId)
+              await migrateAnonymousCountdowns(oldId, newId)
+            } catch (err) {
+              console.error("Migration error:", err)
+            }
+          }
+
+          prevUserIdRef.current = newId
+          setState({
+            status: "authenticated",
+            userId: newId,
+            isAnonymous: user.is_anonymous ?? false,
+            email: user.email ?? null,
+          })
+          syncPendingOps(newId).catch(console.error)
+        }
+        if (event === "SIGNED_OUT") {
+          // Will be handled by the signOut() helper calling init()
+        }
       }
-      if (event === "SIGNED_OUT") {
-        setState({ status: "error", message: "Sessão encerrada." })
-      }
-    })
+    )
 
     // When connectivity returns while in local mode, retry auth
     const handleOnline = () => {
@@ -104,10 +147,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextType = {
     userId: state.status === "authenticated" ? state.userId : null,
+    userEmail: state.status === "authenticated" ? state.email : null,
     loading: state.status === "loading",
     isLocalMode: state.status === "local",
+    isAnonymous: state.status === "authenticated" ? state.isAnonymous : true,
     error: state.status === "error" ? state.message : null,
     retry: init,
+    signOut,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

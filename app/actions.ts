@@ -1,7 +1,7 @@
 "use server"
 
 import webpush from "web-push"
-import { getSupabaseServerClient } from "@/lib/supabase/server"
+import { getSupabaseServerClient, getSupabaseServiceClient } from "@/lib/supabase/server"
 
 function initWebPush(): boolean {
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
@@ -16,6 +16,37 @@ function initWebPush(): boolean {
 
   webpush.setVapidDetails("mailto:mytrip@app.com", publicKey, privateKey)
   return true
+}
+
+export async function migrateAnonymousCountdowns(
+  oldUserId: string,
+  newUserId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await getSupabaseServiceClient()
+
+    const { error: countdownsError } = await supabase
+      .from("countdowns")
+      .update({ user_id: newUserId })
+      .eq("user_id", oldUserId)
+
+    if (countdownsError) return { success: false, error: countdownsError.message }
+
+    const { error: pushError } = await supabase
+      .from("push_subscriptions")
+      .update({ user_id: newUserId })
+      .eq("user_id", oldUserId)
+
+    // push_subscriptions has a UNIQUE on user_id — if new user already has one, ignore conflict
+    if (pushError && pushError.code !== "23505") {
+      return { success: false, error: pushError.message }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error("migrateAnonymousCountdowns error:", error)
+    return { success: false, error: String(error) }
+  }
 }
 
 export async function subscribeUser(sub: PushSubscription) {
