@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import { AnimatePresence, motion } from "motion/react"
 import { CountdownSetup } from "@/components/countdown-setup"
 import { CountdownDisplay } from "@/components/countdown-display"
 import { HomeScreen } from "@/components/home-screen"
@@ -23,6 +24,13 @@ import type { CountdownEntry } from "@/lib/types"
 type View = "list" | "setup" | "display"
 
 const LEGACY_KEY = "countdown-data"
+
+const viewTransition = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
+}
 
 export default function Home() {
   const { userId, loading: authLoading, error: authError, isLocalMode, retry } = useAuth()
@@ -78,7 +86,7 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
-    // Migrate localStorage cache → IDB (one-time)
+    // Migrate localStorage cache -> IDB (one-time)
     migrateLegacyCache().then(async () => {
       const cached = await getAllCountdownsFromDB()
       if (cached.length > 0) setCountdowns(cached)
@@ -203,43 +211,49 @@ export default function Home() {
 
   return (
     <>
-      <FloatingControls onShareGenerated={handleShareGenerated} />
+      <FloatingControls currentView={view} onShareGenerated={handleShareGenerated} />
       <InstallPrompt />
 
-      {view === "list" && (
-        countdowns.length === 0 ? (
-          <HomeScreen onStart={() => openSetup()} />
-        ) : (
-          <CountdownList
-            countdowns={countdowns}
-            onOpen={openDisplay}
-            onNew={() => openSetup()}
-            onDelete={handleDelete}
-          />
-        )
-      )}
+      <AnimatePresence mode="wait">
+        {view === "list" && (
+          <motion.div key="list" {...viewTransition}>
+            {countdowns.length === 0 ? (
+              <HomeScreen onStart={() => openSetup()} />
+            ) : (
+              <CountdownList
+                countdowns={countdowns}
+                onOpen={openDisplay}
+                onNew={() => openSetup()}
+                onDelete={handleDelete}
+              />
+            )}
+          </motion.div>
+        )}
 
-      {view === "setup" && (
-        <CountdownSetup
-          initialCategory={editingEntry?.category}
-          initialTitle={editingEntry?.title}
-          initialDate={editingEntry?.date}
-          initialTime={editingEntry?.time ?? undefined}
-          onComplete={handleSetupComplete}
-          onBack={goToList}
-        />
-      )}
+        {view === "setup" && (
+          <motion.div key="setup" {...viewTransition}>
+            <CountdownSetup
+              initialCategory={editingEntry?.category}
+              initialTitle={editingEntry?.title}
+              initialDate={editingEntry?.date}
+              initialTime={editingEntry?.time ?? undefined}
+              onComplete={handleSetupComplete}
+              onBack={goToList}
+            />
+          </motion.div>
+        )}
 
-      {view === "display" && displayEntry && (
-        <CountdownDisplay
-          key={displayEntry.id}
-          entry={displayEntry}
-          onEdit={() => openSetup(displayEntry)}
-          onReset={goToList}
-        />
-      )}
+        {view === "display" && displayEntry && (
+          <motion.div key="display" {...viewTransition}>
+            <CountdownDisplay
+              key={displayEntry.id}
+              entry={displayEntry}
+              onEdit={() => openSetup(displayEntry)}
+              onReset={goToList}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
-
-
