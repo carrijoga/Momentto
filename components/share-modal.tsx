@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "motion/react"
 import QRCode from "react-qr-code"
 import { Copy, Check, Share2, Loader2, X, Link } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
@@ -62,7 +63,6 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Fallback for older browsers
       const ta = document.createElement("textarea")
       ta.value = shareUrl
       document.body.appendChild(ta)
@@ -85,17 +85,27 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
         url: shareUrl,
       })
     } catch {
-      // User cancelled or not supported — ignore
+      // User cancelled or not supported
     }
   }
 
   return (
     /* Backdrop */
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-sm rounded-t-3xl border border-border bg-background p-6 shadow-xl animate-in slide-in-from-bottom-4 duration-300 sm:rounded-3xl">
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+        className="w-full max-w-sm rounded-t-3xl border border-border bg-background p-6 shadow-xl sm:rounded-3xl"
+      >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-base font-semibold text-foreground">{labels.title}</h2>
@@ -107,11 +117,13 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
           </button>
         </div>
 
-        {/* No share_id yet — show generate button */}
+        {/* No share_id yet */}
         {!current.share_id && (
           <div className="flex flex-col items-center gap-4 py-4">
             <p className="text-center text-sm text-muted-foreground">{labels.publicView}</p>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={handleGenerate}
               disabled={loading}
               className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/25 transition hover:opacity-90 disabled:opacity-60"
@@ -127,19 +139,22 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
                   {labels.generate}
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         )}
 
-        {/* Has share_id — show QR + URL */}
+        {/* Has share_id */}
         {current.share_id && shareUrl && (
-          <div className="flex flex-col items-center gap-5">
-            {/* QR Code */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-col items-center gap-5"
+          >
             <div className="rounded-2xl bg-white p-4 shadow-sm">
               <QRCode value={shareUrl} size={160} />
             </div>
 
-            {/* URL row */}
             <div className="flex w-full items-center gap-2 rounded-xl border border-border bg-secondary/50 px-3 py-2">
               <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground font-mono">
                 {shareUrl}
@@ -157,7 +172,6 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
               </button>
             </div>
 
-            {/* Action buttons */}
             <div className="flex w-full gap-2">
               <button
                 onClick={handleCopy}
@@ -177,11 +191,10 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
               )}
             </div>
 
-            {/* Expiry note */}
             <p className="text-center text-xs text-muted-foreground/70">{labels.expiry}</p>
-          </div>
+          </motion.div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

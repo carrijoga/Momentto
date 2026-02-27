@@ -1,6 +1,7 @@
-﻿"use client"
+"use client"
 
 import { useState, useRef } from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { format } from "date-fns"
 import { ptBR, enUS } from "date-fns/locale"
@@ -111,6 +112,21 @@ const categoryPlaceholders: Record<string, { pt: string; en: string }> = {
 const HOURS   = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))
 const MINUTES = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, "0"))
 
+const stepVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 40 : -40,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -40 : 40,
+    opacity: 0,
+  }),
+}
+
 export function CountdownSetup({
   onComplete,
   onBack,
@@ -123,6 +139,7 @@ export function CountdownSetup({
   const categories = language === "pt" ? categoriesPt : categoriesEn
 
   const [step, setStep]                       = useState<1 | 2>(initialCategory ? 2 : 1)
+  const [direction, setDirection]             = useState(1) // 1 = forward, -1 = backward
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory ?? null)
   const [title, setTitle]                     = useState(initialTitle)
   const [date, setDate]                       = useState<Date | undefined>(
@@ -184,245 +201,315 @@ export function CountdownSetup({
       <div className="w-full max-w-lg">
         {/* Back to home button */}
         {onBack && (
-          <button
+          <motion.button
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
             onClick={onBack}
-            className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground animate-in fade-in duration-300"
+            className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <House className="size-4" />
             <span>{labels.home}</span>
-          </button>
+          </motion.button>
         )}
 
         {/* Header */}
-        <div className="mb-10 text-center animate-in fade-in slide-in-from-top-4 duration-300">
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="mb-10 text-center"
+        >
           <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">
             {labels.title}
           </h1>
           <p className="text-muted-foreground">
             {step === 1 ? labels.step1Sub : labels.step2Sub}
           </p>
-        </div>
+        </motion.div>
 
         {/* Step indicator */}
-        <div className="mb-8 flex items-center justify-center gap-2 animate-in fade-in duration-300">
-          <div className="h-1.5 w-12 rounded-full bg-primary transition-colors duration-300" />
-          <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+          className="mb-8 flex items-center justify-center gap-2"
+        >
+          <motion.div
+            layout
+            className="h-1.5 w-12 rounded-full bg-primary"
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          />
+          <motion.div
+            layout
             className={cn(
-              "h-1.5 w-12 rounded-full transition-colors duration-300",
+              "h-1.5 w-12 rounded-full",
               step === 2 ? "bg-primary" : "bg-secondary"
             )}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
           />
-        </div>
+        </motion.div>
 
-        {step === 1 ? (
-          /* Step 1: Category Selection */
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-              {categories.map((cat, i) => {
-                const isSelected = selectedCategory === cat.id
-                const iconRef = getIconRef(cat.id)
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      setSelectedCategory(cat.id)
-                      const ref = iconRef.current as AirplaneIconHandle | null
-                      ref?.startAnimation?.()
-                      setTimeout(() => setStep(2), 150)
-                    }}
-                    onMouseEnter={() => {
-                      const ref = iconRef.current as AirplaneIconHandle | null
-                      ref?.startAnimation?.()
-                    }}
-                    onMouseLeave={() => {
-                      const ref = iconRef.current as AirplaneIconHandle | null
-                      ref?.stopAnimation?.()
-                    }}
-                    className={cn(
-                      "group flex flex-col items-center gap-2.5 rounded-xl border p-4",
-                      "transition-all duration-150 hover:scale-[1.04] active:scale-[0.97]",
-                      "animate-in fade-in zoom-in-95 duration-200",
-                      isSelected
-                        ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/20"
-                        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-sm"
-                    )}
-                    style={{ animationDelay: `${i * 20}ms` }}
-                  >
-                    {getCategoryIcon(cat.id, iconRef, 24, isSelected)}
-                    <span className="text-xs font-medium">{cat.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-          </div>
-        ) : (
-          /* Step 2: Title & Date */
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-            {/* Selected category badge */}
-            <div className="mb-6 flex items-center justify-center">
-              {selectedCat && (
-                <div className="flex items-center gap-3 rounded-full bg-primary/10 px-5 py-2 text-primary animate-in zoom-in-95 duration-200">
-                  {getCategoryIcon(selectedCat.id, getIconRef(selectedCat.id), 20, true)}
-                  <span className="text-sm font-medium">{selectedCat.label}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-4">
-              {/* Title input */}
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
-                <label htmlFor="event-title" className="mb-2 block text-sm font-medium text-foreground">
-                  {labels.eventName} *
-                </label>
-                <input
-                  id="event-title"
-                  type="text"
-                  placeholder={placeholder}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
-                />
-              </div>
-
-              {/* Date picker */}
-              <div
-                className="animate-in fade-in slide-in-from-bottom-2 duration-200"
-                style={{ animationDelay: "60ms" }}
-              >
-                <label className="mb-2 block text-sm font-medium text-foreground">
-                  {labels.when} *
-                </label>
-                {isMobile ? (
-                  <div className="relative">
-                    <CalendarIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                    <input
-                      type="date"
-                      min={format(today, "yyyy-MM-dd")}
-                      value={date ? format(date, "yyyy-MM-dd") : ""}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setDate(new Date(e.target.value + "T00:00:00"))
-                        } else {
-                          setDate(undefined)
-                        }
+        {/* Step content with AnimatePresence */}
+        <AnimatePresence mode="wait" custom={direction}>
+          {step === 1 ? (
+            <motion.div
+              key="step1"
+              custom={direction}
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            >
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                {categories.map((cat, i) => {
+                  const isSelected = selectedCategory === cat.id
+                  const iconRef = getIconRef(cat.id)
+                  return (
+                    <motion.button
+                      key={cat.id}
+                      initial={{ opacity: 0, scale: 0.9, y: 8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                        delay: i * 0.03,
+                      }}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        setSelectedCategory(cat.id)
+                        const ref = iconRef.current as AirplaneIconHandle | null
+                        ref?.startAnimation?.()
+                        setDirection(1)
+                        setTimeout(() => setStep(2), 150)
+                      }}
+                      onMouseEnter={() => {
+                        const ref = iconRef.current as AirplaneIconHandle | null
+                        ref?.startAnimation?.()
+                      }}
+                      onMouseLeave={() => {
+                        const ref = iconRef.current as AirplaneIconHandle | null
+                        ref?.stopAnimation?.()
                       }}
                       className={cn(
-                        "w-full rounded-xl border border-border bg-card pl-10 pr-4 py-3 text-sm transition-colors",
-                        "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
-                        date ? "text-foreground" : "text-muted-foreground"
+                        "group flex flex-col items-center gap-2.5 rounded-xl border p-4 transition-colors",
+                        isSelected
+                          ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/20"
+                          : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-sm"
                       )}
-                    />
-                  </div>
-                ) : (
-                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        className={cn(
-                          "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-left",
-                          "flex items-center gap-2 transition-colors",
-                          date ? "text-foreground" : "text-muted-foreground",
-                          "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
-                          "hover:border-primary/50"
-                        )}
-                      >
-                        <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
-                        {date ? format(date, "dd/MM/yyyy") : labels.pickDate}
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className="w-auto p-0"
-                      align="start"
-                      side="bottom"
-                      avoidCollisions={false}
-                      sideOffset={4}
                     >
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(d) => {
-                          setDate(d)
-                          setCalendarOpen(false)
-                        }}
-                        disabled={(d) => d < today}
-                        locale={language === "pt" ? ptBR : enUS}
-                        fixedWeeks
-                        initialFocus
-                        className="[--cell-size:--spacing(7)] p-2 text-sm"
-                      />
-                    </PopoverContent>
-                  </Popover>
+                      {getCategoryIcon(cat.id, iconRef, 24, isSelected)}
+                      <span className="text-xs font-medium">{cat.label}</span>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="step2"
+              custom={direction}
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            >
+              {/* Selected category badge */}
+              <div className="mb-6 flex items-center justify-center">
+                {selectedCat && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="flex items-center gap-3 rounded-full bg-primary/10 px-5 py-2 text-primary"
+                  >
+                    {getCategoryIcon(selectedCat.id, getIconRef(selectedCat.id), 20, true)}
+                    <span className="text-sm font-medium">{selectedCat.label}</span>
+                  </motion.div>
                 )}
               </div>
 
-              {/* Optional time picker */}
-              <div
-                className="animate-in fade-in slide-in-from-bottom-2 duration-200"
-                style={{ animationDelay: "120ms" }}
+              <div className="flex flex-col gap-4">
+                {/* Title input */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30, delay: 0.05 }}
+                >
+                  <label htmlFor="event-title" className="mb-2 block text-sm font-medium text-foreground">
+                    {labels.eventName} *
+                  </label>
+                  <input
+                    id="event-title"
+                    type="text"
+                    placeholder={placeholder}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors"
+                  />
+                </motion.div>
+
+                {/* Date picker */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30, delay: 0.1 }}
+                >
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    {labels.when} *
+                  </label>
+                  {isMobile ? (
+                    <div className="relative">
+                      <CalendarIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                      <input
+                        type="date"
+                        min={format(today, "yyyy-MM-dd")}
+                        value={date ? format(date, "yyyy-MM-dd") : ""}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setDate(new Date(e.target.value + "T00:00:00"))
+                          } else {
+                            setDate(undefined)
+                          }
+                        }}
+                        className={cn(
+                          "w-full rounded-xl border border-border bg-card pl-10 pr-4 py-3 text-sm transition-colors",
+                          "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
+                          date ? "text-foreground" : "text-muted-foreground"
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <button
+                          className={cn(
+                            "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-left",
+                            "flex items-center gap-2 transition-colors",
+                            date ? "text-foreground" : "text-muted-foreground",
+                            "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
+                            "hover:border-primary/50"
+                          )}
+                        >
+                          <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
+                          {date ? format(date, "dd/MM/yyyy") : labels.pickDate}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto p-0"
+                        align="start"
+                        side="bottom"
+                        avoidCollisions={false}
+                        sideOffset={4}
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={date}
+                          onSelect={(d) => {
+                            setDate(d)
+                            setCalendarOpen(false)
+                          }}
+                          disabled={(d) => d < today}
+                          locale={language === "pt" ? ptBR : enUS}
+                          fixedWeeks
+                          initialFocus
+                          className="[--cell-size:--spacing(7)] p-2 text-sm"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </motion.div>
+
+                {/* Optional time picker */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 30, delay: 0.15 }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setTimeEnabled((v) => !v)}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all duration-150",
+                      timeEnabled
+                        ? "border-primary/60 bg-primary/5 text-primary"
+                        : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    )}
+                  >
+                    <Clock className="size-4 shrink-0" />
+                    <span>{labels.addTime}</span>
+                    <span className="ml-auto text-xs opacity-60">{timeEnabled ? "+" : "+"}</span>
+                  </button>
+
+                  <AnimatePresence>
+                    {timeEnabled && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-2 flex items-center gap-2">
+                          <label className="text-xs text-muted-foreground shrink-0 w-14">{labels.at}:</label>
+                          <select
+                            value={hour}
+                            onChange={(e) => setHour(e.target.value)}
+                            className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          >
+                            {HOURS.map((h) => <option key={h} value={h}>{h}h</option>)}
+                          </select>
+                          <span className="text-muted-foreground font-bold">:</span>
+                          <select
+                            value={minute}
+                            onChange={(e) => setMinute(e.target.value)}
+                            className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                          >
+                            {MINUTES.map((m) => <option key={m} value={m}>{m}min</option>)}
+                          </select>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30, delay: 0.2 }}
+                className="mt-8 flex gap-3"
               >
-                <button
-                  type="button"
-                  onClick={() => setTimeEnabled((v) => !v)}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => { setDirection(-1); setStep(1) }}
+                  className="flex-1 rounded-xl border border-border bg-card py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+                >
+                  {labels.back}
+                </motion.button>
+                <motion.button
+                  whileHover={title.trim() && date ? { scale: 1.02 } : undefined}
+                  whileTap={title.trim() && date ? { scale: 0.98 } : undefined}
+                  onClick={handleSubmit}
+                  disabled={!title.trim() || !date}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-xl border px-4 py-3 text-sm transition-all duration-150",
-                    timeEnabled
-                      ? "border-primary/60 bg-primary/5 text-primary"
-                      : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    "flex-[2] rounded-xl py-3.5 text-sm font-semibold transition-all",
+                    title.trim() && date
+                      ? "bg-primary text-primary-foreground hover:opacity-90"
+                      : "cursor-not-allowed bg-secondary text-muted-foreground"
                   )}
                 >
-                  <Clock className="size-4 shrink-0" />
-                  <span>{labels.addTime}</span>
-                  <span className="ml-auto text-xs opacity-60">{timeEnabled ? "✓" : "+"}</span>
-                </button>
-
-                {timeEnabled && (
-                  <div className="mt-2 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                    <label className="text-xs text-muted-foreground shrink-0 w-14">{labels.at}:</label>
-                    <select
-                      value={hour}
-                      onChange={(e) => setHour(e.target.value)}
-                      className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    >
-                      {HOURS.map((h) => <option key={h} value={h}>{h}h</option>)}
-                    </select>
-                    <span className="text-muted-foreground font-bold">:</span>
-                    <select
-                      value={minute}
-                      onChange={(e) => setMinute(e.target.value)}
-                      className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    >
-                      {MINUTES.map((m) => <option key={m} value={m}>{m}min</option>)}
-                    </select>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div
-              className="mt-8 flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200"
-              style={{ animationDelay: "180ms" }}
-            >
-              <button
-                onClick={() => setStep(1)}
-                className="flex-1 rounded-xl border border-border bg-card py-3.5 text-sm font-semibold text-foreground transition-all duration-150 hover:bg-secondary active:scale-[0.98]"
-              >
-                {labels.back}
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!title.trim() || !date}
-                className={cn(
-                  "flex-[2] rounded-xl py-3.5 text-sm font-semibold transition-all duration-150",
-                  title.trim() && date
-                    ? "bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98]"
-                    : "cursor-not-allowed bg-secondary text-muted-foreground"
-                )}
-              >
-                {labels.start}
-              </button>
-            </div>
-          </div>
-        )}
+                  {labels.start}
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )

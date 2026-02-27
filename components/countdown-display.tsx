@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import { motion } from "motion/react"
 import pkg from "@/package.json"
 import NumberFlow from "@number-flow/react"
 import Confetti from "react-confetti-boom"
@@ -37,7 +38,6 @@ function calculateTimeLeft(targetDate: string, targetTime?: string): TimeLeft {
   const totalMs = diff
   const totalDays = Math.ceil(totalMs / 86400000)
 
-  // Calculate months properly
   const nowDate = new Date(now)
   let months = 0
   const tempDate = new Date(nowDate)
@@ -92,9 +92,16 @@ function CategoryIcon({ id, className }: { id: string; className?: string }) {
 
 function TimeUnit({ value, label, index }: { value: number; label: string; index: number }) {
   return (
-    <div
-      className="flex flex-col items-center animate-in fade-in zoom-in-90 duration-500"
-      style={{ animationDelay: `${index * 80}ms` }}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.85, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 350,
+        damping: 25,
+        delay: index * 0.08,
+      }}
+      className="flex flex-col items-center"
     >
       <div className="relative flex size-20 items-center justify-center rounded-2xl bg-card border border-border border-primary font-mono font-bold tabular-nums tracking-tight text-foreground sm:size-28 ">
         <span className="text-3xl sm:text-5xl">
@@ -104,7 +111,7 @@ function TimeUnit({ value, label, index }: { value: number; label: string; index
       <span className="mt-2.5 text-xs font-medium uppercase tracking-widest text-muted-foreground sm:text-sm">
         {label}
       </span>
-    </div>
+    </motion.div>
   )
 }
 
@@ -163,11 +170,11 @@ export function CountdownDisplay({
         notificationSentRef.current = true
         sendNotification(
           title,
-          language === "pt" ? "O grande dia chegou! 🎉" : "The big day is here! 🎉"
+          language === "pt" ? "O grande dia chegou!" : "The big day is here!"
         ).catch(console.error)
       }
     }
-  }, [date, time, title, language])
+  }, [date, time, title, language, isPublic])
 
   useEffect(() => {
     setMounted(true)
@@ -194,7 +201,6 @@ export function CountdownDisplay({
 
   const catLabel = (categoryLabels[category] ?? categoryLabels.outro)[language]
 
-  // Progress bar: elapsed fraction from createdAt to target date (fills as date approaches)
   const progressPercent = (() => {
     const created = new Date(createdAt).getTime()
     const target = new Date(date + "T" + (time ? time + ":00" : "23:59:59")).getTime()
@@ -229,7 +235,12 @@ export function CountdownDisplay({
 
       <div className="w-full max-w-3xl">
         {/* Top bar */}
-        <div className="mb-12 flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-500">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="mb-12 flex items-center justify-between"
+        >
           <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-primary">
             <CategoryIcon id={category} />
             <span className="text-xs font-medium uppercase tracking-wider">
@@ -239,17 +250,25 @@ export function CountdownDisplay({
           <div className="flex items-center gap-2">
             {!isPublic && (
               <>
-                {/* Edit button */}
-                <button
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={onEdit}
                   className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground sm:gap-2 sm:px-4"
                   aria-label={language === "pt" ? "Editar" : "Edit"}
                 >
                   <Pencil className="size-3.5 shrink-0" />
                   <span className="hidden sm:inline">{language === "pt" ? "Editar" : "Edit"}</span>
-                </button>
-                {/* Back to list button */}
-                <button
+                </motion.button>
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.15 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onMouseEnter={() => resetRef.current?.startAnimation()}
                   onMouseLeave={() => resetRef.current?.stopAnimation()}
                   onClick={onReset}
@@ -258,7 +277,7 @@ export function CountdownDisplay({
                 >
                   <RotateCCWIcon ref={resetRef} size={14} className="shrink-0" />
                   <span className="hidden sm:inline">{language === "pt" ? "Voltar" : "Back"}</span>
-                </button>
+                </motion.button>
               </>
             )}
             {isPublic && (
@@ -267,19 +286,29 @@ export function CountdownDisplay({
               </span>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Title */}
-        <div className="mb-2 text-center animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
+          className="mb-2 text-center"
+        >
           <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
             {title}
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">{formattedDate}</p>
-        </div>
+        </motion.div>
 
         {/* Countdown or Finished */}
         {isFinished ? (
-          <div className="mt-12 text-center animate-in fade-in zoom-in-95 duration-700">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
+            className="mt-12 text-center"
+          >
             <div
               className="mb-6 inline-flex size-20 items-center justify-center rounded-full bg-primary/15"
               onMouseEnter={() => partyRef.current?.startAnimation()}
@@ -292,19 +321,21 @@ export function CountdownDisplay({
             <p className="mt-2 text-muted-foreground">
               {language === "pt" ? "Aproveite cada momento." : "Enjoy every moment."}
             </p>
-          </div>
+          </motion.div>
         ) : (
           <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
             {timeUnits.map((unit, i) => (
               <div key={unit.label} className="contents">
                 <TimeUnit value={unit.value} label={unit.label} index={i} />
                 {i < timeUnits.length - 1 && (
-                  <span
-                    className="hidden text-3xl font-light text-muted-foreground sm:block animate-in fade-in duration-500"
-                    style={{ animationDelay: `${i * 80 + 40}ms` }}
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.08 + 0.04, duration: 0.3 }}
+                    className="hidden text-3xl font-light text-muted-foreground sm:block"
                   >
                     :
-                  </span>
+                  </motion.span>
                 )}
               </div>
             ))}
@@ -313,7 +344,12 @@ export function CountdownDisplay({
 
         {/* Progress bar */}
         {!isFinished && (
-          <div className="mt-14 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-500">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.5 }}
+            className="mt-14"
+          >
             <div className="flex flex-col items-center gap-3">
               <span className="text-sm text-muted-foreground">
                 {language === "pt" ? "Faltam" : "Remaining"}{" "}
@@ -325,35 +361,49 @@ export function CountdownDisplay({
                 </span>
               </span>
               <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="h-full rounded-full bg-primary transition-all duration-1000 ease-in-out"
-                  style={{ width: `${progressPercent}%` }}
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercent}%` }}
+                  transition={{ duration: 1, ease: [0.4, 0, 0.2, 1], delay: 0.6 }}
+                  className="h-full rounded-full bg-primary"
                 />
               </div>
               <span className="text-xs text-muted-foreground">
                 {Math.round(progressPercent)}% {language === "pt" ? "concluído" : "elapsed"}
               </span>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
 
       {/* Public CTA */}
       {isPublic && (
-        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.4 }}
+          className="fixed bottom-16 left-1/2 -translate-x-1/2"
+        >
           <Link
             href="/"
             className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 whitespace-nowrap"
           >
-            {language === "pt" ? "Criar a minha contagem →" : "Create my own countdown →"}
+            {language === "pt" ? "Criar a minha contagem" : "Create my own countdown"}
+            {" "}
+            {"->"}
           </Link>
-        </div>
+        </motion.div>
       )}
 
       {/* Footer */}
-      <footer className="fixed bottom-4 text-xs text-muted-foreground">
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7, duration: 0.5 }}
+        className="fixed bottom-4 text-xs text-muted-foreground"
+      >
         {language === "pt" ? "Desenvolvido com" : "Made with"}{" "}
-        <span className="text-primary">♥</span>{" "}
+        <span className="text-primary">{"<3"}</span>{" "}
         {language === "pt" ? "por" : "by"}{" "}
         <a
           href="https://github.com/carrijoga"
@@ -364,7 +414,7 @@ export function CountdownDisplay({
           carrijoga
         </a>
         {" "}·{" "}v{pkg.version}
-      </footer>
+      </motion.footer>
     </div>
   )
 }
