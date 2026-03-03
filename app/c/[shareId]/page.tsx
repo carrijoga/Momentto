@@ -1,4 +1,6 @@
+import { cache } from "react"
 import Link from "next/link"
+import type { Metadata } from "next"
 import { getSupabaseServiceClient } from "@/lib/supabase/server"
 import { PublicCountdownWrapper } from "@/components/public-countdown-wrapper"
 import type { CountdownEntry } from "@/lib/types"
@@ -7,20 +9,17 @@ interface Props {
   params: Promise<{ shareId: string }>
 }
 
-export default async function SharedCountdownPage({ params }: Props) {
-  const { shareId } = await params
+// Cached fetcher — called by both generateMetadata and the page component,
+// resulting in a single DB round-trip per request.
+const getCountdown = cache(async (shareId: string): Promise<CountdownEntry | null> => {
   const supabase = await getSupabaseServiceClient()
-
   const { data, error } = await supabase
     .from("countdowns")
     .select("id, share_id, category, title, date, time, created_at, expires_at")
     .eq("share_id", shareId)
     .single()
 
-  // Not found
-  if (error || !data) {
-    return <ExpiredScreen />
-  }
+  if (error || !data) return null
 
   const entry: CountdownEntry = {
     id: data.id,
@@ -33,8 +32,43 @@ export default async function SharedCountdownPage({ params }: Props) {
     expires_at: data.expires_at ?? null,
   }
 
-  // Lazy expiry check
-  if (entry.expires_at && new Date(entry.expires_at) < new Date()) {
+  if (entry.expires_at && new Date(entry.expires_at) < new Date()) return null
+
+  return entry
+})
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { shareId } = await params
+  const entry = await getCountdown(shareId)
+
+  const title = entry ? entry.title : "Contagem regressiva"
+  const description = entry
+    ? `Acompanhe a contagem regressiva para: ${entry.title}`
+    : "Este link de compartilhamento não existe ou já expirou."
+
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    openGraph: {
+      title: `${title} | MyTrip`,
+      description,
+      images: [{ url: `/c/${shareId}/opengraph-image` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | MyTrip`,
+      description,
+      images: [`/c/${shareId}/opengraph-image`],
+    },
+  }
+}
+
+export default async function SharedCountdownPage({ params }: Props) {
+  const { shareId } = await params
+  const entry = await getCountdown(shareId)
+
+  if (!entry) {
     return <ExpiredScreen />
   }
 

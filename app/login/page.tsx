@@ -45,7 +45,7 @@ const t = {
 
 export default function LoginPage() {
   const router = useRouter()
-  const { isAnonymous, loading } = useAuth()
+  const { isAnonymous, loading, userId } = useAuth()
   const { language } = useLanguage()
   const tx = t[language as "pt" | "en"] ?? t.pt
 
@@ -64,7 +64,12 @@ export default function LoginPage() {
   async function handleGoogleSignIn() {
     setError(null)
     const supabase = getSupabaseBrowserClient()
-    const redirectTo = `${window.location.origin}/auth/callback`
+    // Encode the anonymous user_id in the redirect URL so /auth/callback can
+    // migrate the data server-side — this works even when the OAuth flow
+    // completes in a different browser or device.
+    const base = `${window.location.origin}/auth/callback`
+    const redirectTo =
+      isAnonymous && userId ? `${base}?anon_uid=${userId}` : base
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
@@ -79,7 +84,12 @@ export default function LoginPage() {
     setSubmitting(true)
 
     const supabase = getSupabaseBrowserClient()
-    const redirectTo = `${window.location.origin}/auth/callback`
+    // Encode the anonymous user_id in the redirect URL so /auth/callback can
+    // migrate the data server-side — this works even when the magic link is
+    // opened in a different browser or in a mail app's in-app browser.
+    const base = `${window.location.origin}/auth/callback`
+    const redirectTo =
+      isAnonymous && userId ? `${base}?anon_uid=${userId}` : base
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: { emailRedirectTo: redirectTo },

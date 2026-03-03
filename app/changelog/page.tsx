@@ -4,8 +4,18 @@ import type { Metadata } from "next"
 import { ChangelogClient } from "@/components/changelog-client"
 
 export const metadata: Metadata = {
-  title: "Changelog - MyTrip",
+  title: "Changelog",
   description: "Acompanhe todas as novidades e melhorias do MyTrip",
+  openGraph: {
+    title: "Changelog | MyTrip",
+    description: "Acompanhe todas as novidades e melhorias do MyTrip",
+    url: "https://mytrip.carrijoga.com.br/changelog",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Changelog | MyTrip",
+    description: "Acompanhe todas as novidades e melhorias do MyTrip",
+  },
 }
 
 interface ChangelogEntry {

@@ -51,18 +51,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // or opens in a new tab, so prevUserIdRef is lost. We persist the anonymous
         // ID in localStorage (shared across tabs) and recover it here to run migration.
         const storedAnonId = localStorage.getItem("_anon_uid")
-        if (
-          storedAnonId &&
-          storedAnonId !== user.id &&
-          !(user.is_anonymous ?? false)
-        ) {
-          try {
-            await migrateLocalData(storedAnonId, user.id)
-            await migrateAnonymousCountdowns(storedAnonId, user.id)
-          } catch (err) {
-            console.error("Migration error (post-redirect):", err)
+        if (storedAnonId && !(user.is_anonymous ?? false)) {
+          if (storedAnonId === user.id) {
+            // Same user_id: anonymous user was promoted via updateUser/linkIdentity.
+            // No data migration needed — just clean up the stored key.
+            localStorage.removeItem("_anon_uid")
+          } else {
+            // Different user_id: user signed in as a new account (signInWithOtp /
+            // signInWithOAuth without linking). Migrate their anonymous data.
+            try {
+              await migrateLocalData(storedAnonId, user.id)
+              await migrateAnonymousCountdowns(storedAnonId, user.id)
+            } catch (err) {
+              console.error("Migration error (post-redirect):", err)
+            }
+            localStorage.removeItem("_anon_uid")
           }
-          localStorage.removeItem("_anon_uid")
         }
 
         prevUserIdRef.current = user.id
@@ -154,6 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           })
           syncPendingOps(newId).catch(console.error)
         }
+
         if (event === "SIGNED_OUT") {
           // Will be handled by the signOut() helper calling init()
         }

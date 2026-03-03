@@ -114,7 +114,7 @@ export function HomeScreen({ onStart }: { onStart: () => void }) {
   }
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden p-6">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden p-6">
       {/* Scattered background icons — all use motion.div infinite */}
       {scattered.map(({ Icon, top, left, right, bottom, size, opacity, duration, delay }, i) => (
         <motion.div
@@ -202,6 +202,6 @@ export function HomeScreen({ onStart }: { onStart: () => void }) {
           {labels.footer}
         </motion.p>
       </div>
-    </div>
+    </main>
   )
 }
