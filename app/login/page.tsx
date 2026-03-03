@@ -7,6 +7,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/auth-context"
 import { useLanguage } from "@/lib/language-context"
 import { AirplaneIcon } from "@/components/ui/airplane"
+import { sendGAEvent } from "@/lib/analytics"
 
 const t = {
   pt: {
@@ -102,6 +103,7 @@ export default function LoginPage() {
       return
     }
 
+    sendGAEvent("magic_link_sent")
     setSentTo(email.trim())
     setEmailSent(true)
   }

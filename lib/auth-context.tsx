@@ -13,6 +13,7 @@ import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { syncPendingOps, migrateLocalData } from "@/lib/sync"
 import { migrateAnonymousCountdowns } from "@/app/actions"
+import { sendGAEvent } from "@/lib/analytics"
 
 type AuthState =
   | { status: "loading" }
@@ -156,6 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isAnonymous: user.is_anonymous ?? false,
             email: user.email ?? null,
           })
+          sendGAEvent("login", { method: user.app_metadata?.provider ?? "unknown" })
           syncPendingOps(newId).catch(console.error)
         }
 

@@ -79,6 +79,24 @@ Themes can be customized by modifying the theme selector component. The applicat
 
 The application supports Portuguese and English out of the box. To add more languages, extend the language context in `lib/language-context.tsx`.
 
+## 🔑 Environment Variables
+
+Copy `.env.local.example` (or create `.env.local`) and fill in the values:
+
+| Variable | Required | Description |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anonymous key |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role key (server only) |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | ✅ | VAPID public key for Web Push |
+| `VAPID_PRIVATE_KEY` | ✅ | VAPID private key for Web Push (server only) |
+| `KV_REST_API_URL` | ✅ | Upstash Redis REST URL |
+| `KV_REST_API_TOKEN` | ✅ | Upstash Redis REST token (server only) |
+| `NEXT_PUBLIC_GTM_ID` | ⬜ | Google Tag Manager container ID (e.g. `GTM-XXXXXXX`) |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | ⬜ | Google Analytics 4 Measurement ID (e.g. `G-XXXXXXXXXX`) |
+
+> **GA4 setup**: setting `NEXT_PUBLIC_GA_MEASUREMENT_ID` is all that's needed — page views and custom events are tracked automatically.
+
 ---
 
 ## 👨‍💻 Author

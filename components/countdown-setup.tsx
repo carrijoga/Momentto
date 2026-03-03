@@ -14,6 +14,7 @@ import { AirplaneIcon, type AirplaneIconHandle } from "@/components/ui/airplane"
 import { HeartIcon, type HeartIconHandle } from "@/components/ui/heart"
 import { GraduationCapIcon, type GraduationCapIconHandle } from "@/components/ui/graduation-cap"
 import { PartyPopperIcon, type PartyPopperIconHandle } from "@/components/ui/party-popper"
+import { sendGAEvent } from "@/lib/analytics"
 
 interface CountdownData {
   category: string
@@ -164,6 +165,7 @@ export function CountdownSetup({
   const handleSubmit = () => {
     if (selectedCategory && title.trim() && date) {
       const dateStr = format(date, "yyyy-MM-dd")
+      sendGAEvent("countdown_created", { countdown_category: selectedCategory })
       onComplete({
         category: selectedCategory,
         title:    title.trim(),

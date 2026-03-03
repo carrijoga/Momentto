@@ -7,6 +7,7 @@ import { Copy, Check, Share2, Loader2, X, Link } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { generateShareLink } from "@/lib/countdowns"
 import type { CountdownEntry } from "@/lib/types"
+import { sendGAEvent } from "@/lib/analytics"
 
 interface ShareModalProps {
   entry: CountdownEntry
@@ -49,6 +50,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
       const updated = await generateShareLink(current)
       setCurrent(updated)
       onShareGenerated(updated)
+      sendGAEvent("countdown_shared", { method: "generate_link" })
     } catch (e) {
       console.error("Failed to generate share link:", e)
     } finally {
@@ -61,6 +63,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
     try {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
+      sendGAEvent("countdown_shared", { method: "copy_link" })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       const ta = document.createElement("textarea")
@@ -84,6 +87,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
           : `Follow my countdown to: ${current.title}`,
         url: shareUrl,
       })
+      sendGAEvent("countdown_shared", { method: "native_share" })
     } catch {
       // User cancelled or not supported
     }

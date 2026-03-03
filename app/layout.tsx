@@ -10,6 +10,7 @@ import { ActiveCountdownProvider } from "@/lib/active-countdown-context"
 import { ConnectivityProvider } from "@/lib/connectivity-context"
 import { OfflineBanner } from "@/components/offline-banner"
 import { Analytics } from "@vercel/analytics/next"
+import { GoogleAnalytics } from "@next/third-parties/google"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -90,6 +91,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
+      {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      )}
       <head>
         <script
           dangerouslySetInnerHTML={{
