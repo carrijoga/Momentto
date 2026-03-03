@@ -18,7 +18,7 @@ import {
   updateCountdown,
   deleteCountdown,
 } from "@/lib/countdowns"
-import { getAllCountdownsFromDB, migrateLegacyCache } from "@/lib/db"
+import { getAllCountdownsFromDB, migrateLegacyCache, migrateLegacyDb } from "@/lib/db"
 import type { CountdownEntry } from "@/lib/types"
 
 type View = "list" | "setup" | "display"
@@ -86,8 +86,11 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
-    // Migrate localStorage cache -> IDB (one-time)
-    migrateLegacyCache().then(async () => {
+    // Migrate IDB: mytrip-db -> momentto-db (one-time)
+    migrateLegacyDb().then(() =>
+      // Migrate localStorage cache -> IDB (one-time)
+      migrateLegacyCache()
+    ).then(async () => {
       const cached = await getAllCountdownsFromDB()
       if (cached.length > 0) setCountdowns(cached)
     }).catch(console.error)

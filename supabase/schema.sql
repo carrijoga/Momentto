@@ -1,5 +1,5 @@
 -- ============================================================
--- MyTrip — Supabase Schema
+-- Momentto — Supabase Schema
 -- Run this in the Supabase Dashboard → SQL Editor
 -- ============================================================
 

@@ -14,7 +14,7 @@ function initWebPush(): boolean {
     return false
   }
 
-  webpush.setVapidDetails("mailto:mytrip@app.com", publicKey, privateKey)
+  webpush.setVapidDetails("mailto:momentto@app.com", publicKey, privateKey)
   return true
 }
 

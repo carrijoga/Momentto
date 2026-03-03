@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "MyTrip",
-    short_name: "MyTrip",
+    name: "Momentto",
+    short_name: "Momentto",
     description: "Countdown timer for your special events",
     start_url: "/",
     display: "standalone",

@@ -145,8 +145,8 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {language === "pt"
-              ? "Todas as novidades e melhorias do MyTrip."
-              : "All the latest updates and improvements to MyTrip."}
+              ? "Todas as novidades e melhorias do Momentto."
+              : "All the latest updates and improvements to Momentto."}
           </p>
         </motion.div>
 

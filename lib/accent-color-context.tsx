@@ -10,7 +10,7 @@ import {
 } from "react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 
-const STORAGE_KEY = "mytrip-accent-hue"
+const STORAGE_KEY = "momentto-accent-hue"
 const DEFAULT_HUE = 165
 
 export interface AccentColor {
@@ -52,12 +52,17 @@ export function AccentColorProvider({ children }: { children: ReactNode }) {
 
   // On mount: read from localStorage immediately to avoid flash
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
+    // Read new key first; fall back to legacy key and migrate
+    const saved =
+      localStorage.getItem(STORAGE_KEY) ??
+      localStorage.getItem("mytrip-accent-hue")
     if (saved) {
       const hue = Number(saved)
       if (!Number.isNaN(hue)) {
         setAccentHueState(hue)
         applyHue(hue)
+        localStorage.setItem(STORAGE_KEY, String(hue))
+        localStorage.removeItem("mytrip-accent-hue")
       }
     }
   }, [applyHue])

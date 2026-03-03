@@ -1,4 +1,4 @@
-# ✈️ MyTrip
+# ✈️ Momentto
 
 A beautiful and interactive travel countdown application built with Next.js. Count down the days, hours, minutes, and seconds until your next adventure!
 
@@ -37,8 +37,8 @@ A beautiful and interactive travel countdown application built with Next.js. Cou
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/carrijoga/mytrip.git
-cd mytrip
+git clone https://github.com/carrijoga/momentto.git
+cd momentto
 ```
 
 2. Install dependencies:

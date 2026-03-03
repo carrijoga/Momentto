@@ -51,13 +51,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     robots: { index: false, follow: false },
     openGraph: {
-      title: `${title} | MyTrip`,
+      title: `${title} | Momentto`,
       description,
       images: [{ url: `/c/${shareId}/opengraph-image` }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | MyTrip`,
+      title: `${title} | Momentto`,
       description,
       images: [`/c/${shareId}/opengraph-image`],
     },

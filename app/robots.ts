@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/login", "/auth/", "/c/"],
       },
     ],
-    sitemap: "https://mytrip.carrijoga.com.br/sitemap.xml",
+    sitemap: "https://momentto.carrijoga.com.br/sitemap.xml",
   }
 }

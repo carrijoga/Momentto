@@ -15,15 +15,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("pt")
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem("mytrip-language") as Language
+    // Read new key first; fall back to legacy key and migrate
+    const savedLanguage = (
+      localStorage.getItem("momentto-language") ??
+      localStorage.getItem("mytrip-language")
+    ) as Language
     if (savedLanguage) {
       setLanguage(savedLanguage)
+      localStorage.setItem("momentto-language", savedLanguage)
+      localStorage.removeItem("mytrip-language")
     }
   }, [])
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage)
-    localStorage.setItem("mytrip-language", newLanguage)
+    localStorage.setItem("momentto-language", newLanguage)
   }
 
   return (

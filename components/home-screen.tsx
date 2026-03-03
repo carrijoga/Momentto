@@ -155,7 +155,7 @@ export function HomeScreen({ onStart }: { onStart: () => void }) {
           transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
           className="mb-3 text-5xl font-bold tracking-tight text-foreground sm:text-6xl"
         >
-          MyTrip
+          Momentto
         </motion.h1>
 
         {/* Tagline */}

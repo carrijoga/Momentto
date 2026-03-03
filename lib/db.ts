@@ -1,7 +1,7 @@
 import { openDB, type IDBPDatabase } from "idb"
 import type { CountdownEntry } from "@/lib/types"
 
-const DB_NAME = "mytrip-db"
+const DB_NAME = "momentto-db"
 const DB_VERSION = 1
 
 export interface PendingOp {
@@ -11,7 +11,7 @@ export interface PendingOp {
   tempId?: string
 }
 
-type MyTripDB = {
+type MomenttoDb = {
   countdowns: {
     key: string
     value: CountdownEntry
@@ -22,11 +22,11 @@ type MyTripDB = {
   }
 }
 
-let dbPromise: Promise<IDBPDatabase<MyTripDB>> | null = null
+let dbPromise: Promise<IDBPDatabase<MomenttoDb>> | null = null
 
 function getDB() {
   if (!dbPromise) {
-    dbPromise = openDB<MyTripDB>(DB_NAME, DB_VERSION, {
+    dbPromise = openDB<MomenttoDb>(DB_NAME, DB_VERSION, {
       upgrade(db) {
         if (!db.objectStoreNames.contains("countdowns")) {
           db.createObjectStore("countdowns", { keyPath: "id" })
@@ -94,20 +94,75 @@ export async function getPendingCount(): Promise<number> {
 
 /** One-time migration: moves localStorage cache into IndexedDB */
 export async function migrateLegacyCache(): Promise<void> {
-  const MIGRATED_KEY = "mytrip-idb-migrated"
-  const CACHE_KEY = "mytrip-countdowns-cache"
+  const MIGRATED_KEY = "momentto-idb-migrated"
+  const LEGACY_MIGRATED_KEY = "mytrip-idb-migrated"
+  const CACHE_KEY = "momentto-countdowns-cache"
+  const LEGACY_CACHE_KEY = "mytrip-countdowns-cache"
   try {
-    if (localStorage.getItem(MIGRATED_KEY)) return
-    const raw = localStorage.getItem(CACHE_KEY)
+    if (localStorage.getItem(MIGRATED_KEY) || localStorage.getItem(LEGACY_MIGRATED_KEY)) return
+    const raw = localStorage.getItem(CACHE_KEY) ?? localStorage.getItem(LEGACY_CACHE_KEY)
     if (raw) {
       const entries = JSON.parse(raw) as CountdownEntry[]
       for (const entry of entries) {
         await upsertCountdownToDB(entry)
       }
       localStorage.removeItem(CACHE_KEY)
+      localStorage.removeItem(LEGACY_CACHE_KEY)
     }
     localStorage.setItem(MIGRATED_KEY, "1")
   } catch {
     // silently ignore
+  }
+}
+
+/** One-time migration: copies data from the legacy "mytrip-db" IndexedDB to "momentto-db" */
+export async function migrateLegacyDb(): Promise<void> {
+  if (typeof window === "undefined" || !("indexedDB" in window)) return
+
+  const LEGACY_DB_NAME = "mytrip-db"
+  const MIGRATED_MARKER = "momentto-db-migrated"
+
+  try {
+    if (localStorage.getItem(MIGRATED_MARKER)) return
+
+    let wasJustCreated = false
+
+    const legacy = await openDB<MomenttoDb>(LEGACY_DB_NAME, DB_VERSION, {
+      upgrade(db, oldVersion) {
+        if (oldVersion === 0) {
+          wasJustCreated = true
+          if (!db.objectStoreNames.contains("countdowns")) {
+            db.createObjectStore("countdowns", { keyPath: "id" })
+          }
+          if (!db.objectStoreNames.contains("pending_ops")) {
+            db.createObjectStore("pending_ops", { autoIncrement: true })
+          }
+        }
+      },
+    })
+
+    if (!wasJustCreated) {
+      const allCountdowns = await legacy.getAll("countdowns")
+      const allOps = await legacy.getAll("pending_ops")
+      legacy.close()
+
+      if (allCountdowns.length > 0 || allOps.length > 0) {
+        const newDb = await getDB()
+        for (const entry of allCountdowns) {
+          const existing = await newDb.get("countdowns", entry.id)
+          if (!existing) await newDb.put("countdowns", entry)
+        }
+        for (const op of allOps) {
+          await newDb.add("pending_ops", op)
+        }
+      }
+    } else {
+      legacy.close()
+    }
+
+    indexedDB.deleteDatabase(LEGACY_DB_NAME)
+    localStorage.setItem(MIGRATED_MARKER, "1")
+  } catch {
+    // silent — don't block app startup
   }
 }

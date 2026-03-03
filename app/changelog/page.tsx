@@ -5,16 +5,16 @@ import { ChangelogClient } from "@/components/changelog-client"
 
 export const metadata: Metadata = {
   title: "Changelog",
-  description: "Acompanhe todas as novidades e melhorias do MyTrip",
+  description: "Acompanhe todas as novidades e melhorias do Momentto",
   openGraph: {
-    title: "Changelog | MyTrip",
-    description: "Acompanhe todas as novidades e melhorias do MyTrip",
-    url: "https://mytrip.carrijoga.com.br/changelog",
+    title: "Changelog | Momentto",
+    description: "Acompanhe todas as novidades e melhorias do Momentto",
+    url: "https://momentto.carrijoga.com.br/changelog",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Changelog | MyTrip",
-    description: "Acompanhe todas as novidades e melhorias do MyTrip",
+    title: "Changelog | Momentto",
+    description: "Acompanhe todas as novidades e melhorias do Momentto",
   },
 }
 

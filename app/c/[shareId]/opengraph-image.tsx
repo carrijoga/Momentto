@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 import { getSupabaseServiceClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
-export const alt = "Contagem regressiva | MyTrip"
+export const alt = "Contagem regressiva | Momentto"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -86,7 +86,7 @@ export default async function Image({
             marginBottom: 32,
           }}
         >
-          MyTrip
+          Momentto
         </div>
 
         {/* Emoji */}
