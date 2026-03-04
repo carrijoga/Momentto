@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "motion/react"
 import QRCode from "react-qr-code"
 import { Copy, Check, Share2, Loader2, X, Link } from "lucide-react"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import { generateShareLink } from "@/lib/countdowns"
 import type { CountdownEntry } from "@/lib/types"
 import { sendGAEvent } from "@/lib/analytics"
@@ -16,7 +16,7 @@ interface ShareModalProps {
 }
 
 export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps) {
-  const { language } = useLanguage()
+  const t = useTranslations("share")
   const [current, setCurrent] = useState<CountdownEntry>(entry)
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -28,20 +28,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
   const canNativeShare =
     typeof navigator !== "undefined" && "share" in navigator
 
-  const labels = {
-    title:       language === "pt" ? "Compartilhar contagem" : "Share countdown",
-    generate:    language === "pt" ? "Gerar link de compartilhamento" : "Generate share link",
-    generating:  language === "pt" ? "Gerando..." : "Generating...",
-    copy:        language === "pt" ? "Copiar link" : "Copy link",
-    copied:      language === "pt" ? "Copiado!" : "Copied!",
-    shareBtn:    language === "pt" ? "Compartilhar" : "Share",
-    expiry:      language === "pt"
-      ? "Link expira 5 dias após a data do evento."
-      : "Link expires 5 days after the event date.",
-    publicView:  language === "pt"
-      ? "Quem abrir este link pode acompanhar a contagem, sem poder editar."
-      : "Anyone with this link can follow the countdown, without editing.",
-  }
+
 
   async function handleGenerate() {
     if (loading) return
@@ -82,9 +69,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
     try {
       await navigator.share({
         title: current.title,
-        text: language === "pt"
-          ? `Acompanha comigo a contagem para: ${current.title}`
-          : `Follow my countdown to: ${current.title}`,
+        text: t("nativeShareText", { title: current.title }),
         url: shareUrl,
       })
       sendGAEvent("countdown_shared", { method: "native_share" })
@@ -112,7 +97,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
       >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">{labels.title}</h2>
+          <h2 className="text-base font-semibold text-foreground">{t("title")}</h2>
           <button
             onClick={onClose}
             className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
@@ -124,7 +109,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
         {/* No share_id yet */}
         {!current.share_id && (
           <div className="flex flex-col items-center gap-4 py-4">
-            <p className="text-center text-sm text-muted-foreground">{labels.publicView}</p>
+            <p className="text-center text-sm text-muted-foreground">{t("publicView")}</p>
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -135,12 +120,12 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
               {loading ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  {labels.generating}
+                  {t("generating")}
                 </>
               ) : (
                 <>
                   <Link className="size-4" />
-                  {labels.generate}
+                  {t("generate")}
                 </>
               )}
             </motion.button>
@@ -166,7 +151,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
               <button
                 onClick={handleCopy}
                 className="shrink-0 flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
-                title={labels.copy}
+                title={t("copy")}
               >
                 {copied ? (
                   <Check className="size-3.5 text-green-500" />
@@ -182,20 +167,19 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-secondary py-2.5 text-xs font-semibold text-foreground transition hover:bg-secondary/70"
               >
                 {copied ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
-                {copied ? labels.copied : labels.copy}
+                {copied ? t("copied") : t("copy")}
               </button>
               {canNativeShare && (
                 <button
                   onClick={handleNativeShare}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-2.5 text-xs font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
                 >
-                  <Share2 className="size-3.5" />
-                  {labels.shareBtn}
+                  {t("shareBtn")}
                 </button>
               )}
             </div>
 
-            <p className="text-center text-xs text-muted-foreground/70">{labels.expiry}</p>
+            <p className="text-center text-xs text-muted-foreground/70">{t("expiry")}</p>
           </motion.div>
         )}
       </motion.div>

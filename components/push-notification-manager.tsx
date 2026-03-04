@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { subscribeUser, unsubscribeUser } from "@/app/actions"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import { sendGAEvent } from "@/lib/analytics"
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -17,18 +17,15 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function PushNotificationManager() {
-  const { language } = useLanguage()
+  const t = useTranslations("push")
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const t = {
-    activate: language === "pt" ? "Ativar notificações" : "Enable notifications",
-    deactivate: language === "pt" ? "Desativar notificações" : "Disable notifications",
-    notSupported:
-      language === "pt"
-        ? "Notificações não suportadas neste browser"
-        : "Notifications not supported in this browser",
+  const labels = {
+    activate: t("activate"),
+    deactivate: t("deactivate"),
+    notSupported: t("notSupported"),
   }
 
   useEffect(() => {
@@ -98,8 +95,8 @@ export function PushNotificationManager() {
         {loading
           ? "..."
           : subscription
-          ? t.deactivate
-          : t.activate}
+          ? labels.deactivate
+          : labels.activate}
       </button>
     </div>
   )

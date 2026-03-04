@@ -13,7 +13,7 @@ import { AirplaneIcon, type AirplaneIconHandle } from "@/components/ui/airplane"
 import { HeartIcon, type HeartIconHandle } from "@/components/ui/heart"
 import { GraduationCapIcon, type GraduationCapIconHandle } from "@/components/ui/graduation-cap"
 import { cn } from "@/lib/utils"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import { useRef } from "react"
 import { sendNotification } from "@/app/actions"
 
@@ -115,18 +115,7 @@ function TimeUnit({ value, label, index }: { value: number; label: string; index
   )
 }
 
-const categoryLabels: Record<string, { pt: string; en: string }> = {
-  viagem: { pt: "Viagem", en: "Travel" },
-  aniversario: { pt: "Aniversário", en: "Birthday" },
-  casamento: { pt: "Casamento", en: "Wedding" },
-  formatura: { pt: "Formatura", en: "Graduation" },
-  festa: { pt: "Festa", en: "Party" },
-  bebe: { pt: "Nascimento", en: "Baby" },
-  show: { pt: "Show", en: "Concert" },
-  conquista: { pt: "Conquista", en: "Achievement" },
-  evento: { pt: "Evento", en: "Event" },
-  outro: { pt: "Outro", en: "Other" },
-}
+
 
 import type { CountdownEntry } from "@/lib/types"
 
@@ -146,7 +135,8 @@ export function CountdownDisplay({
 }: CountdownDisplayProps) {
   const { category, title, date, created_at: createdAt } = entry
   const time = entry.time ?? undefined
-  const { language } = useLanguage()
+  const t = useTranslations("countdown")
+  const tCat = useTranslations("categories")
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft(date, time))
   const [showConfetti, setShowConfetti] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -170,11 +160,11 @@ export function CountdownDisplay({
         notificationSentRef.current = true
         sendNotification(
           title,
-          language === "pt" ? "O grande dia chegou!" : "The big day is here!"
+          t("notificationMsg")
         ).catch(console.error)
       }
     }
-  }, [date, time, title, language, isPublic])
+  }, [date, time, title, t, isPublic])
 
   useEffect(() => {
     setMounted(true)
@@ -192,14 +182,14 @@ export function CountdownDisplay({
 
   const formattedDate = (() => {
     const d = new Date(date + "T00:00:00").toLocaleDateString(
-      language === "pt" ? "pt-BR" : "en-US",
+      undefined,
       { day: "2-digit", month: "long", year: "numeric" }
     )
     if (!time) return d
-    return `${d} ${language === "pt" ? "às" : "at"} ${time}`
+    return `${d} ${time}`
   })()
 
-  const catLabel = (categoryLabels[category] ?? categoryLabels.outro)[language]
+  const catLabel = tCat((category in {viagem:1,aniversario:1,casamento:1,formatura:1,festa:1,bebe:1,show:1,conquista:1,evento:1,outro:1}) ? category as any : "outro")
 
   const progressPercent = (() => {
     const created = new Date(createdAt).getTime()
@@ -217,12 +207,12 @@ export function CountdownDisplay({
 
   const timeUnits = [
     ...(timeLeft.months > 0
-      ? [{ value: timeLeft.months, label: language === "pt" ? (timeLeft.months === 1 ? "Mês" : "Meses") : (timeLeft.months === 1 ? "Month" : "Months") }]
+      ? [{ value: timeLeft.months, label: timeLeft.months === 1 ? t("month") : t("months") }]
       : []),
-    { value: timeLeft.days, label: language === "pt" ? (timeLeft.days === 1 ? "Dia" : "Dias") : (timeLeft.days === 1 ? "Day" : "Days") },
-    { value: timeLeft.hours, label: language === "pt" ? (timeLeft.hours === 1 ? "Hora" : "Horas") : (timeLeft.hours === 1 ? "Hour" : "Hours") },
-    { value: timeLeft.minutes, label: language === "pt" ? (timeLeft.minutes === 1 ? "Minuto" : "Minutos") : (timeLeft.minutes === 1 ? "Minute" : "Minutes") },
-    { value: timeLeft.seconds, label: language === "pt" ? (timeLeft.seconds === 1 ? "Segundo" : "Segundos") : (timeLeft.seconds === 1 ? "Second" : "Seconds") },
+    { value: timeLeft.days, label: timeLeft.days === 1 ? t("day") : t("days") },
+    { value: timeLeft.hours, label: timeLeft.hours === 1 ? t("hour") : t("hours") },
+    { value: timeLeft.minutes, label: timeLeft.minutes === 1 ? t("minute") : t("minutes") },
+    { value: timeLeft.seconds, label: timeLeft.seconds === 1 ? t("second") : t("seconds") },
   ]
 
   return (
@@ -258,10 +248,10 @@ export function CountdownDisplay({
                   whileTap={{ scale: 0.95 }}
                   onClick={onEdit}
                   className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground sm:gap-2 sm:px-4"
-                  aria-label={language === "pt" ? "Editar" : "Edit"}
+                  aria-label={t("edit")}
                 >
                   <Pencil className="size-3.5 shrink-0" />
-                  <span className="hidden sm:inline">{language === "pt" ? "Editar" : "Edit"}</span>
+                  <span className="hidden sm:inline">{t("edit")}</span>
                 </motion.button>
                 <motion.button
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -273,16 +263,16 @@ export function CountdownDisplay({
                   onMouseLeave={() => resetRef.current?.stopAnimation()}
                   onClick={onReset}
                   className="flex items-center gap-1.5 rounded-full bg-card border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:gap-2 sm:px-4"
-                  aria-label={language === "pt" ? "Voltar" : "Back"}
+                  aria-label={t("back")}
                 >
                   <RotateCCWIcon ref={resetRef} size={14} className="shrink-0" />
-                  <span className="hidden sm:inline">{language === "pt" ? "Voltar" : "Back"}</span>
+                  <span className="hidden sm:inline">{t("back")}</span>
                 </motion.button>
               </>
             )}
             {isPublic && (
               <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                {language === "pt" ? "Visualização pública" : "Public view"}
+                {t("publicView")}
               </span>
             )}
           </div>
@@ -316,10 +306,10 @@ export function CountdownDisplay({
               <PartyPopperIcon ref={partyRef} size={40} className="text-primary" />
             </div>
             <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              {language === "pt" ? "O grande dia chegou!" : "The big day is here!"}
+              {t("bigDay")}
             </h2>
             <p className="mt-2 text-muted-foreground">
-              {language === "pt" ? "Aproveite cada momento." : "Enjoy every moment."}
+              {t("enjoy")}
             </p>
           </motion.div>
         ) : (
@@ -352,12 +342,10 @@ export function CountdownDisplay({
           >
             <div className="flex flex-col items-center gap-3">
               <span className="text-sm text-muted-foreground">
-                {language === "pt" ? "Faltam" : "Remaining"}{" "}
+                {t("remaining")}{" "}
                 <span className="font-semibold text-foreground">
                   {totalDaysRemaining}{" "}
-                  {language === "pt"
-                    ? totalDaysRemaining === 1 ? "dia" : "dias"
-                    : totalDaysRemaining === 1 ? "day" : "days"}
+                  {totalDaysRemaining === 1 ? t("day") : t("days")}
                 </span>
               </span>
               <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-secondary">
@@ -369,7 +357,7 @@ export function CountdownDisplay({
                 />
               </div>
               <span className="text-xs text-muted-foreground">
-                {Math.round(progressPercent)}% {language === "pt" ? "concluído" : "elapsed"}
+                {Math.round(progressPercent)}% {t("elapsed")}
               </span>
             </div>
           </motion.div>
@@ -388,7 +376,7 @@ export function CountdownDisplay({
             href="/"
             className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 whitespace-nowrap"
           >
-            {language === "pt" ? "Criar a minha contagem" : "Create my own countdown"}
+            {t("createOwn")}
             {" "}
             {"->"}
           </Link>
@@ -402,9 +390,9 @@ export function CountdownDisplay({
         transition={{ delay: 0.7, duration: 0.5 }}
         className="fixed bottom-4 text-xs text-muted-foreground"
       >
-        {language === "pt" ? "Desenvolvido com" : "Made with"}{" "}
+        {t("madeWith")}{" "}
         <span className="text-primary">{"<3"}</span>{" "}
-        {language === "pt" ? "por" : "by"}{" "}
+        {t("by")}{" "}
         <a
           href="https://github.com/carrijoga"
           target="_blank"

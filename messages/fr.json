@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "description": "Compte à rebours pour votre moment spécial. Créez et partagez des comptes à rebours pour des voyages, mariages, remises de diplômes et bien plus.",
+    "ogTitle": "Momentto — Compte à rebours pour votre moment spécial",
+    "ogDescription": "Créez et partagez des comptes à rebours pour des voyages, mariages, remises de diplômes et bien plus.",
+    "ogAlt": "Momentto — Compte à rebours"
+  },
+  "home": {
+    "tagline": "Chaque moment spécial mérite d'être attendu avec émotion.",
+    "sub": "Créez votre compte à rebours et ressentez l'anticipation grandir à chaque seconde.",
+    "cta": "Créer mon compte à rebours",
+    "footer": "Voyages · Mariages · Diplômes · Fêtes · et bien plus"
+  },
+  "countdown": {
+    "edit": "Modifier",
+    "back": "Retour",
+    "publicView": "Vue publique",
+    "bigDay": "Le grand jour est arrivé !",
+    "enjoy": "Profitez de chaque instant.",
+    "remaining": "Restant",
+    "day": "Jour",
+    "days": "Jours",
+    "elapsed": "écoulé",
+    "createOwn": "Créer mon propre compte à rebours",
+    "madeWith": "Fait avec",
+    "by": "par",
+    "notificationMsg": "Le grand jour est arrivé !",
+    "month": "Mois",
+    "months": "Mois",
+    "hour": "Heure",
+    "hours": "Heures",
+    "minute": "Minute",
+    "minutes": "Minutes",
+    "second": "Seconde",
+    "seconds": "Secondes"
+  },
+  "categories": {
+    "viagem": "Voyage",
+    "aniversario": "Anniversaire",
+    "casamento": "Mariage",
+    "formatura": "Diplôme",
+    "festa": "Fête",
+    "bebe": "Bébé",
+    "show": "Concert",
+    "conquista": "Réussite",
+    "evento": "Événement",
+    "outro": "Autre"
+  },
+  "setup": {
+    "title": "Compte à rebours",
+    "home": "Accueil",
+    "step1Sub": "Choisissez la raison de votre compte à rebours",
+    "step2Sub": "Dites-nous en plus sur ce moment spécial",
+    "eventName": "Quel est le nom de l'événement ?",
+    "when": "Quand cela aura-t-il lieu ?",
+    "pickDate": "Sélectionner une date",
+    "addTime": "Ajouter une heure (optionnel)",
+    "at": "Heure",
+    "continue": "Continuer",
+    "back": "Retour",
+    "start": "Démarrer le compte à rebours",
+    "placeholders": {
+      "viagem": "Ex : Voyage à Paris",
+      "aniversario": "Ex : Anniversaire de Camille",
+      "casamento": "Ex : Mariage d'Ana et Jean",
+      "formatura": "Ex : Remise de diplôme de médecine",
+      "festa": "Ex : Fête du Nouvel An",
+      "bebe": "Ex : Arrivée du bébé",
+      "show": "Ex : Concert de Coldplay",
+      "conquista": "Ex : Réussite à l'examen",
+      "evento": "Ex : Conférence tech",
+      "outro": "Ex : Ma retraite",
+      "default": "Ex : Mon événement spécial"
+    }
+  },
+  "list": {
+    "title": "Mes comptes à rebours",
+    "new": "Nouveau compte à rebours",
+    "share": "Partager",
+    "delete": "Supprimer",
+    "today": "Aujourd'hui !",
+    "arrived": "C'est le jour !",
+    "day": "jour",
+    "days": "jours"
+  },
+  "share": {
+    "title": "Partager le compte à rebours",
+    "generate": "Générer un lien de partage",
+    "generating": "Génération...",
+    "copy": "Copier le lien",
+    "copied": "Copié !",
+    "shareBtn": "Partager",
+    "expiry": "Le lien expire 5 jours après la date de l'événement.",
+    "publicView": "Quiconque ouvre ce lien peut suivre le compte à rebours, sans pouvoir le modifier.",
+    "nativeShareText": "Suivez mon compte à rebours pour : {title}",
+    "fallbackTitle": "Compte à rebours",
+    "fallbackDescription": "Ce lien de partage n'existe pas ou a expiré.",
+    "countdownFor": "Suivez le compte à rebours pour : {title}"
+  },
+  "controls": {
+    "share": "Partager",
+    "menu": "Menu",
+    "signIn": "Se connecter pour synchroniser",
+    "signOut": "Se déconnecter",
+    "notificationsOn": "Notifications actives",
+    "notificationsOff": "Activer les notifications",
+    "language": "Langue",
+    "accentColor": "Couleur d'accent",
+    "theme": "Thème",
+    "themes": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    }
+  },
+  "offline": {
+    "syncing": "Synchronisation en cours...",
+    "offline": "Vous êtes hors ligne. Les modifications seront sauvegardées à la reconnexion."
+  },
+  "install": {
+    "prompt": "Pour recevoir des notifications sur iOS, installez l'app : appuyez sur",
+    "andThen": "puis sur",
+    "addToHome": "\"Ajouter à l'écran d'accueil\""
+  },
+  "push": {
+    "activate": "Activer les notifications",
+    "deactivate": "Désactiver les notifications",
+    "notSupported": "Notifications non prises en charge dans ce navigateur"
+  },
+  "changelog": {
+    "back": "Retour",
+    "description": "Toutes les nouveautés et améliorations de Momentto.",
+    "empty": "Aucune mise à jour disponible.",
+    "metaDescription": "Toutes les nouveautés et améliorations de Momentto"
+  },
+  "auth": {
+    "sessionError": "Impossible de démarrer la session.",
+    "retry": "Réessayer",
+    "headline": "Synchronisez vos comptes à rebours",
+    "sub": "Connectez-vous pour accéder à vos événements depuis n'importe quel appareil.",
+    "google": "Continuer avec Google",
+    "emailLabel": "Votre email",
+    "emailPlaceholder": "vous@email.com",
+    "emailButton": "Envoyer le lien d'accès",
+    "sending": "Envoi...",
+    "checkInbox": "Vérifiez votre boîte mail",
+    "checkInboxSub": "Nous avons envoyé un lien d'accès à {email}. Cliquez dessus pour vous connecter.",
+    "backToLogin": "Utiliser un autre email",
+    "skip": "Continuer sans compte",
+    "errorPrefix": "Erreur : ",
+    "orDivider": "ou"
+  }
+}

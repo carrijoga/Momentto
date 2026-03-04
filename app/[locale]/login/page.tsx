@@ -5,50 +5,16 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
 import { getSupabaseBrowserClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/auth-context"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
+import { useLocale } from "next-intl"
 import { AirplaneIcon } from "@/components/ui/airplane"
 import { sendGAEvent } from "@/lib/analytics"
-
-const t = {
-  pt: {
-    headline: "Sincronize seus countdowns",
-    sub: "Faça login para acessar seus eventos em qualquer dispositivo.",
-    google: "Continuar com Google",
-    emailLabel: "Seu email",
-    emailPlaceholder: "voce@email.com",
-    emailButton: "Enviar link de acesso",
-    sending: "Enviando...",
-    checkInbox: "Verifique seu email",
-    checkInboxSub: (email: string) =>
-      `Enviamos um link de acesso para ${email}. Clique nele para entrar.`,
-    backToLogin: "Usar outro email",
-    skip: "Continuar sem conta",
-    errorPrefix: "Erro: ",
-    orDivider: "ou",
-  },
-  en: {
-    headline: "Sync your countdowns",
-    sub: "Sign in to access your events from any device.",
-    google: "Continue with Google",
-    emailLabel: "Your email",
-    emailPlaceholder: "you@email.com",
-    emailButton: "Send magic link",
-    sending: "Sending...",
-    checkInbox: "Check your inbox",
-    checkInboxSub: (email: string) =>
-      `We sent a sign-in link to ${email}. Click it to sign in.`,
-    backToLogin: "Use a different email",
-    skip: "Continue without account",
-    errorPrefix: "Error: ",
-    orDivider: "or",
-  },
-}
 
 export default function LoginPage() {
   const router = useRouter()
   const { isAnonymous, loading, userId } = useAuth()
-  const { language } = useLanguage()
-  const tx = t[language as "pt" | "en"] ?? t.pt
+  const t = useTranslations("auth")
+  const locale = useLocale()
 
   const [email, setEmail] = useState("")
   const [emailSent, setEmailSent] = useState(false)
@@ -58,16 +24,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && !isAnonymous) {
-      router.replace("/")
+      router.replace(`/${locale}`)
     }
-  }, [isAnonymous, loading, router])
+  }, [isAnonymous, loading, router, locale])
 
   async function handleGoogleSignIn() {
     setError(null)
     const supabase = getSupabaseBrowserClient()
-    // Encode the anonymous user_id in the redirect URL so /auth/callback can
-    // migrate the data server-side — this works even when the OAuth flow
-    // completes in a different browser or device.
     const base = `${window.location.origin}/auth/callback`
     const redirectTo =
       isAnonymous && userId ? `${base}?anon_uid=${userId}` : base
@@ -85,9 +48,6 @@ export default function LoginPage() {
     setSubmitting(true)
 
     const supabase = getSupabaseBrowserClient()
-    // Encode the anonymous user_id in the redirect URL so /auth/callback can
-    // migrate the data server-side — this works even when the magic link is
-    // opened in a different browser or in a mail app's in-app browser.
     const base = `${window.location.origin}/auth/callback`
     const redirectTo =
       isAnonymous && userId ? `${base}?anon_uid=${userId}` : base
@@ -134,15 +94,14 @@ export default function LoginPage() {
           </motion.div>
           <div className="space-y-1">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              {tx.headline}
+              {t("headline")}
             </h1>
-            <p className="text-sm text-muted-foreground">{tx.sub}</p>
+            <p className="text-sm text-muted-foreground">{t("sub")}</p>
           </div>
         </div>
 
         <AnimatePresence mode="wait">
           {emailSent ? (
-            /* Confirmation state */
             <motion.div
               key="confirmation"
               initial={{ opacity: 0, x: 20 }}
@@ -152,18 +111,17 @@ export default function LoginPage() {
               className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm"
             >
               <div className="space-y-1 text-center">
-                <p className="text-sm font-medium text-foreground">{tx.checkInbox}</p>
-                <p className="text-xs text-muted-foreground">{tx.checkInboxSub(sentTo)}</p>
+                <p className="text-sm font-medium text-foreground">{t("checkInbox")}</p>
+                <p className="text-xs text-muted-foreground">{t("checkInboxSub", { email: sentTo })}</p>
               </div>
               <button
                 onClick={() => { setEmailSent(false); setEmail("") }}
                 className="w-full rounded-xl py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               >
-                {tx.backToLogin}
+                {t("backToLogin")}
               </button>
             </motion.div>
           ) : (
-            /* Sign-in form */
             <motion.div
               key="signin"
               initial={{ opacity: 0, x: -20 }}
@@ -183,13 +141,13 @@ export default function LoginPage() {
                   <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05" />
                   <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335" />
                 </svg>
-                {tx.google}
+                {t("google")}
               </button>
 
               {/* Divider */}
               <div className="flex items-center gap-2">
                 <div className="h-px flex-1 bg-border" />
-                <span className="text-xs text-muted-foreground">{tx.orDivider}</span>
+                <span className="text-xs text-muted-foreground">{t("orDivider")}</span>
                 <div className="h-px flex-1 bg-border" />
               </div>
 
@@ -197,7 +155,7 @@ export default function LoginPage() {
               <form onSubmit={handleEmailSubmit} className="space-y-3">
                 <div className="space-y-1.5">
                   <label htmlFor="email" className="text-xs font-medium text-muted-foreground">
-                    {tx.emailLabel}
+                    {t("emailLabel")}
                   </label>
                   <input
                     id="email"
@@ -206,7 +164,7 @@ export default function LoginPage() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={tx.emailPlaceholder}
+                    placeholder={t("emailPlaceholder")}
                     className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                   />
                 </div>
@@ -215,7 +173,7 @@ export default function LoginPage() {
                   disabled={submitting || !email.trim()}
                   className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 >
-                  {submitting ? tx.sending : tx.emailButton}
+                  {submitting ? t("sending") : t("emailButton")}
                 </button>
               </form>
 
@@ -229,7 +187,7 @@ export default function LoginPage() {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden rounded-lg bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive"
                   >
-                    {tx.errorPrefix}{error}
+                    {t("errorPrefix")}{error}
                   </motion.p>
                 )}
               </AnimatePresence>
@@ -239,10 +197,10 @@ export default function LoginPage() {
 
         {/* Skip */}
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push(`/${locale}`)}
           className="block w-full text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
-          {tx.skip}
+          {t("skip")}
         </button>
       </motion.div>
     </main>

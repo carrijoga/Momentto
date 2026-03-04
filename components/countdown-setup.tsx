@@ -9,7 +9,8 @@ import { CalendarIcon, Clock, Cake, Baby, Music, Trophy, Calendar as CalendarLuc
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
+import { useLocale } from "next-intl"
 import { AirplaneIcon, type AirplaneIconHandle } from "@/components/ui/airplane"
 import { HeartIcon, type HeartIconHandle } from "@/components/ui/heart"
 import { GraduationCapIcon, type GraduationCapIconHandle } from "@/components/ui/graduation-cap"
@@ -71,44 +72,7 @@ function getCategoryIcon(
   }
 }
 
-const categoriesPt = [
-  { id: "viagem",      label: "Viagem"     },
-  { id: "aniversario", label: "Aniversário" },
-  { id: "casamento",   label: "Casamento"  },
-  { id: "formatura",   label: "Formatura"  },
-  { id: "festa",       label: "Festa"      },
-  { id: "bebe",        label: "Nascimento" },
-  { id: "show",        label: "Show"       },
-  { id: "conquista",   label: "Conquista"  },
-  { id: "evento",      label: "Evento"     },
-  { id: "outro",       label: "Outro"      },
-]
 
-const categoriesEn = [
-  { id: "viagem",      label: "Travel"      },
-  { id: "aniversario", label: "Birthday"    },
-  { id: "casamento",   label: "Wedding"     },
-  { id: "formatura",   label: "Graduation"  },
-  { id: "festa",       label: "Party"       },
-  { id: "bebe",        label: "Baby"        },
-  { id: "show",        label: "Concert"     },
-  { id: "conquista",   label: "Achievement" },
-  { id: "evento",      label: "Event"       },
-  { id: "outro",       label: "Other"       },
-]
-
-const categoryPlaceholders: Record<string, { pt: string; en: string }> = {
-  viagem:      { pt: "Ex: Viagem para Paris",          en: "e.g. Trip to Paris"             },
-  aniversario: { pt: "Ex: Aniversário da Camila",      en: "e.g. Camila's Birthday"         },
-  casamento:   { pt: "Ex: Casamento da Ana e João",    en: "e.g. Ana and João's Wedding"    },
-  formatura:   { pt: "Ex: Formatura de Medicina",      en: "e.g. Medical School Graduation" },
-  festa:       { pt: "Ex: Festa de Réveillon",         en: "e.g. New Year's Party"          },
-  bebe:        { pt: "Ex: Chegada do Bebê",            en: "e.g. Baby's Arrival"            },
-  show:        { pt: "Ex: Show do Coldplay",           en: "e.g. Coldplay Concert"          },
-  conquista:   { pt: "Ex: Aprovação no concurso",      en: "e.g. Passing the exam"          },
-  evento:      { pt: "Ex: Conferência de tecnologia",  en: "e.g. Tech Conference"           },
-  outro:       { pt: "Ex: Minha aposentadoria",        en: "e.g. My Retirement"             },
-}
 
 const HOURS   = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0"))
 const MINUTES = Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, "0"))
@@ -136,8 +100,12 @@ export function CountdownSetup({
   initialDate,
   initialTime,
 }: CountdownSetupProps) {
-  const { language } = useLanguage()
-  const categories = language === "pt" ? categoriesPt : categoriesEn
+  const t = useTranslations("setup")
+  const tCat = useTranslations("categories")
+  const locale = useLocale()
+
+  const CATEGORY_IDS = ["viagem", "aniversario", "casamento", "formatura", "festa", "bebe", "show", "conquista", "evento", "outro"] as const
+  const categories = CATEGORY_IDS.map((id) => ({ id, label: tCat(id) }))
 
   const [step, setStep]                       = useState<1 | 2>(initialCategory ? 2 : 1)
   const [direction, setDirection]             = useState(1) // 1 = forward, -1 = backward
@@ -180,23 +148,10 @@ export function CountdownSetup({
   today.setHours(0, 0, 0, 0)
 
   const placeholder = selectedCategory
-    ? (categoryPlaceholders[selectedCategory]?.[language] ?? (language === "pt" ? "Ex: Meu evento" : "e.g. My event"))
-    : language === "pt" ? "Ex: Meu evento especial" : "e.g. My special event"
+    ? (t(`placeholders.${selectedCategory}` as any) ?? t("placeholders.default"))
+    : t("placeholders.default")
 
-  const labels = {
-    title:     language === "pt" ? "Contagem Regressiva"                   : "Countdown",
-    home:      language === "pt" ? "Início"                                : "Home",
-    step1Sub:  language === "pt" ? "Escolha o motivo da sua contagem"      : "Choose the reason for your countdown",
-    step2Sub:  language === "pt" ? "Diga mais sobre esse momento especial" : "Tell us more about this special moment",
-    eventName: language === "pt" ? "Qual o nome do evento?"                : "What is the event name?",
-    when:      language === "pt" ? "Quando vai acontecer?"                 : "When is it happening?",
-    pickDate:  language === "pt" ? "Selecione uma data"                    : "Select a date",
-    addTime:   language === "pt" ? "Adicionar horário (opcional)"          : "Add time (optional)",
-    at:        language === "pt" ? "Horário"                               : "Time",
-    continue:  language === "pt" ? "Continuar"                             : "Continue",
-    back:      language === "pt" ? "Voltar"                                : "Back",
-    start:     language === "pt" ? "Iniciar Contagem"                       : "Start Countdown",
-  }
+  const dateLocale = locale === "pt-BR" ? ptBR : enUS
 
   return (
     <div className="flex min-h-dvh items-center justify-center p-4">
@@ -211,7 +166,7 @@ export function CountdownSetup({
             className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <House className="size-4" />
-            <span>{labels.home}</span>
+            <span>{t("home")}</span>
           </motion.button>
         )}
 
@@ -223,10 +178,10 @@ export function CountdownSetup({
           className="mb-10 text-center"
         >
           <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">
-            {labels.title}
+            {t("title")}
           </h1>
           <p className="text-muted-foreground">
-            {step === 1 ? labels.step1Sub : labels.step2Sub}
+            {step === 1 ? t("step1Sub") : t("step2Sub")}
           </p>
         </motion.div>
 
@@ -343,7 +298,7 @@ export function CountdownSetup({
                   transition={{ type: "spring", stiffness: 350, damping: 30, delay: 0.05 }}
                 >
                   <label htmlFor="event-title" className="mb-2 block text-sm font-medium text-foreground">
-                    {labels.eventName} *
+                    {t("eventName")} *
                   </label>
                   <input
                     id="event-title"
@@ -362,7 +317,7 @@ export function CountdownSetup({
                   transition={{ type: "spring", stiffness: 350, damping: 30, delay: 0.1 }}
                 >
                   <label className="mb-2 block text-sm font-medium text-foreground">
-                    {labels.when} *
+                    {t("when")} *
                   </label>
                   {isMobile ? (
                     <div className="relative">
@@ -398,7 +353,7 @@ export function CountdownSetup({
                           )}
                         >
                           <CalendarIcon className="size-4 shrink-0 text-muted-foreground" />
-                          {date ? format(date, "dd/MM/yyyy") : labels.pickDate}
+                          {date ? format(date, "dd/MM/yyyy") : t("pickDate")}
                         </button>
                       </PopoverTrigger>
                       <PopoverContent
@@ -416,7 +371,7 @@ export function CountdownSetup({
                             setCalendarOpen(false)
                           }}
                           disabled={(d) => d < today}
-                          locale={language === "pt" ? ptBR : enUS}
+                          locale={dateLocale}
                           fixedWeeks
                           initialFocus
                           className="[--cell-size:--spacing(7)] p-2 text-sm"
@@ -443,7 +398,7 @@ export function CountdownSetup({
                     )}
                   >
                     <Clock className="size-4 shrink-0" />
-                    <span>{labels.addTime}</span>
+                    <span>{t("addTime")}</span>
                     <span className="ml-auto text-xs opacity-60">{timeEnabled ? "+" : "+"}</span>
                   </button>
 
@@ -457,7 +412,7 @@ export function CountdownSetup({
                         className="overflow-hidden"
                       >
                         <div className="mt-2 flex items-center gap-2">
-                          <label className="text-xs text-muted-foreground shrink-0 w-14">{labels.at}:</label>
+                          <label className="text-xs text-muted-foreground shrink-0 w-14">{t("at")}:</label>
                           <select
                             value={hour}
                             onChange={(e) => setHour(e.target.value)}
@@ -492,7 +447,7 @@ export function CountdownSetup({
                   onClick={() => { setDirection(-1); setStep(1) }}
                   className="flex-1 rounded-xl border border-border bg-card py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
                 >
-                  {labels.back}
+                  {t("back")}
                 </motion.button>
                 <motion.button
                   whileHover={title.trim() && date ? { scale: 1.02 } : undefined}
@@ -506,7 +461,7 @@ export function CountdownSetup({
                       : "cursor-not-allowed bg-secondary text-muted-foreground"
                   )}
                 >
-                  {labels.start}
+                  {t("start")}
                 </motion.button>
               </motion.div>
             </motion.div>

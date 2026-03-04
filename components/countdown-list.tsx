@@ -18,7 +18,8 @@ import { AirplaneIcon } from "@/components/ui/airplane"
 import { HeartIcon } from "@/components/ui/heart"
 import { GraduationCapIcon } from "@/components/ui/graduation-cap"
 import { PartyPopperIcon } from "@/components/ui/party-popper"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
+import { useLocale } from "next-intl"
 import { ShareModal } from "@/components/share-modal"
 import { generateShareLink } from "@/lib/countdowns"
 import type { CountdownEntry } from "@/lib/types"
@@ -39,28 +40,15 @@ function CategoryIcon({ id, className }: { id: string; className?: string }) {
   }
 }
 
-const categoryLabels: Record<string, { pt: string; en: string }> = {
-  viagem:      { pt: "Viagem",     en: "Travel" },
-  aniversario: { pt: "Aniversário",en: "Birthday" },
-  casamento:   { pt: "Casamento",  en: "Wedding" },
-  formatura:   { pt: "Formatura",  en: "Graduation" },
-  festa:       { pt: "Festa",      en: "Party" },
-  bebe:        { pt: "Nascimento", en: "Baby" },
-  show:        { pt: "Show",       en: "Concert" },
-  conquista:   { pt: "Conquista",  en: "Achievement" },
-  evento:      { pt: "Evento",     en: "Event" },
-  outro:       { pt: "Outro",      en: "Other" },
-}
-
 function getDaysRemaining(date: string): number {
   const target = new Date(date + "T23:59:59").getTime()
   const now = Date.now()
   return Math.max(0, Math.ceil((target - now) / 86400000))
 }
 
-function formatDate(date: string, language: string): string {
+function formatDate(date: string, locale: string): string {
   return new Date(date + "T00:00:00").toLocaleDateString(
-    language === "pt" ? "pt-BR" : "en-US",
+    locale,
     { day: "2-digit", month: "short", year: "numeric" }
   )
 }
@@ -73,15 +61,20 @@ interface CountdownListProps {
 }
 
 export function CountdownList({ countdowns, onOpen, onNew, onDelete }: CountdownListProps) {
-  const { language } = useLanguage()
+  const t = useTranslations("list")
+  const tCat = useTranslations("categories")
+  const locale = useLocale()
   const [shareTarget, setShareTarget] = useState<CountdownEntry | null>(null)
   const [local, setLocal] = useState<CountdownEntry[]>(countdowns)
+  const [mounted, setMounted] = useState(false)
   const removedRef = useRef<Set<string>>(new Set())
 
   // Sync when parent array changes — skip any locally removed items
   useEffect(() => {
     setLocal(countdowns.filter((c) => !removedRef.current.has(c.id)))
   }, [countdowns])
+
+  useEffect(() => { setMounted(true) }, [])
 
   function handleDelete(id: string) {
     // Remove from local state immediately — AnimatePresence handles the exit animation
@@ -106,15 +99,13 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
     }
   }
 
+  const daysLabel = (n: number) => n === 1 ? t("day") : t("days")
+
   const labels = {
-    title: language === "pt" ? "Minhas contagens" : "My countdowns",
-    new: language === "pt" ? "Nova contagem" : "New countdown",
-    days: (n: number) =>
-      language === "pt"
-        ? n === 0 ? "Hoje!" : n === 1 ? "1 dia" : `${n} dias`
-        : n === 0 ? "Today!" : n === 1 ? "1 day" : `${n} days`,
-    share:  language === "pt" ? "Compartilhar" : "Share",
-    delete: language === "pt" ? "Excluir"  : "Delete",
+    title: t("title"),
+    new: t("new"),
+    share: t("share"),
+    delete: t("delete"),
   }
 
   return (
@@ -134,9 +125,10 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <AnimatePresence mode="popLayout">
             {(local.length > 0 ? local : countdowns).map((entry, i) => {
-              const days = getDaysRemaining(entry.date)
-              const catLabel = (categoryLabels[entry.category] ?? categoryLabels.outro)[language]
-              const isFinished = days === 0
+              // Use 999 as SSR placeholder so isFinished/urgency classes match client (not at boundary)
+              const days = mounted ? getDaysRemaining(entry.date) : 999
+              const catLabel = tCat(entry.category as any) ?? tCat("outro")
+              const isFinished = mounted && days === 0
 
               return (
                 <motion.div
@@ -210,8 +202,8 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
                       </span>
                       <span className="mt-0.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
                         {isFinished
-                          ? (language === "pt" ? "Chegou!" : "It's here!")
-                          : labels.days(days).replace(/^\d+\s*/, "")}
+                          ? t("arrived")
+                          : daysLabel(days)}
                       </span>
                     </div>
 
@@ -220,8 +212,8 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
                       <p className="truncate text-sm font-semibold text-foreground leading-snug">
                         {entry.title}
                       </p>
-                      <p className="mt-1 truncate text-[11px] text-muted-foreground">
-                        {formatDate(entry.date, language)}
+                      <p className="mt-1 truncate text-[11px] text-muted-foreground" suppressHydrationWarning>
+                        {formatDate(entry.date, locale)}
                       </p>
                     </div>
                   </div>

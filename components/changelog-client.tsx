@@ -3,7 +3,10 @@
 import { motion } from "motion/react"
 import { ArrowLeft, Tag, Sparkles, Wrench, Calendar } from "lucide-react"
 import Link from "next/link"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
+import { useLocale } from "next-intl"
+import ReactMarkdown, { type Components } from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 interface ChangelogEntry {
   slug: string
@@ -15,105 +18,69 @@ interface ChangelogClientProps {
   entries: ChangelogEntry[]
 }
 
-/** Very small Markdown-to-JSX renderer -- supports #, ##, -, and paragraphs. */
-function renderMarkdown(md: string) {
-  const lines = md.split("\n")
-  const elements: React.ReactNode[] = []
-  let listItems: string[] = []
-  let key = 0
-  let seenSection = false
-
-  function flushList() {
-    if (listItems.length === 0) return
-    elements.push(
-      <ul key={key++} className="flex flex-col gap-2 pl-1">
-        {listItems.map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed text-foreground/80">
-            <span className="mt-1.5 block size-1.5 shrink-0 rounded-full bg-primary/60" />
-            {item}
-          </li>
-        ))}
-      </ul>
-    )
-    listItems = []
-  }
-
-  for (const line of lines) {
-    const trimmed = line.trim()
-
-    if (trimmed.startsWith("# ")) {
-      flushList()
-      continue
-    }
-
-    if (trimmed.startsWith("## ")) {
-      seenSection = true
-      flushList()
-      const heading = trimmed.replace("## ", "")
-      const icon = getSectionIcon(heading)
-      elements.push(
-        <div key={key++} className="mt-5 mb-2.5 flex items-center gap-2">
-          {icon}
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {heading}
-          </h3>
-        </div>
-      )
-      continue
-    }
-
-    if (trimmed.startsWith("- ")) {
-      listItems.push(trimmed.replace("- ", ""))
-      continue
-    }
-
-    if (trimmed === "") {
-      flushList()
-      continue
-    }
-
-    if (!seenSection) continue
-    flushList()
-    elements.push(
-      <p key={key++} className="text-sm leading-relaxed text-muted-foreground">
-        {trimmed}
-      </p>
-    )
-  }
-
-  flushList()
-  return elements
-}
-
 function getSectionIcon(heading: string) {
   const lower = heading.toLowerCase()
-  if (lower.includes("novidade") || lower.includes("new")) {
+  if (
+    lower.includes("novidade") ||
+    lower.includes("new") ||
+    lower.includes("novedades") ||
+    lower.includes("nouveauté") ||
+    lower.includes("neuigkeit")
+  ) {
     return <Sparkles className="size-3.5 text-primary" />
   }
-  if (lower.includes("melhoria") || lower.includes("improve")) {
+  if (
+    lower.includes("melhoria") ||
+    lower.includes("improve") ||
+    lower.includes("mejora") ||
+    lower.includes("amélioration") ||
+    lower.includes("verbesserung")
+  ) {
     return <Wrench className="size-3.5 text-muted-foreground" />
   }
   return <Tag className="size-3.5 text-muted-foreground" />
 }
 
-function extractTitle(content: string): string {
-  const match = content.match(/^# (.+)$/m)
-  return match ? match[1] : ""
+const markdownComponents: Components = {
+  h1: ({ children }) => (
+    <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
+      {children}
+    </h2>
+  ),
+  h2: ({ children }) => {
+    const text = String(children)
+    const icon = getSectionIcon(text)
+    return (
+      <div className="mt-5 mb-2.5 flex items-center gap-2">
+        {icon}
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          {children}
+        </h3>
+      </div>
+    )
+  },
+  p: ({ children }) => (
+    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+      {children}
+    </p>
+  ),
+  ul: ({ children }) => (
+    <ul className="flex flex-col gap-2 pl-1 mt-2">{children}</ul>
+  ),
+  li: ({ children }) => (
+    <li className="flex items-start gap-2.5 text-sm leading-relaxed text-foreground/80">
+      <span className="mt-1.5 block size-1.5 shrink-0 rounded-full bg-primary/60" />
+      <span>{children}</span>
+    </li>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-semibold text-foreground">{children}</strong>
+  ),
 }
 
-function extractDescription(content: string): string {
-  const lines = content.split("\n")
-  for (const line of lines) {
-    const trimmed = line.trim()
-    if (trimmed === "" || trimmed.startsWith("#")) continue
-    return trimmed
-  }
-  return ""
-}
-
-function formatDate(dateStr: string, language: "pt" | "en"): string {
+function formatDate(dateStr: string, locale: string): string {
   const d = new Date(dateStr + "T00:00:00")
-  return d.toLocaleDateString(language === "pt" ? "pt-BR" : "en-US", {
+  return d.toLocaleDateString(locale, {
     day: "2-digit",
     month: "long",
     year: "numeric",
@@ -121,7 +88,8 @@ function formatDate(dateStr: string, language: "pt" | "en"): string {
 }
 
 export function ChangelogClient({ entries }: ChangelogClientProps) {
-  const { language } = useLanguage()
+  const t = useTranslations("changelog")
+  const locale = useLocale()
 
   return (
     <div className="flex min-h-dvh flex-col items-center p-4 pb-20 sm:p-6">
@@ -134,19 +102,17 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
           className="mb-10"
         >
           <Link
-            href="/"
+            href={`/${locale}`}
             className="mb-6 inline-flex items-center gap-2 rounded-full bg-card border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" />
-            {language === "pt" ? "Voltar" : "Back"}
+            {t("back")}
           </Link>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Changelog
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {language === "pt"
-              ? "Todas as novidades e melhorias do Momentto."
-              : "All the latest updates and improvements to Momentto."}
+            {t("description")}
           </p>
         </motion.div>
 
@@ -156,9 +122,6 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
 
           <div className="flex flex-col gap-10">
             {entries.map((entry, index) => {
-              const title = extractTitle(entry.content)
-              const description = extractDescription(entry.content)
-
               return (
                 <motion.div
                   key={entry.slug}
@@ -191,25 +154,18 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
                   <div className="mb-3 flex items-center gap-2">
                     <Calendar className="size-3.5 text-muted-foreground" />
                     <time className="text-xs font-medium text-muted-foreground">
-                      {formatDate(entry.date, language)}
+                      {formatDate(entry.date, locale)}
                     </time>
                   </div>
 
                   {/* Card */}
                   <div className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
-                    {title && (
-                      <h2 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
-                        {title}
-                      </h2>
-                    )}
-                    {description && (
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                        {description}
-                      </p>
-                    )}
-                    <div className="mt-4">
-                      {renderMarkdown(entry.content)}
-                    </div>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                    >
+                      {entry.content}
+                    </ReactMarkdown>
                   </div>
                 </motion.div>
               )
@@ -226,9 +182,7 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
             className="mt-20 text-center"
           >
             <p className="text-muted-foreground">
-              {language === "pt"
-                ? "Nenhuma atualização disponível."
-                : "No updates available."}
+              {t("empty")}
             </p>
           </motion.div>
         )}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useMemo } from "react"
+import { useRef, useState, useEffect } from "react"
 import type { ElementType } from "react"
 import { motion } from "motion/react"
 import {
@@ -27,7 +27,7 @@ import {
   Smile,
   Sun,
 } from "lucide-react"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import { AirplaneIcon, type AirplaneIconHandle } from "@/components/ui/airplane"
 
 // Motion types for background icons
@@ -88,29 +88,20 @@ const scattered: ScatteredIcon[] = [
 ]
 
 export function HomeScreen({ onStart }: { onStart: () => void }) {
-  const { language } = useLanguage()
+  const t = useTranslations("home")
   const airplaneRef = useRef<AirplaneIconHandle>(null)
 
-  // Pick a random motion type once per mount
-  const sessionMotion = useMemo<MotionType>(
-    () => MOTION_TYPES[Math.floor(Math.random() * MOTION_TYPES.length)],
-    []
-  )
+  // Pick a random motion type once per mount (deferred to avoid SSR/client mismatch)
+  const [sessionMotion, setSessionMotion] = useState<MotionType>(MOTION_TYPES[0])
+  useEffect(() => {
+    setSessionMotion(MOTION_TYPES[Math.floor(Math.random() * MOTION_TYPES.length)])
+  }, [])
 
   const labels = {
-    tagline:
-      language === "pt"
-        ? "Cada momento especial merece ser aguardado com emoção."
-        : "Every special moment deserves to be eagerly awaited.",
-    sub:
-      language === "pt"
-        ? "Crie sua contagem regressiva e sinta a antecipação crescer a cada segundo."
-        : "Create your countdown and feel the anticipation build with every second.",
-    cta: language === "pt" ? "Criar minha contagem" : "Create my countdown",
-    footer:
-      language === "pt"
-        ? "Viagens · Casamentos · Formaturas · Festas · e muito mais"
-        : "Trips · Weddings · Graduations · Parties · and much more",
+    tagline: t("tagline"),
+    sub: t("sub"),
+    cta: t("cta"),
+    footer: t("footer"),
   }
 
   return (

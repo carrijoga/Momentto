@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "description": "Countdown für deinen besonderen Moment. Erstelle und teile Countdowns für Reisen, Hochzeiten, Abschlüsse und vieles mehr.",
+    "ogTitle": "Momentto — Countdown für deinen besonderen Moment",
+    "ogDescription": "Erstelle und teile Countdowns für Reisen, Hochzeiten, Abschlüsse und vieles mehr.",
+    "ogAlt": "Momentto — Countdown"
+  },
+  "home": {
+    "tagline": "Jeder besondere Moment verdient es, mit Vorfreude erwartet zu werden.",
+    "sub": "Erstelle deinen Countdown und spüre, wie die Vorfreude mit jeder Sekunde wächst.",
+    "cta": "Meinen Countdown erstellen",
+    "footer": "Reisen · Hochzeiten · Abschlüsse · Feiern · und vieles mehr"
+  },
+  "countdown": {
+    "edit": "Bearbeiten",
+    "back": "Zurück",
+    "publicView": "Öffentliche Ansicht",
+    "bigDay": "Der große Tag ist da!",
+    "enjoy": "Genieße jeden Moment.",
+    "remaining": "Verbleibend",
+    "day": "Tag",
+    "days": "Tage",
+    "elapsed": "vergangen",
+    "createOwn": "Meinen eigenen Countdown erstellen",
+    "madeWith": "Erstellt mit",
+    "by": "von",
+    "notificationMsg": "Der große Tag ist da!",
+    "month": "Monat",
+    "months": "Monate",
+    "hour": "Stunde",
+    "hours": "Stunden",
+    "minute": "Minute",
+    "minutes": "Minuten",
+    "second": "Sekunde",
+    "seconds": "Sekunden"
+  },
+  "categories": {
+    "viagem": "Reise",
+    "aniversario": "Geburtstag",
+    "casamento": "Hochzeit",
+    "formatura": "Abschluss",
+    "festa": "Party",
+    "bebe": "Baby",
+    "show": "Konzert",
+    "conquista": "Erfolg",
+    "evento": "Veranstaltung",
+    "outro": "Sonstiges"
+  },
+  "setup": {
+    "title": "Countdown",
+    "home": "Startseite",
+    "step1Sub": "Wähle den Grund für deinen Countdown",
+    "step2Sub": "Erzähl uns mehr über diesen besonderen Moment",
+    "eventName": "Wie heißt das Ereignis?",
+    "when": "Wann findet es statt?",
+    "pickDate": "Datum auswählen",
+    "addTime": "Uhrzeit hinzufügen (optional)",
+    "at": "Uhrzeit",
+    "continue": "Weiter",
+    "back": "Zurück",
+    "start": "Countdown starten",
+    "placeholders": {
+      "viagem": "z. B. Reise nach Paris",
+      "aniversario": "z. B. Camilas Geburtstag",
+      "casamento": "z. B. Hochzeit von Ana und João",
+      "formatura": "z. B. Medizinstudium-Abschluss",
+      "festa": "z. B. Silvesterparty",
+      "bebe": "z. B. Ankunft des Babys",
+      "show": "z. B. Coldplay-Konzert",
+      "conquista": "z. B. Prüfung bestehen",
+      "evento": "z. B. Tech-Konferenz",
+      "outro": "z. B. Mein Ruhestand",
+      "default": "z. B. Mein besonderes Ereignis"
+    }
+  },
+  "list": {
+    "title": "Meine Countdowns",
+    "new": "Neuer Countdown",
+    "share": "Teilen",
+    "delete": "Löschen",
+    "today": "Heute!",
+    "arrived": "Ist da!",
+    "day": "Tag",
+    "days": "Tage"
+  },
+  "share": {
+    "title": "Countdown teilen",
+    "generate": "Freigabelink erstellen",
+    "generating": "Wird erstellt...",
+    "copy": "Link kopieren",
+    "copied": "Kopiert!",
+    "shareBtn": "Teilen",
+    "expiry": "Der Link läuft 5 Tage nach dem Ereignisdatum ab.",
+    "publicView": "Wer diesen Link öffnet, kann den Countdown verfolgen, aber nicht bearbeiten.",
+    "nativeShareText": "Verfolge meinen Countdown für: {title}",
+    "fallbackTitle": "Countdown",
+    "fallbackDescription": "Dieser Freigabelink existiert nicht oder ist abgelaufen.",
+    "countdownFor": "Countdown verfolgen für: {title}"
+  },
+  "controls": {
+    "share": "Teilen",
+    "menu": "Menü",
+    "signIn": "Anmelden zum Synchronisieren",
+    "signOut": "Abmelden",
+    "notificationsOn": "Benachrichtigungen aktiv",
+    "notificationsOff": "Benachrichtigungen aktivieren",
+    "language": "Sprache",
+    "accentColor": "Akzentfarbe",
+    "theme": "Design",
+    "themes": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    }
+  },
+  "offline": {
+    "syncing": "Änderungen werden synchronisiert...",
+    "offline": "Du bist offline. Änderungen werden bei der Wiederverbindung gespeichert."
+  },
+  "install": {
+    "prompt": "Um Benachrichtigungen auf iOS zu erhalten, installiere die App: Tippe auf",
+    "andThen": "und dann auf",
+    "addToHome": "\"Zum Home-Bildschirm\""
+  },
+  "push": {
+    "activate": "Benachrichtigungen aktivieren",
+    "deactivate": "Benachrichtigungen deaktivieren",
+    "notSupported": "Benachrichtigungen werden in diesem Browser nicht unterstützt"
+  },
+  "changelog": {
+    "back": "Zurück",
+    "description": "Alle Neuigkeiten und Verbesserungen von Momentto.",
+    "empty": "Keine Updates verfügbar.",
+    "metaDescription": "Alle Neuigkeiten und Verbesserungen von Momentto"
+  },
+  "auth": {
+    "sessionError": "Sitzung konnte nicht gestartet werden.",
+    "retry": "Erneut versuchen",
+    "headline": "Countdowns synchronisieren",
+    "sub": "Melde dich an, um deine Ereignisse auf jedem Gerät abzurufen.",
+    "google": "Mit Google fortfahren",
+    "emailLabel": "Deine E-Mail",
+    "emailPlaceholder": "du@email.com",
+    "emailButton": "Magic Link senden",
+    "sending": "Wird gesendet...",
+    "checkInbox": "Überprüfe dein Postfach",
+    "checkInboxSub": "Wir haben einen Anmeldelink an {email} gesendet. Klicke darauf, um dich anzumelden.",
+    "backToLogin": "Andere E-Mail verwenden",
+    "skip": "Ohne Konto fortfahren",
+    "errorPrefix": "Fehler: ",
+    "orDivider": "oder"
+  }
+}

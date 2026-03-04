@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "description": "Contagem regressiva para o seu momento especial. Crie e compartilhe countdowns para viagens, casamentos, formaturas e muito mais.",
+    "ogTitle": "Momentto — Contagem regressiva para o seu momento especial",
+    "ogDescription": "Crie e compartilhe countdowns para viagens, casamentos, formaturas e muito mais.",
+    "ogAlt": "Momentto — Contagem regressiva"
+  },
+  "home": {
+    "tagline": "Cada momento especial merece ser aguardado com emoção.",
+    "sub": "Crie sua contagem regressiva e sinta a antecipação crescer a cada segundo.",
+    "cta": "Criar minha contagem",
+    "footer": "Viagens · Casamentos · Formaturas · Festas · e muito mais"
+  },
+  "countdown": {
+    "edit": "Editar",
+    "back": "Voltar",
+    "publicView": "Visualização pública",
+    "bigDay": "O grande dia chegou!",
+    "enjoy": "Aproveite cada momento.",
+    "remaining": "Faltam",
+    "day": "Dia",
+    "days": "Dias",
+    "elapsed": "concluído",
+    "createOwn": "Criar a minha contagem",
+    "madeWith": "Desenvolvido com",
+    "by": "por",
+    "notificationMsg": "O grande dia chegou!",
+    "month": "Mês",
+    "months": "Meses",
+    "hour": "Hora",
+    "hours": "Horas",
+    "minute": "Minuto",
+    "minutes": "Minutos",
+    "second": "Segundo",
+    "seconds": "Segundos"
+  },
+  "categories": {
+    "viagem": "Viagem",
+    "aniversario": "Aniversário",
+    "casamento": "Casamento",
+    "formatura": "Formatura",
+    "festa": "Festa",
+    "bebe": "Nascimento",
+    "show": "Show",
+    "conquista": "Conquista",
+    "evento": "Evento",
+    "outro": "Outro"
+  },
+  "setup": {
+    "title": "Contagem Regressiva",
+    "home": "Início",
+    "step1Sub": "Escolha o motivo da sua contagem",
+    "step2Sub": "Diga mais sobre esse momento especial",
+    "eventName": "Qual o nome do evento?",
+    "when": "Quando vai acontecer?",
+    "pickDate": "Selecione uma data",
+    "addTime": "Adicionar horário (opcional)",
+    "at": "Horário",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "start": "Iniciar Contagem",
+    "placeholders": {
+      "viagem": "Ex: Viagem para Paris",
+      "aniversario": "Ex: Aniversário da Camila",
+      "casamento": "Ex: Casamento da Ana e João",
+      "formatura": "Ex: Formatura de Medicina",
+      "festa": "Ex: Festa de Réveillon",
+      "bebe": "Ex: Chegada do Bebê",
+      "show": "Ex: Show do Coldplay",
+      "conquista": "Ex: Aprovação no concurso",
+      "evento": "Ex: Conferência de tecnologia",
+      "outro": "Ex: Minha aposentadoria",
+      "default": "Ex: Meu evento especial"
+    }
+  },
+  "list": {
+    "title": "Minhas contagens",
+    "new": "Nova contagem",
+    "share": "Compartilhar",
+    "delete": "Excluir",
+    "today": "Hoje!",
+    "arrived": "Chegou!",
+    "day": "dia",
+    "days": "dias"
+  },
+  "share": {
+    "title": "Compartilhar contagem",
+    "generate": "Gerar link de compartilhamento",
+    "generating": "Gerando...",
+    "copy": "Copiar link",
+    "copied": "Copiado!",
+    "shareBtn": "Compartilhar",
+    "expiry": "Link expira 5 dias após a data do evento.",
+    "publicView": "Quem abrir este link pode acompanhar a contagem, sem poder editar.",
+    "nativeShareText": "Acompanha comigo a contagem para: {title}",
+    "fallbackTitle": "Contagem regressiva",
+    "fallbackDescription": "Este link de compartilhamento não existe ou já expirou.",
+    "countdownFor": "Acompanhe a contagem regressiva para: {title}"
+  },
+  "controls": {
+    "share": "Compartilhar",
+    "menu": "Menu",
+    "signIn": "Entrar para sincronizar",
+    "signOut": "Sair",
+    "notificationsOn": "Notificações ativas",
+    "notificationsOff": "Ativar notificações",
+    "language": "Idioma",
+    "accentColor": "Cor de destaque",
+    "theme": "Tema",
+    "themes": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    }
+  },
+  "offline": {
+    "syncing": "Sincronizando alterações...",
+    "offline": "Você está offline. Alterações serão salvas ao reconectar."
+  },
+  "install": {
+    "prompt": "Para receber notificações no iOS, instale o app: toque em",
+    "andThen": "e depois",
+    "addToHome": "\"Adicionar à Tela de Início\""
+  },
+  "push": {
+    "activate": "Ativar notificações",
+    "deactivate": "Desativar notificações",
+    "notSupported": "Notificações não suportadas neste browser"
+  },
+  "changelog": {
+    "back": "Voltar",
+    "description": "Todas as novidades e melhorias do Momentto.",
+    "empty": "Nenhuma atualização disponível.",
+    "metaDescription": "Acompanhe todas as novidades e melhorias do Momentto"
+  },
+  "auth": {
+    "sessionError": "Não foi possível iniciar a sessão.",
+    "retry": "Tentar novamente",
+    "headline": "Sincronize seus countdowns",
+    "sub": "Faça login para acessar seus eventos em qualquer dispositivo.",
+    "google": "Continuar com Google",
+    "emailLabel": "Seu email",
+    "emailPlaceholder": "voce@email.com",
+    "emailButton": "Enviar link de acesso",
+    "sending": "Enviando...",
+    "checkInbox": "Verifique seu email",
+    "checkInboxSub": "Enviamos um link de acesso para {email}. Clique nele para entrar.",
+    "backToLogin": "Usar outro email",
+    "skip": "Continuar sem conta",
+    "errorPrefix": "Erro: ",
+    "orDivider": "ou"
+  }
+}

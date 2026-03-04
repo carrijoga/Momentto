@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import { X } from "lucide-react"
 
 export function InstallPrompt() {
-  const { language } = useLanguage()
+  const t = useTranslations("install")
   const [isIOS, setIsIOS] = useState(false)
   const [isStandalone, setIsStandalone] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -19,12 +19,8 @@ export function InstallPrompt() {
 
   const shouldShow = isIOS && !isStandalone && !dismissed
 
-  const text =
-    language === "pt"
-      ? "Para receber notificações no iOS, instale o app: toque em"
-      : "To receive notifications on iOS, install the app: tap"
-
-  const addText = language === "pt" ? "\"Adicionar à Tela de Início\"" : "\"Add to Home Screen\""
+  const text = t("prompt")
+  const addText = t("addToHome")
 
   function handleDismiss() {
     localStorage.setItem("install-prompt-dismissed", "true")
@@ -52,7 +48,7 @@ export function InstallPrompt() {
             <p className="pr-6">
               {text}{" "}
               <span role="img" aria-label="share">{"⎋"}</span>{" "}
-              {language === "pt" ? "e depois" : "and then"}{" "}
+              {t("andThen")}{" "}
               <span className="text-foreground font-medium">{addText}</span>
               {" "}
               <span role="img" aria-label="plus">{"+"}</span>

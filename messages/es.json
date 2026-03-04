@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "description": "Cuenta regresiva para tu momento especial. Crea y comparte contadores para viajes, bodas, graduaciones y mucho más.",
+    "ogTitle": "Momentto — Cuenta regresiva para tu momento especial",
+    "ogDescription": "Crea y comparte contadores para viajes, bodas, graduaciones y mucho más.",
+    "ogAlt": "Momentto — Cuenta regresiva"
+  },
+  "home": {
+    "tagline": "Cada momento especial merece ser esperado con emoción.",
+    "sub": "Crea tu cuenta regresiva y siente cómo crece la anticipación con cada segundo.",
+    "cta": "Crear mi cuenta regresiva",
+    "footer": "Viajes · Bodas · Graduaciones · Fiestas · y mucho más"
+  },
+  "countdown": {
+    "edit": "Editar",
+    "back": "Volver",
+    "publicView": "Vista pública",
+    "bigDay": "¡El gran día llegó!",
+    "enjoy": "Disfruta cada momento.",
+    "remaining": "Faltan",
+    "day": "Día",
+    "days": "Días",
+    "elapsed": "completado",
+    "createOwn": "Crear mi propia cuenta regresiva",
+    "madeWith": "Hecho con",
+    "by": "por",
+    "notificationMsg": "¡El gran día llegó!",
+    "month": "Mes",
+    "months": "Meses",
+    "hour": "Hora",
+    "hours": "Horas",
+    "minute": "Minuto",
+    "minutes": "Minutos",
+    "second": "Segundo",
+    "seconds": "Segundos"
+  },
+  "categories": {
+    "viagem": "Viaje",
+    "aniversario": "Cumpleaños",
+    "casamento": "Boda",
+    "formatura": "Graduación",
+    "festa": "Fiesta",
+    "bebe": "Bebé",
+    "show": "Concierto",
+    "conquista": "Logro",
+    "evento": "Evento",
+    "outro": "Otro"
+  },
+  "setup": {
+    "title": "Cuenta Regresiva",
+    "home": "Inicio",
+    "step1Sub": "Elige el motivo de tu cuenta regresiva",
+    "step2Sub": "Cuéntanos más sobre este momento especial",
+    "eventName": "¿Cuál es el nombre del evento?",
+    "when": "¿Cuándo sucederá?",
+    "pickDate": "Selecciona una fecha",
+    "addTime": "Agregar hora (opcional)",
+    "at": "Hora",
+    "continue": "Continuar",
+    "back": "Volver",
+    "start": "Iniciar Cuenta Regresiva",
+    "placeholders": {
+      "viagem": "Ej: Viaje a París",
+      "aniversario": "Ej: Cumpleaños de Camila",
+      "casamento": "Ej: Boda de Ana y Juan",
+      "formatura": "Ej: Graduación de Medicina",
+      "festa": "Ej: Fiesta de Año Nuevo",
+      "bebe": "Ej: Llegada del Bebé",
+      "show": "Ej: Concierto de Coldplay",
+      "conquista": "Ej: Aprobar el examen",
+      "evento": "Ej: Conferencia de tecnología",
+      "outro": "Ej: Mi jubilación",
+      "default": "Ej: Mi evento especial"
+    }
+  },
+  "list": {
+    "title": "Mis cuentas regresivas",
+    "new": "Nueva cuenta regresiva",
+    "share": "Compartir",
+    "delete": "Eliminar",
+    "today": "¡Hoy!",
+    "arrived": "¡Llegó!",
+    "day": "día",
+    "days": "días"
+  },
+  "share": {
+    "title": "Compartir cuenta regresiva",
+    "generate": "Generar enlace para compartir",
+    "generating": "Generando...",
+    "copy": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "shareBtn": "Compartir",
+    "expiry": "El enlace expira 5 días después de la fecha del evento.",
+    "publicView": "Quien abra este enlace puede ver la cuenta regresiva, sin poder editarla.",
+    "nativeShareText": "Sígueme en la cuenta regresiva para: {title}",
+    "fallbackTitle": "Cuenta regresiva",
+    "fallbackDescription": "Este enlace no existe o ya venció.",
+    "countdownFor": "Sigue la cuenta regresiva para: {title}"
+  },
+  "controls": {
+    "share": "Compartir",
+    "menu": "Menú",
+    "signIn": "Iniciar sesión para sincronizar",
+    "signOut": "Cerrar sesión",
+    "notificationsOn": "Notificaciones activas",
+    "notificationsOff": "Activar notificaciones",
+    "language": "Idioma",
+    "accentColor": "Color de acento",
+    "theme": "Tema",
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
+  },
+  "offline": {
+    "syncing": "Sincronizando cambios...",
+    "offline": "Estás sin conexión. Los cambios se guardarán al reconectar."
+  },
+  "install": {
+    "prompt": "Para recibir notificaciones en iOS, instala la app: toca",
+    "andThen": "y luego",
+    "addToHome": "\"Agregar a pantalla de inicio\""
+  },
+  "push": {
+    "activate": "Activar notificaciones",
+    "deactivate": "Desactivar notificaciones",
+    "notSupported": "Notificaciones no admitidas en este navegador"
+  },
+  "changelog": {
+    "back": "Volver",
+    "description": "Todas las novedades y mejoras de Momentto.",
+    "empty": "No hay actualizaciones disponibles.",
+    "metaDescription": "Todas las novedades y mejoras de Momentto"
+  },
+  "auth": {
+    "sessionError": "No se pudo iniciar la sesión.",
+    "retry": "Reintentar",
+    "headline": "Sincroniza tus cuentas regresivas",
+    "sub": "Inicia sesión para acceder a tus eventos desde cualquier dispositivo.",
+    "google": "Continuar con Google",
+    "emailLabel": "Tu email",
+    "emailPlaceholder": "tu@email.com",
+    "emailButton": "Enviar enlace de acceso",
+    "sending": "Enviando...",
+    "checkInbox": "Revisa tu correo",
+    "checkInboxSub": "Enviamos un enlace de acceso a {email}. Haz clic para ingresar.",
+    "backToLogin": "Usar otro email",
+    "skip": "Continuar sin cuenta",
+    "errorPrefix": "Error: ",
+    "orDivider": "o"
+  }
+}

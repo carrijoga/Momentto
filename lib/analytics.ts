@@ -27,3 +27,6 @@ export const GA_EVENT_NOTIFICATION_SUBSCRIBED = "notification_subscribed"
 
 /** sendGAEvent("notification_unsubscribed") */
 export const GA_EVENT_NOTIFICATION_UNSUBSCRIBED = "notification_unsubscribed"
+
+/** sendGAEvent("language_changed", { locale: string }) */
+export const GA_EVENT_LANGUAGE_CHANGED = "language_changed"

@@ -2,12 +2,12 @@
 
 import { motion, AnimatePresence } from "motion/react"
 import { useConnectivity } from "@/lib/connectivity-context"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 export function OfflineBanner() {
   const { isOnline, isSyncing, pendingCount } = useConnectivity()
-  const { language } = useLanguage()
+  const t = useTranslations("offline")
 
   const show = !isOnline || isSyncing
   const isSyncingNow = isSyncing && isOnline
@@ -30,14 +30,12 @@ export function OfflineBanner() {
           {isSyncingNow ? (
             <>
               <span className="inline-block size-2 rounded-full bg-white/60 animate-pulse" />
-              {language === "pt" ? "Sincronizando alterações..." : "Syncing changes..."}
+          {t("syncing")}
             </>
           ) : (
             <>
               <span className="inline-block size-2 rounded-full bg-white/70" />
-              {language === "pt"
-                ? "Você está offline. Alterações serão salvas ao reconectar."
-                : "You're offline. Changes will be saved when you reconnect."}
+              {t("offline")}
               {pendingCount > 0 && (
                 <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0.5 tabular-nums">
                   {pendingCount}

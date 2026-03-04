@@ -7,7 +7,8 @@ import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
 import { SettingsIcon, type SettingsIconHandle } from "@/components/ui/settings"
 import { BellIcon } from "@/components/ui/bell"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations, useLocale } from "next-intl"
+import { useRouter, usePathname } from "next/navigation"
 import { useAccentColor, useAccentColorServerSync } from "@/lib/accent-color-context"
 import { usePushNotifications } from "@/hooks/use-push-notifications"
 import { useActiveCountdown } from "@/lib/active-countdown-context"
@@ -17,10 +18,12 @@ import type { CountdownEntry } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
 
 const themes = [
-  { value: "light", label: "Claro", labelEn: "Light", Icon: Sun },
-  { value: "dark", label: "Escuro", labelEn: "Dark", Icon: Moon },
-  { value: "system", label: "Sistema", labelEn: "System", Icon: Monitor },
+  { value: "light", Icon: Sun },
+  { value: "dark", Icon: Moon },
+  { value: "system", Icon: Monitor },
 ]
+
+const LOCALES = ["en", "pt-BR", "es", "fr", "de"] as const
 
 type CurrentView = "list" | "setup" | "display"
 
@@ -31,7 +34,10 @@ interface FloatingControlsProps {
 
 export function FloatingControls({ currentView = "list", onShareGenerated }: FloatingControlsProps) {
   const { theme, setTheme } = useTheme()
-  const { language, setLanguage } = useLanguage()
+  const t = useTranslations("controls")
+  const locale = useLocale()
+  const router = useRouter()
+  const pathname = usePathname()
   const { accentHue, setAccentHue, colors } = useAccentColor()
   const settingsRef = useRef<SettingsIconHandle>(null)
   const { isSupported, subscription, loading, subscribeToPush, unsubscribeFromPush } = usePushNotifications()
@@ -39,6 +45,12 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
   const { isAnonymous, userEmail, signOut, userId } = useAuth()
   const [shareOpen, setShareOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  function changeLocale(newLocale: string) {
+    const pathWithoutLocale = pathname.replace(new RegExp(`^/${locale}`), "") || "/"
+    router.replace(`/${newLocale}${pathWithoutLocale}`)
+    setMenuOpen(false)
+  }
 
   useAccentColorServerSync(userId)
 
@@ -61,7 +73,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             onClick={() => setShareOpen(true)}
             className="flex size-11 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground shadow-lg backdrop-blur-md transition-colors hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={language === "pt" ? "Compartilhar" : "Share"}
+            aria-label={t("share")}
           >
             <Share2 size={18} />
           </motion.button>
@@ -92,7 +104,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                   ? "border-border bg-card/80 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                   : "border-primary/40 bg-card/80 text-primary hover:border-primary"
             }`}
-            aria-label={language === "pt" ? "Menu" : "Menu"}
+            aria-label={t("menu")}
           >
             {menuOpen ? (
               <X size={18} />
@@ -125,17 +137,17 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="absolute bottom-16 right-0 w-60 overflow-hidden rounded-2xl border border-border bg-card/95 p-3 shadow-xl backdrop-blur-xl"
+              className="absolute bottom-16 right-0 w-64 overflow-hidden rounded-2xl border border-border bg-card/95 p-3 shadow-xl backdrop-blur-xl"
             >
               {/* Account */}
               {isAnonymous ? (
                 <Link
-                  href="/login"
+                  href={`/${locale}/login`}
                   onClick={() => setMenuOpen(false)}
                   className="mb-2 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
                 >
                   <UserRound className="size-3.5" />
-                  {language === "pt" ? "Entrar para sincronizar" : "Sign in to sync"}
+                  {t("signIn")}
                 </Link>
               ) : (
                 <>
@@ -145,7 +157,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                     className="mb-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
                   >
                     <LogOut className="size-3.5" />
-                    {language === "pt" ? "Sair" : "Sign out"}
+                    {t("signOut")}
                   </button>
                 </>
               )}
@@ -159,9 +171,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                     className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground disabled:opacity-50"
                   >
                     <BellIcon className={subscription ? "text-primary" : ""} size={14} />
-                    {subscription
-                      ? language === "pt" ? "Notificações ativas" : "Notifications on"
-                      : language === "pt" ? "Ativar notificações" : "Enable notifications"}
+                    {subscription ? t("notificationsOn") : t("notificationsOff")}
                   </button>
                 </>
               )}
@@ -172,20 +182,20 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
               <div className="mb-2.5">
                 <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                   <Globe className="size-3.5" />
-                  {language === "pt" ? "Idioma" : "Language"}
+                  {t("language")}
                 </p>
-                <div className="flex gap-1.5">
-                  {(["pt", "en"] as const).map((lang) => (
+                <div className="flex flex-wrap gap-1.5">
+                  {LOCALES.map((loc) => (
                     <button
-                      key={lang}
-                      onClick={() => setLanguage(lang)}
-                      className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-all ${
-                        language === lang
+                      key={loc}
+                      onClick={() => changeLocale(loc)}
+                      className={`rounded-lg px-2 py-1.5 text-xs font-medium transition-all ${
+                        locale === loc
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
                       }`}
                     >
-                      {lang.toUpperCase()}
+                      {loc.toUpperCase()}
                     </button>
                   ))}
                 </div>
@@ -195,7 +205,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
 
               {/* Changelog */}
               <Link
-                href="/changelog"
+                href={`/${locale}/changelog`}
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
               >
@@ -208,7 +218,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
               {/* Accent color */}
               <div className="mb-2.5">
                 <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                  {language === "pt" ? "Cor de destaque" : "Accent color"}
+                  {t("accentColor")}
                 </p>
                 <div className="grid grid-cols-4 gap-1.5">
                   {colors.map((color) => (
@@ -216,11 +226,11 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                       key={color.hue}
                       whileHover={{ scale: 1.15 }}
                       whileTap={{ scale: 0.9 }}
-                      title={language === "pt" ? color.label : color.labelEn}
+                      title={color.labelEn}
                       onClick={() => setAccentHue(color.hue, userId)}
                       className="group relative flex h-7 w-full items-center justify-center rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       style={{ backgroundColor: color.swatch }}
-                      aria-label={language === "pt" ? color.label : color.labelEn}
+                      aria-label={color.labelEn}
                     >
                       <AnimatePresence>
                         {accentHue === color.hue && (
@@ -244,10 +254,10 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
               {/* Theme */}
               <div>
                 <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                  {language === "pt" ? "Tema" : "Theme"}
+                  {t("theme")}
                 </p>
                 <div className="flex flex-col gap-1">
-                  {themes.map(({ value, label, labelEn, Icon }) => (
+                  {themes.map(({ value, Icon }) => (
                     <button
                       key={value}
                       onClick={() => setTheme(value)}
@@ -258,7 +268,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                       }`}
                     >
                       <Icon className="size-3.5" />
-                      <span>{language === "pt" ? label : labelEn}</span>
+                      <span>{t(`themes.${value}` as any)}</span>
                       {theme === value && (
                         <motion.span
                           initial={{ scale: 0 }}

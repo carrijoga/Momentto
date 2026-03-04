@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "description": "Countdown to your special moment. Create and share countdowns for trips, weddings, graduations and much more.",
+    "ogTitle": "Momentto — Countdown to your special moment",
+    "ogDescription": "Create and share countdowns for trips, weddings, graduations and much more.",
+    "ogAlt": "Momentto — Countdown"
+  },
+  "home": {
+    "tagline": "Every special moment deserves to be eagerly awaited.",
+    "sub": "Create your countdown and feel the anticipation build with every second.",
+    "cta": "Create my countdown",
+    "footer": "Trips · Weddings · Graduations · Parties · and much more"
+  },
+  "countdown": {
+    "edit": "Edit",
+    "back": "Back",
+    "publicView": "Public view",
+    "bigDay": "The big day is here!",
+    "enjoy": "Enjoy every moment.",
+    "remaining": "Remaining",
+    "day": "Day",
+    "days": "Days",
+    "elapsed": "elapsed",
+    "createOwn": "Create my own countdown",
+    "madeWith": "Made with",
+    "by": "by",
+    "notificationMsg": "The big day is here!",
+    "month": "Month",
+    "months": "Months",
+    "hour": "Hour",
+    "hours": "Hours",
+    "minute": "Minute",
+    "minutes": "Minutes",
+    "second": "Second",
+    "seconds": "Seconds"
+  },
+  "categories": {
+    "viagem": "Travel",
+    "aniversario": "Birthday",
+    "casamento": "Wedding",
+    "formatura": "Graduation",
+    "festa": "Party",
+    "bebe": "Baby",
+    "show": "Concert",
+    "conquista": "Achievement",
+    "evento": "Event",
+    "outro": "Other"
+  },
+  "setup": {
+    "title": "Countdown",
+    "home": "Home",
+    "step1Sub": "Choose the reason for your countdown",
+    "step2Sub": "Tell us more about this special moment",
+    "eventName": "What is the event name?",
+    "when": "When is it happening?",
+    "pickDate": "Select a date",
+    "addTime": "Add time (optional)",
+    "at": "Time",
+    "continue": "Continue",
+    "back": "Back",
+    "start": "Start Countdown",
+    "placeholders": {
+      "viagem": "e.g. Trip to Paris",
+      "aniversario": "e.g. Camila's Birthday",
+      "casamento": "e.g. Ana and João's Wedding",
+      "formatura": "e.g. Medical School Graduation",
+      "festa": "e.g. New Year's Party",
+      "bebe": "e.g. Baby's Arrival",
+      "show": "e.g. Coldplay Concert",
+      "conquista": "e.g. Passing the exam",
+      "evento": "e.g. Tech Conference",
+      "outro": "e.g. My Retirement",
+      "default": "e.g. My special event"
+    }
+  },
+  "list": {
+    "title": "My countdowns",
+    "new": "New countdown",
+    "share": "Share",
+    "delete": "Delete",
+    "today": "Today!",
+    "arrived": "It's here!",
+    "day": "day",
+    "days": "days"
+  },
+  "share": {
+    "title": "Share countdown",
+    "generate": "Generate share link",
+    "generating": "Generating...",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "shareBtn": "Share",
+    "expiry": "Link expires 5 days after the event date.",
+    "publicView": "Anyone with this link can follow the countdown, without editing.",
+    "nativeShareText": "Follow my countdown to: {title}",
+    "fallbackTitle": "Countdown",
+    "fallbackDescription": "This share link does not exist or has expired.",
+    "countdownFor": "Countdown to: {title}"
+  },
+  "controls": {
+    "share": "Share",
+    "menu": "Menu",
+    "signIn": "Sign in to sync",
+    "signOut": "Sign out",
+    "notificationsOn": "Notifications on",
+    "notificationsOff": "Enable notifications",
+    "language": "Language",
+    "accentColor": "Accent color",
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "offline": {
+    "syncing": "Syncing changes...",
+    "offline": "You're offline. Changes will be saved when you reconnect."
+  },
+  "install": {
+    "prompt": "To receive notifications on iOS, install the app: tap",
+    "andThen": "and then",
+    "addToHome": "\"Add to Home Screen\""
+  },
+  "push": {
+    "activate": "Enable notifications",
+    "deactivate": "Disable notifications",
+    "notSupported": "Notifications not supported in this browser"
+  },
+  "changelog": {
+    "back": "Back",
+    "description": "All the latest updates and improvements to Momentto.",
+    "empty": "No updates available.",
+    "metaDescription": "All the updates and improvements to Momentto"
+  },
+  "auth": {
+    "sessionError": "Could not start session.",
+    "retry": "Retry",
+    "headline": "Sync your countdowns",
+    "sub": "Sign in to access your events from any device.",
+    "google": "Continue with Google",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "you@email.com",
+    "emailButton": "Send magic link",
+    "sending": "Sending...",
+    "checkInbox": "Check your inbox",
+    "checkInboxSub": "We sent a sign-in link to {email}. Click it to sign in.",
+    "backToLogin": "Use a different email",
+    "skip": "Continue without account",
+    "errorPrefix": "Error: ",
+    "orDivider": "or"
+  }
+}

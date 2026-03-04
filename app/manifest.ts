@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Momentto",
     short_name: "Momentto",
     description: "Countdown timer for your special events",
-    start_url: "/",
+    start_url: "/en",
     display: "standalone",
     background_color: "#1a1a2e",
     theme_color: "#1a1a2e",

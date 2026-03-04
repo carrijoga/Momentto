@@ -1,4 +1,7 @@
 import withPWA from "next-pwa"
+import createNextIntlPlugin from "next-intl/plugin"
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts")
 
 let userConfig = undefined
 try {
@@ -85,4 +88,4 @@ const pwa = withPWA({
   buildExcludes: [/middleware-manifest\.json$/],
 })
 
-export default pwa(nextConfig)
+export default pwa(withNextIntl(nextConfig))

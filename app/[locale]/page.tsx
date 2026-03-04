@@ -11,7 +11,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { InstallPrompt } from "@/components/install-prompt"
 import { useAuth } from "@/lib/auth-context"
 import { useActiveCountdown } from "@/lib/active-countdown-context"
-import { useLanguage } from "@/lib/language-context"
+import { useTranslations } from "next-intl"
 import {
   fetchCountdowns,
   createCountdown,
@@ -35,7 +35,7 @@ const viewTransition = {
 export default function Home() {
   const { userId, loading: authLoading, error: authError, isLocalMode, retry } = useAuth()
   const { setActiveCountdown } = useActiveCountdown()
-  const { language } = useLanguage()
+  const t = useTranslations("auth")
 
   const [mounted, setMounted] = useState(false)
   const [view, setView] = useState<View>("list")
@@ -195,9 +195,7 @@ export default function Home() {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-sm text-muted-foreground">
-          {language === "pt"
-            ? "Não foi possível iniciar a sessão."
-            : "Could not start session."}
+          {t("sessionError")}
         </p>
         <p className="rounded-lg bg-destructive/10 px-4 py-2 text-xs font-mono text-destructive">
           {authError}
@@ -206,7 +204,7 @@ export default function Home() {
           onClick={retry}
           className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
         >
-          {language === "pt" ? "Tentar novamente" : "Retry"}
+          {t("retry")}
         </button>
       </div>
     )

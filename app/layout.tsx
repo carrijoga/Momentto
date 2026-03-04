@@ -3,12 +3,10 @@ import "./globals.css"
 import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import { LanguageProvider } from "@/lib/language-context"
 import { AccentColorProvider } from "@/lib/accent-color-context"
 import { AuthProvider } from "@/lib/auth-context"
 import { ActiveCountdownProvider } from "@/lib/active-countdown-context"
 import { ConnectivityProvider } from "@/lib/connectivity-context"
-import { OfflineBanner } from "@/components/offline-banner"
 import { Analytics } from "@vercel/analytics/next"
 import { GoogleAnalytics } from "@next/third-parties/google"
 
@@ -114,16 +112,13 @@ export default function RootLayout({
           storageKey="momentto-theme"
         >
           <AccentColorProvider>
-          <LanguageProvider>
             <AuthProvider>
               <ConnectivityProvider>
                 <ActiveCountdownProvider>
-                  <OfflineBanner />
                   {children}
                 </ActiveCountdownProvider>
               </ConnectivityProvider>
             </AuthProvider>
-          </LanguageProvider>
           </AccentColorProvider>
         </ThemeProvider>
         <Analytics />
