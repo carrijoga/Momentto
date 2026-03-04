@@ -113,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     const supabase = getSupabaseBrowserClient()
+    sendGAEvent("logout")
     await supabase.auth.signOut()
     // Clear any stale anonymous ID so it doesn't interfere after sign-out
     localStorage.removeItem("_anon_uid")

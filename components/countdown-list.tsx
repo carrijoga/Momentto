@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "motion/react"
+import { sendGAEvent } from "@/lib/analytics"
 import {
   Cake,
   Baby,
@@ -86,6 +87,7 @@ export function CountdownList({ countdowns, onOpen, onNew, onDelete }: Countdown
     // Remove from local state immediately — AnimatePresence handles the exit animation
     removedRef.current.add(id)
     setLocal((prev) => prev.filter((c) => c.id !== id))
+    sendGAEvent("countdown_deleted")
     // Notify parent (may trigger async DB delete)
     onDelete(id)
   }

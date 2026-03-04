@@ -15,3 +15,15 @@ export const GA_EVENT_LOGIN = "login"
 
 /** sendGAEvent("magic_link_sent") */
 export const GA_EVENT_MAGIC_LINK_SENT = "magic_link_sent"
+
+/** sendGAEvent("logout") */
+export const GA_EVENT_LOGOUT = "logout"
+
+/** sendGAEvent("countdown_deleted") */
+export const GA_EVENT_COUNTDOWN_DELETED = "countdown_deleted"
+
+/** sendGAEvent("notification_subscribed") */
+export const GA_EVENT_NOTIFICATION_SUBSCRIBED = "notification_subscribed"
+
+/** sendGAEvent("notification_unsubscribed") */
+export const GA_EVENT_NOTIFICATION_UNSUBSCRIBED = "notification_unsubscribed"

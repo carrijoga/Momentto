@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { subscribeUser, unsubscribeUser } from "@/app/actions"
 import { useLanguage } from "@/lib/language-context"
+import { sendGAEvent } from "@/lib/analytics"
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
@@ -61,6 +62,8 @@ export function PushNotificationManager() {
       const result = await subscribeUser(serialized)
       if (!result.success) {
         console.error("subscribeUser failed:", result.error)
+      } else {
+        sendGAEvent("notification_subscribed")
       }
     } catch (err) {
       console.error("Failed to subscribe:", err)
@@ -75,6 +78,7 @@ export function PushNotificationManager() {
       await subscription?.unsubscribe()
       setSubscription(null)
       await unsubscribeUser()
+      sendGAEvent("notification_unsubscribed")
     } catch (err) {
       console.error("Failed to unsubscribe:", err)
     } finally {
