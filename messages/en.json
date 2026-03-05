@@ -168,5 +168,64 @@
     "skip": "Continue without account",
     "errorPrefix": "Error: ",
     "orDivider": "or"
+  },
+  "landing": {
+    "nav": {
+      "cta": "Open app"
+    },
+    "hero": {
+      "tagline": "Every special moment deserves to be eagerly awaited.",
+      "sub": "Create beautiful countdowns for your trips, weddings, graduations and everything that makes life worth celebrating.",
+      "cta": "Start for free"
+    },
+    "demo": {
+      "label": "Dream Vacation",
+      "daysLabel": "days",
+      "hoursLabel": "hrs",
+      "minutesLabel": "min",
+      "secondsLabel": "sec"
+    },
+    "features": {
+      "title": "Everything you need to count down to what matters",
+      "item0": {
+        "title": "Any occasion",
+        "description": "Trips, weddings, graduations, parties, babies — if it deserves anticipation, Momentto has a category for it."
+      },
+      "item1": {
+        "title": "Share with anyone",
+        "description": "Generate a public link and let your friends and family follow the countdown in real time."
+      },
+      "item2": {
+        "title": "Stay notified",
+        "description": "Enable push notifications and never miss the moment — get an alert right when your event arrives."
+      },
+      "item3": {
+        "title": "Works offline",
+        "description": "Installed as a PWA, Momentto works even without an internet connection. Your countdowns are always available."
+      }
+    },
+    "howItWorks": {
+      "title": "Up and running in 30 seconds",
+      "step0": {
+        "title": "Pick a category",
+        "description": "Choose from trips, weddings, graduations, parties and many more."
+      },
+      "step1": {
+        "title": "Set the date",
+        "description": "Enter your event name and the exact date — time is optional."
+      },
+      "step2": {
+        "title": "Watch and share",
+        "description": "Your live countdown is ready. Share it with a link or install the app on your home screen."
+      }
+    },
+    "cta": {
+      "title": "Ready to start counting?",
+      "sub": "Join thousands of people celebrating their next big moment.",
+      "button": "Create my countdown"
+    },
+    "footer": {
+      "rights": "All rights reserved."
+    }
   }
 }

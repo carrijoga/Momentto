@@ -32,5 +32,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(origin)
+  return NextResponse.redirect(`${origin}/app`)
 }

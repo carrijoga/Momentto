@@ -24,7 +24,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && !isAnonymous) {
-      router.replace(`/${locale}`)
+      router.replace(`/${locale}/app`)
     }
   }, [isAnonymous, loading, router, locale])
 
@@ -197,7 +197,7 @@ export default function LoginPage() {
 
         {/* Skip */}
         <button
-          onClick={() => router.push(`/${locale}`)}
+          onClick={() => router.push(`/${locale}/app`)}
           className="block w-full text-center text-xs text-muted-foreground transition-colors hover:text-foreground"
         >
           {t("skip")}

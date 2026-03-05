@@ -29,9 +29,9 @@ export function CreateCopyButton({
 
   function handleClick() {
     if (isAuthenticated) {
-      router.push(`/${locale}?copy=${copyParam}`)
+      router.push(`/${locale}/app?copy=${copyParam}`)
     } else {
-      router.push(`/${locale}/login?next=/${locale}&copy=${copyParam}`)
+      router.push(`/${locale}/login?next=/${locale}/app&copy=${copyParam}`)
     }
   }
 

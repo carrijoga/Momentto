@@ -168,5 +168,64 @@
     "skip": "Continuar sem conta",
     "errorPrefix": "Erro: ",
     "orDivider": "ou"
+  },
+  "landing": {
+    "nav": {
+      "cta": "Abrir app"
+    },
+    "hero": {
+      "tagline": "Todo momento especial merece ser aguardado com emoção.",
+      "sub": "Crie contagens regressivas para viagens, casamentos, formaturas e tudo que faz a vida valer a pena celebrar.",
+      "cta": "Comece gratuitamente"
+    },
+    "demo": {
+      "label": "Viagem dos Sonhos",
+      "daysLabel": "dias",
+      "hoursLabel": "hrs",
+      "minutesLabel": "min",
+      "secondsLabel": "seg"
+    },
+    "features": {
+      "title": "Tudo que você precisa para contar os dias até o que importa",
+      "item0": {
+        "title": "Qualquer ocasião",
+        "description": "Viagens, casamentos, formaturas, festas, bebês — se merece ser aguardado, o Momentto tem uma categoria para isso."
+      },
+      "item1": {
+        "title": "Compartilhe com todos",
+        "description": "Gere um link público e deixe seus amigos e família acompanhar a contagem em tempo real."
+      },
+      "item2": {
+        "title": "Fique notificado",
+        "description": "Ative as notificações push e nunca perca o momento — receba um alerta exatamente quando seu evento chegar."
+      },
+      "item3": {
+        "title": "Funciona offline",
+        "description": "Instalado como PWA, o Momentto funciona mesmo sem internet. Suas contagens estão sempre disponíveis."
+      }
+    },
+    "howItWorks": {
+      "title": "Funcionando em 30 segundos",
+      "step0": {
+        "title": "Escolha uma categoria",
+        "description": "Selecione entre viagens, casamentos, formaturas, festas e muito mais."
+      },
+      "step1": {
+        "title": "Defina a data",
+        "description": "Digite o nome do evento e a data exata — o horário é opcional."
+      },
+      "step2": {
+        "title": "Acompanhe e compartilhe",
+        "description": "Sua contagem ao vivo está pronta. Compartilhe com um link ou instale o app na sua tela inicial."
+      }
+    },
+    "cta": {
+      "title": "Pronto para começar a contar?",
+      "sub": "Junte-se a milhares de pessoas celebrando seu próximo grande momento.",
+      "button": "Criar minha contagem"
+    },
+    "footer": {
+      "rights": "Todos os direitos reservados."
+    }
   }
 }

@@ -102,7 +102,7 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
           className="mb-10"
         >
           <Link
-            href={`/${locale}`}
+            href={`/${locale}/app`}
             className="mb-6 inline-flex items-center gap-2 rounded-full bg-card border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
           >
             <ArrowLeft className="size-3.5" />
