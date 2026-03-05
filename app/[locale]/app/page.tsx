@@ -9,6 +9,7 @@ import { CountdownList } from "@/components/countdown-list"
 import { FloatingControls } from "@/components/floating-controls"
 import { Spinner } from "@/components/ui/spinner"
 import { InstallPrompt } from "@/components/install-prompt"
+import { OnboardingModal } from "@/components/onboarding-modal"
 import { useAuth } from "@/lib/auth-context"
 import { useActiveCountdown } from "@/lib/active-countdown-context"
 import { useTranslations } from "next-intl"
@@ -50,6 +51,7 @@ export default function Home() {
   const [editingEntry, setEditingEntry] = useState<CountdownEntry | null>(null)
   const [displayEntry, setDisplayEntry] = useState<CountdownEntry | null>(null)
   const [prefillSetup, setPrefillSetup] = useState<{ category?: string; title: string; date: string; time?: string } | null>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   // ── Load countdowns from Supabase once authenticated ──────────────────────
   const loadCountdowns = useCallback(async () => {
@@ -163,6 +165,14 @@ export default function Home() {
     setView("setup")
   }
 
+  function handleNew() {
+    if (typeof window !== "undefined" && !localStorage.getItem("onboarding-completed")) {
+      setShowOnboarding(true)
+    } else {
+      openSetup()
+    }
+  }
+
   function goToList() {
     setDisplayEntry(null)
     setEditingEntry(null)
@@ -269,6 +279,10 @@ export default function Home() {
     <>
       <FloatingControls currentView={view} onShareGenerated={handleShareGenerated} />
       <InstallPrompt />
+      <OnboardingModal
+        open={showOnboarding}
+        onComplete={() => { setShowOnboarding(false); openSetup() }}
+      />
 
       <AnimatePresence mode="wait">
         {view === "list" && (
@@ -277,7 +291,7 @@ export default function Home() {
               countdowns={countdowns}
               savedCountdowns={savedCountdowns}
               onOpen={openDisplay}
-              onNew={() => openSetup()}
+              onNew={handleNew}
               onDelete={handleDelete}
               onUnsave={handleUnsave}
             />

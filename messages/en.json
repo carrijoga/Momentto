@@ -227,5 +227,33 @@
     "footer": {
       "rights": "All rights reserved."
     }
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "start": "Let's go!",
+    "stepCount": "{current} of {total}",
+    "steps": {
+      "create": {
+        "title": "Create your countdown",
+        "description": "Pick a category and set a date. Your countdown starts ticking immediately."
+      },
+      "view": {
+        "title": "Watch it live",
+        "description": "See days, hours, minutes and seconds counting down in real time — always up to date."
+      },
+      "share": {
+        "title": "Share with anyone",
+        "description": "Generate a public link so friends and family can follow along — no account needed."
+      },
+      "notify": {
+        "title": "Get notified",
+        "description": "Enable push notifications and receive an alert right when your event arrives."
+      },
+      "install": {
+        "title": "Install as an app",
+        "description": "Add Momentto to your home screen and access your countdowns offline, anytime."
+      }
+    }
   }
 }

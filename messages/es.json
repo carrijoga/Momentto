@@ -168,5 +168,33 @@
     "skip": "Continuar sin cuenta",
     "errorPrefix": "Error: ",
     "orDivider": "o"
+  },
+  "onboarding": {
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "start": "¡Empecemos!",
+    "stepCount": "{current} de {total}",
+    "steps": {
+      "create": {
+        "title": "Crea tu cuenta regresiva",
+        "description": "Elige una categoría y establece una fecha. Tu cuenta regresiva comenzará de inmediato."
+      },
+      "view": {
+        "title": "Síguelo en vivo",
+        "description": "Mira días, horas, minutos y segundos contando en tiempo real — siempre actualizado."
+      },
+      "share": {
+        "title": "Comparte con todos",
+        "description": "Genera un enlace público para que amigos y familia sigan el conteo — sin necesidad de cuenta."
+      },
+      "notify": {
+        "title": "Recibe notificaciones",
+        "description": "Activa las notificaciones push y recibe una alerta justo cuando llegue tu evento."
+      },
+      "install": {
+        "title": "Instala como app",
+        "description": "Agrega Momentto a tu pantalla de inicio y accede a tus cuentas regresivas sin conexión."
+      }
+    }
   }
 }

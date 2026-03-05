@@ -168,5 +168,33 @@
     "skip": "Ohne Konto fortfahren",
     "errorPrefix": "Fehler: ",
     "orDivider": "oder"
+  },
+  "onboarding": {
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "start": "Los geht's!",
+    "stepCount": "{current} von {total}",
+    "steps": {
+      "create": {
+        "title": "Countdown erstellen",
+        "description": "Wähle eine Kategorie und lege ein Datum fest. Dein Countdown startet sofort."
+      },
+      "view": {
+        "title": "Live verfolgen",
+        "description": "Sieh Tage, Stunden, Minuten und Sekunden in Echtzeit herunterzählen — immer aktuell."
+      },
+      "share": {
+        "title": "Mit allen teilen",
+        "description": "Erstelle einen öffentlichen Link, damit Freunde und Familie mitverfolgen können — ohne Konto."
+      },
+      "notify": {
+        "title": "Benachrichtigt werden",
+        "description": "Aktiviere Push-Benachrichtigungen und erhalte genau dann einen Alarm, wenn dein Event beginnt."
+      },
+      "install": {
+        "title": "Als App installieren",
+        "description": "Füge Momentto zu deinem Startbildschirm hinzu und greife jederzeit offline auf deine Countdowns zu."
+      }
+    }
   }
 }

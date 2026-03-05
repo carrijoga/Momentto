@@ -227,5 +227,33 @@
     "footer": {
       "rights": "Todos os direitos reservados."
     }
+  },
+  "onboarding": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "start": "Vamos lá!",
+    "stepCount": "{current} de {total}",
+    "steps": {
+      "create": {
+        "title": "Crie sua contagem",
+        "description": "Escolha uma categoria e defina uma data. Sua contagem começa a correr imediatamente."
+      },
+      "view": {
+        "title": "Acompanhe ao vivo",
+        "description": "Veja dias, horas, minutos e segundos contando em tempo real — sempre atualizado."
+      },
+      "share": {
+        "title": "Compartilhe com todos",
+        "description": "Gere um link público para amigos e família acompanharem — sem precisar de conta."
+      },
+      "notify": {
+        "title": "Receba notificações",
+        "description": "Ative as notificações push e receba um alerta exatamente quando seu evento chegar."
+      },
+      "install": {
+        "title": "Instale como app",
+        "description": "Adicione o Momentto à sua tela inicial e acesse suas contagens offline, a qualquer hora."
+      }
+    }
   }
 }

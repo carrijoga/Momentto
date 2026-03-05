@@ -168,5 +168,33 @@
     "skip": "Continuer sans compte",
     "errorPrefix": "Erreur : ",
     "orDivider": "ou"
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "next": "Suivant",
+    "start": "C'est parti !",
+    "stepCount": "{current} sur {total}",
+    "steps": {
+      "create": {
+        "title": "Créez votre compte à rebours",
+        "description": "Choisissez une catégorie et définissez une date. Votre compte à rebours démarre immédiatement."
+      },
+      "view": {
+        "title": "Suivez en direct",
+        "description": "Regardez les jours, heures, minutes et secondes défiler en temps réel — toujours à jour."
+      },
+      "share": {
+        "title": "Partagez avec tous",
+        "description": "Générez un lien public pour que vos proches puissent suivre le décompte — sans compte requis."
+      },
+      "notify": {
+        "title": "Recevez des notifications",
+        "description": "Activez les notifications push et recevez une alerte dès que votre événement arrive."
+      },
+      "install": {
+        "title": "Installez comme une app",
+        "description": "Ajoutez Momentto à votre écran d'accueil et accédez à vos comptes à rebours hors ligne."
+      }
+    }
   }
 }
