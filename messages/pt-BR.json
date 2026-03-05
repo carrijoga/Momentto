@@ -81,7 +81,14 @@
     "today": "Hoje!",
     "arrived": "Chegou!",
     "day": "dia",
-    "days": "dias"
+    "days": "dias",
+    "myCountdowns": "Meus Contadores",
+    "savedCountdowns": "Contadores Salvos",
+    "savedEmpty": "Nenhum contador salvo ainda",
+    "savedEmptyDescription": "Salve contadores de amigos para acompanhá-los aqui. Visite um link de compartilhamento e toque em Salvar.",
+    "unsave": "Remover dos salvos",
+    "linkRevoked": "Um contador compartilhado foi removido (link revogado)",
+    "shared": "Compartilhado"
   },
   "share": {
     "title": "Compartilhar contagem",
@@ -95,7 +102,19 @@
     "nativeShareText": "Acompanha comigo a contagem para: {title}",
     "fallbackTitle": "Contagem regressiva",
     "fallbackDescription": "Este link de compartilhamento não existe ou já expirou.",
-    "countdownFor": "Acompanhe a contagem regressiva para: {title}"
+    "countdownFor": "Acompanhe a contagem regressiva para: {title}",
+    "revoke": "Revogar link",
+    "revokeConfirm": "Revogar este link?",
+    "revokeDescription": "Quem tiver este link perderá o acesso imediatamente.",
+    "saveCount": "{count} pessoas salvaram este contador",
+    "expiry5d": "5 dias",
+    "expiry30d": "30 dias",
+    "expiryNever": "Nunca",
+    "save": "Salvar",
+    "saved": "Salvo",
+    "createCopy": "Criar minha cópia",
+    "qrDownloadHint": "Toque para baixar o QR code",
+    "cancel": "Cancelar"
   },
   "controls": {
     "share": "Compartilhar",

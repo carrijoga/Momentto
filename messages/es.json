@@ -81,7 +81,14 @@
     "today": "¡Hoy!",
     "arrived": "¡Llegó!",
     "day": "día",
-    "days": "días"
+    "days": "días",
+    "myCountdowns": "Mis Cuentas Regresivas",
+    "savedCountdowns": "Cuentas Guardadas",
+    "savedEmpty": "Aún no tienes cuentas guardadas",
+    "savedEmptyDescription": "Guarda cuentas regresivas de amigos para seguirlas aquí. Visita un enlace compartido y toca Guardar.",
+    "unsave": "Quitar de guardados",
+    "linkRevoked": "Una cuenta regresiva compartida fue eliminada (enlace revocado)",
+    "shared": "Compartida"
   },
   "share": {
     "title": "Compartir cuenta regresiva",
@@ -95,7 +102,19 @@
     "nativeShareText": "Sígueme en la cuenta regresiva para: {title}",
     "fallbackTitle": "Cuenta regresiva",
     "fallbackDescription": "Este enlace no existe o ya venció.",
-    "countdownFor": "Sigue la cuenta regresiva para: {title}"
+    "countdownFor": "Sigue la cuenta regresiva para: {title}",
+    "revoke": "Revocar enlace",
+    "revokeConfirm": "¿Revocar este enlace?",
+    "revokeDescription": "Cualquiera con este enlace perderá el acceso de inmediato.",
+    "saveCount": "{count} personas guardaron esto",
+    "expiry5d": "5 días",
+    "expiry30d": "30 días",
+    "expiryNever": "Nunca",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "createCopy": "Crear mi copia",
+    "qrDownloadHint": "Toca para descargar el código QR",
+    "cancel": "Cancelar"
   },
   "controls": {
     "share": "Compartir",

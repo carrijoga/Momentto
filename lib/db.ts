@@ -1,8 +1,8 @@
 import { openDB, type IDBPDatabase } from "idb"
-import type { CountdownEntry } from "@/lib/types"
+import type { CountdownEntry, SavedCountdownEntry } from "@/lib/types"
 
 const DB_NAME = "momentto-db"
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 export interface PendingOp {
   id?: number
@@ -20,6 +20,14 @@ type MomenttoDb = {
     key: number
     value: PendingOp
   }
+  saved_countdowns: {
+    key: string
+    value: SavedCountdownEntry
+  }
+  saved_countdowns_cache: {
+    key: string
+    value: SavedCountdownEntry
+  }
 }
 
 let dbPromise: Promise<IDBPDatabase<MomenttoDb>> | null = null
@@ -27,12 +35,22 @@ let dbPromise: Promise<IDBPDatabase<MomenttoDb>> | null = null
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB<MomenttoDb>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains("countdowns")) {
-          db.createObjectStore("countdowns", { keyPath: "id" })
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
+          if (!db.objectStoreNames.contains("countdowns")) {
+            db.createObjectStore("countdowns", { keyPath: "id" })
+          }
+          if (!db.objectStoreNames.contains("pending_ops")) {
+            db.createObjectStore("pending_ops", { autoIncrement: true })
+          }
         }
-        if (!db.objectStoreNames.contains("pending_ops")) {
-          db.createObjectStore("pending_ops", { autoIncrement: true })
+        if (oldVersion < 2) {
+          if (!db.objectStoreNames.contains("saved_countdowns")) {
+            db.createObjectStore("saved_countdowns", { keyPath: "id" })
+          }
+          if (!db.objectStoreNames.contains("saved_countdowns_cache")) {
+            db.createObjectStore("saved_countdowns_cache", { keyPath: "share_id" })
+          }
         }
       },
     })
@@ -92,6 +110,39 @@ export async function getPendingCount(): Promise<number> {
   return db.count("pending_ops")
 }
 
+// ── Saved countdowns (references) ─────────────────────────────────────────
+
+export async function getAllSavedFromDB(): Promise<SavedCountdownEntry[]> {
+  const db = await getDB()
+  const all = await db.getAll("saved_countdowns")
+  return all.sort((a, b) => new Date(b.saved_at).getTime() - new Date(a.saved_at).getTime())
+}
+
+export async function upsertSavedToDB(entry: SavedCountdownEntry): Promise<void> {
+  const db = await getDB()
+  await db.put("saved_countdowns", entry)
+}
+
+export async function removeSavedFromDB(id: string): Promise<void> {
+  const db = await getDB()
+  await db.delete("saved_countdowns", id)
+}
+
+export async function getCachedSaved(shareId: string): Promise<SavedCountdownEntry | undefined> {
+  const db = await getDB()
+  return db.get("saved_countdowns_cache", shareId)
+}
+
+export async function upsertSavedCache(entry: SavedCountdownEntry): Promise<void> {
+  const db = await getDB()
+  await db.put("saved_countdowns_cache", entry)
+}
+
+export async function removeSavedCache(shareId: string): Promise<void> {
+  const db = await getDB()
+  await db.delete("saved_countdowns_cache", shareId)
+}
+
 /** One-time migration: moves localStorage cache into IndexedDB */
 export async function migrateLegacyCache(): Promise<void> {
   const MIGRATED_KEY = "momentto-idb-migrated"
@@ -122,12 +173,17 @@ export async function migrateLegacyDb(): Promise<void> {
   const LEGACY_DB_NAME = "mytrip-db"
   const MIGRATED_MARKER = "momentto-db-migrated"
 
+  type LegacyDb = {
+    countdowns: { key: string; value: CountdownEntry }
+    pending_ops: { key: number; value: PendingOp }
+  }
+
   try {
     if (localStorage.getItem(MIGRATED_MARKER)) return
 
     let wasJustCreated = false
 
-    const legacy = await openDB<MomenttoDb>(LEGACY_DB_NAME, DB_VERSION, {
+    const legacy = await openDB<LegacyDb>(LEGACY_DB_NAME, 1, {
       upgrade(db, oldVersion) {
         if (oldVersion === 0) {
           wasJustCreated = true

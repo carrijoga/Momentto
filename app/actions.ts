@@ -23,7 +23,7 @@ export async function migrateAnonymousCountdowns(
   newUserId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await getSupabaseServiceClient()
+    const supabase = getSupabaseServiceClient()
 
     const { error: countdownsError } = await supabase
       .from("countdowns")
@@ -125,5 +125,81 @@ export async function sendNotification(title: string, body: string) {
   } catch (error) {
     console.error("Error sending push notification:", error)
     return { success: false, error: "Failed to send notification" }
+  }
+}
+
+// ── Share resolution ────────────────────────────────────────────────────────
+
+export interface ResolvedCountdown {
+  share_id: string
+  title: string
+  date: string
+  category: string
+  expires_at: string | null
+}
+
+/**
+ * Batch-resolves public data for a list of share_ids using the service role.
+ * Returns only publicly safe fields (no user_id).
+ */
+export async function resolveShareIds(shareIds: string[]): Promise<ResolvedCountdown[]> {
+  if (!shareIds.length) return []
+
+  try {
+    const supabase = getSupabaseServiceClient()
+    const { data, error } = await supabase
+      .from("countdowns")
+      .select("share_id, title, date, category, expires_at")
+      .in("share_id", shareIds)
+      .not("share_id", "is", null)
+
+    if (error) throw new Error(error.message)
+
+    return (data ?? []).map((row) => ({
+      share_id: row.share_id as string,
+      title: row.title,
+      date: row.date,
+      category: row.category,
+      expires_at: row.expires_at ?? null,
+    }))
+  } catch (error) {
+    console.error("resolveShareIds error:", error)
+    return []
+  }
+}
+
+/**
+ * Returns the number of users who saved a countdown — only for the owner.
+ * Validates that the authenticated user owns the countdown before counting.
+ */
+export async function getSaveCount(shareId: string): Promise<{ count: number } | { error: string }> {
+  try {
+    const supabase = await getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: "Not authenticated" }
+
+    // Validate ownership with authenticated client (respects RLS)
+    const { data: owned } = await supabase
+      .from("countdowns")
+      .select("id")
+      .eq("share_id", shareId)
+      .eq("user_id", user.id)
+      .single()
+
+    if (!owned) return { error: "Not owner" }
+
+    // Count saves using service role (bypasses RLS on saved_countdowns)
+    const serviceSupabase = getSupabaseServiceClient()
+    const { count, error } = await serviceSupabase
+      .from("saved_countdowns")
+      .select("id", { count: "exact", head: true })
+      .eq("share_id", shareId)
+
+    if (error) throw new Error(error.message)
+
+    return { count: count ?? 0 }
+  } catch (error) {
+    console.error("getSaveCount error:", error)
+    return { error: String(error) }
   }
 }

@@ -29,7 +29,7 @@ export default async function Image({
 }: {
   params: { shareId: string }
 }) {
-  const supabase = await getSupabaseServiceClient()
+  const supabase = getSupabaseServiceClient()
   const { data } = await supabase
     .from("countdowns")
     .select("title, category, date, expires_at")

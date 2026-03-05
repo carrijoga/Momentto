@@ -81,7 +81,14 @@
     "today": "Today!",
     "arrived": "It's here!",
     "day": "day",
-    "days": "days"
+    "days": "days",
+    "myCountdowns": "My Countdowns",
+    "savedCountdowns": "Saved Countdowns",
+    "savedEmpty": "No saved countdowns yet",
+    "savedEmptyDescription": "Save countdowns from friends to follow them here. Visit a share link and tap Save.",
+    "unsave": "Remove from saved",
+    "linkRevoked": "A shared countdown was removed (link revoked)",
+    "shared": "Shared"
   },
   "share": {
     "title": "Share countdown",
@@ -95,7 +102,19 @@
     "nativeShareText": "Follow my countdown to: {title}",
     "fallbackTitle": "Countdown",
     "fallbackDescription": "This share link does not exist or has expired.",
-    "countdownFor": "Countdown to: {title}"
+    "countdownFor": "Countdown to: {title}",
+    "revoke": "Revoke link",
+    "revokeConfirm": "Revoke this link?",
+    "revokeDescription": "Anyone with this link will lose access immediately.",
+    "saveCount": "{count} people saved this",
+    "expiry5d": "5 days",
+    "expiry30d": "30 days",
+    "expiryNever": "Never",
+    "save": "Save",
+    "saved": "Saved",
+    "createCopy": "Create my copy",
+    "qrDownloadHint": "Tap to download QR code",
+    "cancel": "Cancel"
   },
   "controls": {
     "share": "Share",

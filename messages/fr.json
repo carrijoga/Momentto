@@ -81,7 +81,14 @@
     "today": "Aujourd'hui !",
     "arrived": "C'est le jour !",
     "day": "jour",
-    "days": "jours"
+    "days": "jours",
+    "myCountdowns": "Mes Comptes à Rebours",
+    "savedCountdowns": "Comptes Sauvegardés",
+    "savedEmpty": "Aucun compte à rebours sauvegardé",
+    "savedEmptyDescription": "Sauvegardez des comptes à rebours d'amis pour les suivre ici. Visitez un lien de partage et appuyez sur Enregistrer.",
+    "unsave": "Retirer des sauvegardés",
+    "linkRevoked": "Un compte à rebours partagé a été supprimé (lien révoqué)",
+    "shared": "Partagé"
   },
   "share": {
     "title": "Partager le compte à rebours",
@@ -95,7 +102,19 @@
     "nativeShareText": "Suivez mon compte à rebours pour : {title}",
     "fallbackTitle": "Compte à rebours",
     "fallbackDescription": "Ce lien de partage n'existe pas ou a expiré.",
-    "countdownFor": "Suivez le compte à rebours pour : {title}"
+    "countdownFor": "Suivez le compte à rebours pour : {title}",
+    "revoke": "Révoquer le lien",
+    "revokeConfirm": "Révoquer ce lien ?",
+    "revokeDescription": "Toute personne ayant ce lien perdra l'accès immédiatement.",
+    "saveCount": "{count} personnes ont sauvegardé ceci",
+    "expiry5d": "5 jours",
+    "expiry30d": "30 jours",
+    "expiryNever": "Jamais",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "createCopy": "Créer ma copie",
+    "qrDownloadHint": "Appuyez pour télécharger le QR code",
+    "cancel": "Annuler"
   },
   "controls": {
     "share": "Partager",

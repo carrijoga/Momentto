@@ -1,8 +1,10 @@
 import { cache } from "react"
 import Link from "next/link"
 import type { Metadata } from "next"
-import { getSupabaseServiceClient } from "@/lib/supabase/server"
+import { getSupabaseServiceClient, getSupabaseServerClient } from "@/lib/supabase/server"
 import { PublicCountdownWrapper } from "@/components/public-countdown-wrapper"
+import { SaveCountdownButton } from "@/components/save-countdown-button"
+import { CreateCopyButton } from "@/components/create-copy-button"
 import type { CountdownEntry } from "@/lib/types"
 import { getTranslations } from "next-intl/server"
 
@@ -11,7 +13,7 @@ interface Props {
 }
 
 const getCountdown = cache(async (shareId: string): Promise<CountdownEntry | null> => {
-  const supabase = await getSupabaseServiceClient()
+  const supabase = getSupabaseServiceClient()
   const { data, error } = await supabase
     .from("countdowns")
     .select("id, share_id, category, title, date, time, created_at, expires_at")
@@ -31,7 +33,8 @@ const getCountdown = cache(async (shareId: string): Promise<CountdownEntry | nul
     expires_at: data.expires_at ?? null,
   }
 
-  if (entry.expires_at && new Date(entry.expires_at) < new Date()) return null
+  // expires_at = null means "never expires"; only block if explicitly expired
+  if (entry.expires_at != null && new Date(entry.expires_at) < new Date()) return null
 
   return entry
 })
@@ -53,7 +56,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${title} | Momentto`,
       description,
-      // locale-prefixed OG image path so Next.js finds the right route
       images: [{ url: `/${locale}/c/${shareId}/opengraph-image` }],
     },
     twitter: {
@@ -71,10 +73,66 @@ export default async function SharedCountdownPage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "share" })
 
   if (!entry) {
-    return <ExpiredScreen fallbackTitle={t("fallbackTitle")} fallbackDescription={t("fallbackDescription")} createCta={t("generate")} />
+    return (
+      <ExpiredScreen
+        fallbackTitle={t("fallbackTitle")}
+        fallbackDescription={t("fallbackDescription")}
+        createCta={t("generate")}
+      />
+    )
   }
 
-  return <PublicCountdownWrapper entry={entry} />
+  // Check if the authenticated user has already saved this countdown
+  let isSaved = false
+  let savedId: string | null = null
+  let isAuthenticated = false
+
+  try {
+    const supabase = await getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      isAuthenticated = true
+      const { data: savedRow } = await supabase
+        .from("saved_countdowns")
+        .select("id")
+        .eq("share_id", shareId)
+        .single()
+      if (savedRow) {
+        isSaved = true
+        savedId = savedRow.id
+      }
+    }
+  } catch {
+    // Not authenticated or error — proceed without save state
+  }
+
+  return (
+    <div className="relative">
+      <PublicCountdownWrapper entry={entry} />
+      <div className="fixed bottom-6 left-0 right-0 z-40 flex items-center justify-center gap-3 px-4">
+        <CreateCopyButton
+          title={entry.title}
+          date={entry.date}
+          category={entry.category}
+          locale={locale}
+          isAuthenticated={isAuthenticated}
+        />
+        {isAuthenticated && (
+          <SaveCountdownButton
+            shareId={shareId}
+            savedId={savedId}
+            isSaved={isSaved}
+            resolvedData={{
+              title: entry.title,
+              date: entry.date,
+              category: entry.category,
+              expires_at: entry.expires_at,
+            }}
+          />
+        )}
+      </div>
+    </div>
+  )
 }
 
 function ExpiredScreen({
@@ -104,3 +162,4 @@ function ExpiredScreen({
     </div>
   )
 }
+

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import { useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "motion/react"
 import { CountdownSetup } from "@/components/countdown-setup"
 import { CountdownDisplay } from "@/components/countdown-display"
@@ -12,14 +13,17 @@ import { InstallPrompt } from "@/components/install-prompt"
 import { useAuth } from "@/lib/auth-context"
 import { useActiveCountdown } from "@/lib/active-countdown-context"
 import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 import {
   fetchCountdowns,
+  fetchSavedCountdowns,
   createCountdown,
   updateCountdown,
   deleteCountdown,
+  unsaveCountdown,
 } from "@/lib/countdowns"
 import { getAllCountdownsFromDB, migrateLegacyCache, migrateLegacyDb } from "@/lib/db"
-import type { CountdownEntry } from "@/lib/types"
+import type { CountdownEntry, SavedCountdownEntry } from "@/lib/types"
 
 type View = "list" | "setup" | "display"
 
@@ -36,20 +40,28 @@ export default function Home() {
   const { userId, loading: authLoading, error: authError, isLocalMode, retry } = useAuth()
   const { setActiveCountdown } = useActiveCountdown()
   const t = useTranslations("auth")
+  const tList = useTranslations("list")
+  const searchParams = useSearchParams()
 
   const [mounted, setMounted] = useState(false)
   const [view, setView] = useState<View>("list")
   const [countdowns, setCountdowns] = useState<CountdownEntry[]>([])
+  const [savedCountdowns, setSavedCountdowns] = useState<SavedCountdownEntry[]>([])
   const [loadingData, setLoadingData] = useState(false)
   const [editingEntry, setEditingEntry] = useState<CountdownEntry | null>(null)
   const [displayEntry, setDisplayEntry] = useState<CountdownEntry | null>(null)
+  const [prefillSetup, setPrefillSetup] = useState<{ category?: string; title: string; date: string; time?: string } | null>(null)
 
   // ── Load countdowns from Supabase once authenticated ──────────────────────
   const loadCountdowns = useCallback(async () => {
     setLoadingData(true)
     try {
-      const entries = await fetchCountdowns()
+      const [entries, saved] = await Promise.all([
+        fetchCountdowns(),
+        fetchSavedCountdowns(),
+      ])
       setCountdowns(entries)
+      setSavedCountdowns(saved)
 
       // Migrate legacy single-countdown format
       try {
@@ -107,6 +119,38 @@ export default function Home() {
     if (userId || isLocalMode) loadCountdowns()
   }, [userId, isLocalMode, loadCountdowns])
 
+  // ── Handle ?copy= query param (create copy of a shared countdown) ─────────
+  useEffect(() => {
+    if (!mounted) return
+    const copyParam = searchParams.get("copy")
+    if (!copyParam) return
+    try {
+      const data = JSON.parse(decodeURIComponent(atob(copyParam)))
+      if (data?.title && data?.date) {
+        setPrefillSetup({ category: data.category, title: data.title, date: data.date, time: data.time })
+        setView("setup")
+        // Remove ?copy from URL without navigation
+        const url = new URL(window.location.href)
+        url.searchParams.delete("copy")
+        window.history.replaceState({}, "", url.toString())
+      }
+    } catch {
+      // ignore malformed param
+    }
+  }, [mounted, searchParams])
+
+  // ── Listen for revoked saved countdowns ───────────────────────────────────
+  useEffect(() => {
+    const handleRevoked = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { revokedIds?: string[] }
+      const ids = detail?.revokedIds ?? []
+      setSavedCountdowns((prev) => prev.filter((c) => !ids.includes(c.id)))
+      toast(tList("linkRevoked"))
+    }
+    window.addEventListener("saved-countdowns-revoked", handleRevoked)
+    return () => window.removeEventListener("saved-countdowns-revoked", handleRevoked)
+  }, [tList])
+
   // ── Navigation helpers ────────────────────────────────────────────────────
   function openDisplay(entry: CountdownEntry) {
     setDisplayEntry(entry)
@@ -116,12 +160,14 @@ export default function Home() {
 
   function openSetup(entry?: CountdownEntry) {
     setEditingEntry(entry ?? null)
+    setPrefillSetup(null)
     setView("setup")
   }
 
   function goToList() {
     setDisplayEntry(null)
     setEditingEntry(null)
+    setPrefillSetup(null)
     setActiveCountdown(null)
     setView("list")
   }
@@ -173,6 +219,16 @@ export default function Home() {
     }
   }
 
+  // ── Unsave ────────────────────────────────────────────────────────────────
+  async function handleUnsave(id: string, shareId: string) {
+    setSavedCountdowns((prev) => prev.filter((c) => c.id !== id))
+    try {
+      await unsaveCountdown(id, shareId)
+    } catch (e) {
+      console.error("Failed to unsave countdown:", e)
+    }
+  }
+
   // ── Share link patch ──────────────────────────────────────────────────────
   function handleShareGenerated(updated: CountdownEntry) {
     setCountdowns((prev) => prev.map((c) => (c.id === updated.id ? updated : c)))
@@ -218,14 +274,16 @@ export default function Home() {
       <AnimatePresence mode="wait">
         {view === "list" && (
           <motion.div key="list" {...viewTransition}>
-            {countdowns.length === 0 ? (
+            {countdowns.length === 0 && savedCountdowns.length === 0 ? (
               <HomeScreen onStart={() => openSetup()} />
             ) : (
               <CountdownList
                 countdowns={countdowns}
+                savedCountdowns={savedCountdowns}
                 onOpen={openDisplay}
                 onNew={() => openSetup()}
                 onDelete={handleDelete}
+                onUnsave={handleUnsave}
               />
             )}
           </motion.div>
@@ -234,10 +292,10 @@ export default function Home() {
         {view === "setup" && (
           <motion.div key="setup" {...viewTransition}>
             <CountdownSetup
-              initialCategory={editingEntry?.category}
-              initialTitle={editingEntry?.title}
-              initialDate={editingEntry?.date}
-              initialTime={editingEntry?.time ?? undefined}
+              initialCategory={editingEntry?.category ?? prefillSetup?.category}
+              initialTitle={editingEntry?.title ?? prefillSetup?.title}
+              initialDate={editingEntry?.date ?? prefillSetup?.date}
+              initialTime={editingEntry?.time ?? prefillSetup?.time ?? undefined}
               onComplete={handleSetupComplete}
               onBack={goToList}
             />
