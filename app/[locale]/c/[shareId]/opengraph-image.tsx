@@ -34,17 +34,14 @@ function daysUntil(dateStr: string): number {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 }
 
-export async function generateImageMetadata() {
-  return [{ id: "og", alt: "Momentto countdown" }]
-}
-
 export default async function Image({
   params,
 }: {
-  params: { shareId: string; locale: string }
+  params: Promise<{ shareId: string; locale: string }>
 }) {
-  const t = await getTranslations({ locale: params.locale, namespace: "share" })
-  const tCountdown = await getTranslations({ locale: params.locale, namespace: "countdown" })
+  const { shareId, locale } = await params
+  const t = await getTranslations({ locale, namespace: "share" })
+  const tCountdown = await getTranslations({ locale, namespace: "countdown" })
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,102 +50,140 @@ export default async function Image({
   const { data } = await supabase
     .from("countdowns")
     .select("title, category, date, expires_at")
-    .eq("share_id", params.shareId)
+    .eq("share_id", shareId)
     .single()
 
   const title = data?.title ?? t("fallbackTitle")
   const emoji = CATEGORY_EMOJI[data?.category ?? "default"] ?? CATEGORY_EMOJI.default
   const days = data?.date ? daysUntil(data.date) : null
   const isExpired = data?.expires_at && new Date(data.expires_at) < new Date()
-
-  const daysLabel = days === 1
-    ? `1 ${tCountdown("day").toLowerCase()}`
-    : `${days} ${tCountdown("days").toLowerCase()}`
+  const daysWord = days === 1 ? tCountdown("day") : tCountdown("days")
 
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#1a1a2e",
+          background: "linear-gradient(135deg, #0d0d1f 0%, #1a1a2e 55%, #16213e 100%)",
           width: "100%",
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
           fontFamily: "sans-serif",
           position: "relative",
           overflow: "hidden",
-          padding: "60px",
         }}
       >
-        {/* Background glow */}
+        {/* Glow top-right */}
         <div
           style={{
             position: "absolute",
-            top: -80,
-            left: "50%",
-            width: 600,
-            height: 400,
+            top: -120,
+            right: -120,
+            width: 520,
+            height: 520,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(99,102,241,0.28) 0%, transparent 65%)",
+          }}
+        />
+        {/* Glow bottom-left */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -160,
+            left: -80,
+            width: 580,
+            height: 580,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 65%)",
           }}
         />
 
-        {/* Badge */}
+        {/* Main content */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "6px 16px",
-            borderRadius: 999,
-            background: "rgba(99,102,241,0.15)",
-            border: "1px solid rgba(99,102,241,0.3)",
-            color: "rgba(255,255,255,0.6)",
-            fontSize: 18,
-            marginBottom: 32,
+            flexDirection: "column",
+            flex: 1,
+            padding: "56px 80px",
+            justifyContent: "space-between",
           }}
         >
-          Momentto
-        </div>
-
-        {/* Emoji */}
-        <div style={{ fontSize: 80, marginBottom: 24 }}>{emoji}</div>
-
-        {/* Title */}
-        <div
-          style={{
-            fontSize: 60,
-            fontWeight: 800,
-            color: "#ffffff",
-            textAlign: "center",
-            lineHeight: 1.15,
-            maxWidth: 900,
-            marginBottom: 28,
-          }}
-        >
-          {title}
-        </div>
-
-        {/* Days remaining */}
-        {!isExpired && days !== null && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: 12,
-              color: "rgba(255,255,255,0.75)",
-            }}
-          >
-            <span style={{ fontSize: 64, fontWeight: 700, color: "#818cf8" }}>
-              {days}
-            </span>
-            <span style={{ fontSize: 28 }}>
-              {daysLabel}
-            </span>
+          {/* Top: branding */}
+          <div style={{ display: "flex" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "7px 20px",
+                borderRadius: 999,
+                background: "rgba(99,102,241,0.14)",
+                border: "1px solid rgba(99,102,241,0.32)",
+                color: "rgba(255,255,255,0.5)",
+                fontSize: 22,
+                letterSpacing: "0.04em",
+              }}
+            >
+              Momentto
+            </div>
           </div>
-        )}
+
+          {/* Middle: emoji + title */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ fontSize: 76, lineHeight: 1 }}>{emoji}</div>
+            <div
+              style={{
+                fontSize: 68,
+                fontWeight: 800,
+                color: "#ffffff",
+                lineHeight: 1.1,
+                maxWidth: 840,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {title}
+            </div>
+          </div>
+
+          {/* Bottom: days counter pill */}
+          {!isExpired && days !== null ? (
+            <div style={{ display: "flex" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 12,
+                  padding: "18px 32px",
+                  borderRadius: 18,
+                  background: "rgba(99,102,241,0.14)",
+                  border: "1px solid rgba(99,102,241,0.28)",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 56,
+                    fontWeight: 800,
+                    color: "#818cf8",
+                    lineHeight: 1,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {days}
+                </span>
+                <span
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 500,
+                    color: "rgba(255,255,255,0.55)",
+                  }}
+                >
+                  {daysWord}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: "flex" }} />
+          )}
+        </div>
       </div>
     ),
     { ...size }

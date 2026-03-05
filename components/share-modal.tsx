@@ -168,6 +168,8 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
             <p className="text-center text-sm text-muted-foreground">{t("publicView")}</p>
 
             {/* Expiry mode selector */}
+            <div className="flex w-full flex-col gap-1.5">
+            <p className="text-xs font-medium text-muted-foreground">{t("expiryLabel")}</p>
             <div className="flex w-full gap-1.5 rounded-xl border border-border bg-secondary/40 p-1">
               {EXPIRES_OPTIONS.map((opt) => (
                 <button
@@ -182,6 +184,7 @@ export function ShareModal({ entry, onClose, onShareGenerated }: ShareModalProps
                   {t(opt.labelKey)}
                 </button>
               ))}
+            </div>
             </div>
 
             <motion.button

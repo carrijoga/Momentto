@@ -107,6 +107,7 @@
     "revokeConfirm": "¿Revocar este enlace?",
     "revokeDescription": "Cualquiera con este enlace perderá el acceso de inmediato.",
     "saveCount": "{count} personas guardaron esto",
+    "expiryLabel": "El enlace expira tras",
     "expiry5d": "5 días",
     "expiry30d": "30 días",
     "expiryNever": "Nunca",
