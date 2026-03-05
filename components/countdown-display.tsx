@@ -364,26 +364,8 @@ export function CountdownDisplay({
         )}
       </div>
 
-      {/* Public CTA */}
-      {isPublic && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.4 }}
-          className="fixed bottom-16 left-1/2 -translate-x-1/2"
-        >
-          <Link
-            href="/"
-            className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition hover:opacity-90 whitespace-nowrap"
-          >
-            {t("createOwn")}
-            {" "}
-            {"->"}
-          </Link>
-        </motion.div>
-      )}
-
-      {/* Footer */}
+      {/* Footer — hidden in public mode to avoid overlap with the fixed action bar */}
+      {!isPublic && (
       <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -403,6 +385,7 @@ export function CountdownDisplay({
         </a>
         {" "}·{" "}v{pkg.version}
       </motion.footer>
+      )}
     </div>
   )
 }

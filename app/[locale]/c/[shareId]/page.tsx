@@ -107,9 +107,11 @@ export default async function SharedCountdownPage({ params }: Props) {
   }
 
   return (
-    <div className="relative">
-      <PublicCountdownWrapper entry={entry} />
-      <div className="fixed bottom-6 left-0 right-0 z-40 flex items-center justify-center gap-3 px-4">
+    <div className="flex min-h-dvh flex-col">
+      <div className="flex-1">
+        <PublicCountdownWrapper entry={entry} />
+      </div>
+      <div className="sticky bottom-0 z-40 flex items-center justify-center gap-3 px-4 py-4 border-t border-border/40 bg-background/80 backdrop-blur-md">
         <CreateCopyButton
           title={entry.title}
           date={entry.date}

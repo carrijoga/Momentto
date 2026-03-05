@@ -16,6 +16,7 @@ import {
   Plus,
   BookmarkMinus,
   ExternalLink,
+  Link2,
 } from "lucide-react"
 import { AirplaneIcon } from "@/components/ui/airplane"
 import { HeartIcon } from "@/components/ui/heart"
@@ -137,6 +138,7 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                 const days = mounted ? getDaysRemaining(entry.date) : 999
                 const catLabel = tCat(entry.category as any) ?? tCat("outro")
                 const isFinished = mounted && days === 0
+                const isUrgent = mounted && !isFinished && days <= 7
 
                 return (
                   <motion.div
@@ -151,7 +153,7 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                       scale: { type: "spring", stiffness: 400, damping: 30 },
                       y: { type: "spring", stiffness: 400, damping: 30, delay: i * 0.04 },
                     }}
-                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors hover:border-primary/40 hover:shadow-md cursor-pointer"
+                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-md cursor-pointer"
                     onClick={() => onOpen(entry)}
                   >
                     {/* Top accent bar */}
@@ -159,68 +161,47 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                       className={`h-1 w-full ${
                         isFinished
                           ? "bg-primary"
-                          : days <= 7
+                          : isUrgent
                           ? "bg-amber-500"
-                          : "bg-primary/30"
+                          : "bg-primary/20"
                       }`}
                     />
 
                     {/* Card body */}
-                    <div className="flex flex-1 flex-col p-3.5 sm:p-4">
-                      {/* Category + actions row */}
-                      <div className="mb-3 flex items-center justify-between">
+                    <div className="flex flex-1 flex-col p-3 sm:p-4">
+
+                      {/* Category badge row */}
+                      <div className="mb-3 flex items-start justify-between gap-1.5">
                         <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-primary">
-                          <CategoryIcon id={entry.category} className="size-3" />
-                          <span className="text-[10px] font-medium uppercase tracking-wider leading-none">
+                          <CategoryIcon id={entry.category} className="size-3 shrink-0" />
+                          <span className="text-[10px] font-medium uppercase tracking-wider leading-none truncate max-w-[70px]">
                             {catLabel}
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-0.5">
-                          {/* Shared indicator — always visible when share_id exists */}
-                          {entry.share_id && (
-                            <span
-                              className="flex size-5 items-center justify-center rounded-md text-primary/60"
-                              aria-label={t("shared")}
-                            >
-                              <Share2 className="size-2.5" />
-                            </span>
-                          )}
-
-                          {/* Hover actions */}
-                          <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleShare(entry) }}
-                              className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                              aria-label={t("share")}
-                            >
-                              <Share2 className="size-3" />
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleDelete(entry.id) }}
-                              className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                              aria-label={t("delete")}
-                            >
-                              <Trash2 className="size-3" />
-                            </button>
-                          </div>
-                        </div>
+                        {/* Shared badge — replaces the green icon */}
+                        {entry.share_id && (
+                          <span className="flex items-center gap-1 rounded-full border border-border/80 bg-secondary/70 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            <Link2 className="size-2.5 shrink-0" />
+                            Link
+                          </span>
+                        )}
                       </div>
 
                       {/* Days counter */}
-                      <div className="mb-3 flex flex-col items-center py-2">
+                      <div className="mb-2.5 flex flex-col items-center py-1.5">
                         <span
-                          className={`text-4xl font-bold tabular-nums tracking-tight sm:text-5xl ${
+                          className={`text-4xl font-bold tabular-nums tracking-tight leading-none sm:text-5xl ${
                             isFinished
                               ? "text-primary"
-                              : days <= 7
+                              : isUrgent
                               ? "text-amber-600 dark:text-amber-400"
                               : "text-foreground"
                           }`}
                         >
                           {isFinished ? "!" : days}
                         </span>
-                        <span className="mt-0.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                        <span className="mt-1 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
                           {isFinished ? t("arrived") : daysLabel(days)}
                         </span>
                       </div>
@@ -230,26 +211,30 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                         <p className="truncate text-sm font-semibold text-foreground leading-snug">
                           {entry.title}
                         </p>
-                        <p className="mt-1 truncate text-[11px] text-muted-foreground" suppressHydrationWarning>
+                        <p className="mt-0.5 truncate text-[11px] text-muted-foreground" suppressHydrationWarning>
                           {formatDate(entry.date, locale)}
                         </p>
                       </div>
                     </div>
 
-                    {/* Mobile actions row */}
-                    <div className="flex items-center border-t border-border/60 sm:hidden">
+                    {/* Action row — always visible, clear separation */}
+                    <div className="flex items-center border-t border-border/60">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleShare(entry) }}
-                        className="flex flex-1 items-center justify-center gap-1 py-2.5 text-[11px] text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                        className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
+                        aria-label={t("share")}
                       >
-                        <Share2 className="size-3" />
+                        <Share2 className="size-3.5" />
+                        <span className="hidden sm:inline">{t("share")}</span>
                       </button>
                       <div className="h-4 w-px bg-border/60" />
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(entry.id) }}
-                        className="flex flex-1 items-center justify-center gap-1 py-2.5 text-[11px] text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        aria-label={t("delete")}
                       >
-                        <Trash2 className="size-3" />
+                        <Trash2 className="size-3.5" />
+                        <span className="hidden sm:inline">{t("delete")}</span>
                       </button>
                     </div>
                   </motion.div>
@@ -291,6 +276,7 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                   const days = mounted ? getDaysRemaining(entry.date) : 999
                   const catLabel = tCat(entry.category as any) ?? tCat("outro")
                   const isFinished = mounted && days === 0
+                  const isUrgent = mounted && !isFinished && days <= 7
 
                   return (
                     <motion.div
@@ -305,7 +291,7 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                         scale: { type: "spring", stiffness: 400, damping: 30 },
                         y: { type: "spring", stiffness: 400, damping: 30, delay: i * 0.04 },
                       }}
-                      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card opacity-90 transition-colors hover:border-primary/40 hover:opacity-100 hover:shadow-md cursor-pointer"
+                      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-shadow hover:shadow-md cursor-pointer"
                       onClick={() => router.push(`/${locale}/c/${entry.share_id}`)}
                     >
                       {/* Top accent bar */}
@@ -313,47 +299,43 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                         className={`h-1 w-full ${
                           isFinished
                             ? "bg-primary"
-                            : days <= 7
+                            : isUrgent
                             ? "bg-amber-500"
-                            : "bg-primary/30"
+                            : "bg-primary/20"
                         }`}
                       />
 
                       {/* Card body */}
-                      <div className="flex flex-1 flex-col p-3.5 sm:p-4">
-                        {/* Category + unsave row */}
-                        <div className="mb-3 flex items-center justify-between">
+                      <div className="flex flex-1 flex-col p-3 sm:p-4">
+                        {/* Category badge row */}
+                        <div className="mb-3 flex items-start justify-between gap-1.5">
                           <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-primary">
-                            <CategoryIcon id={entry.category} className="size-3" />
-                            <span className="text-[10px] font-medium uppercase tracking-wider leading-none">
+                            <CategoryIcon id={entry.category} className="size-3 shrink-0" />
+                            <span className="text-[10px] font-medium uppercase tracking-wider leading-none truncate max-w-[70px]">
                               {catLabel}
                             </span>
                           </div>
-
-                          {/* Unsave button (hover on desktop) */}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleUnsave(entry.id, entry.share_id) }}
-                            className="flex size-6 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-                            aria-label={t("unsave")}
-                          >
-                            <BookmarkMinus className="size-3" />
-                          </button>
+                          {/* Saved badge */}
+                          <span className="flex items-center gap-1 rounded-full border border-border/80 bg-secondary/70 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            <ExternalLink className="size-2.5 shrink-0" />
+                            Salvo
+                          </span>
                         </div>
 
                         {/* Days counter */}
-                        <div className="mb-3 flex flex-col items-center py-2">
+                        <div className="mb-2.5 flex flex-col items-center py-1.5">
                           <span
-                            className={`text-4xl font-bold tabular-nums tracking-tight sm:text-5xl ${
+                            className={`text-4xl font-bold tabular-nums tracking-tight leading-none sm:text-5xl ${
                               isFinished
                                 ? "text-primary"
-                                : days <= 7
+                                : isUrgent
                                 ? "text-amber-600 dark:text-amber-400"
                                 : "text-foreground"
                             }`}
                           >
                             {isFinished ? "!" : days}
                           </span>
-                          <span className="mt-0.5 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                          <span className="mt-1 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
                             {isFinished ? t("arrived") : daysLabel(days)}
                           </span>
                         </div>
@@ -363,19 +345,21 @@ export function CountdownList({ countdowns, savedCountdowns, onOpen, onNew, onDe
                           <p className="truncate text-sm font-semibold text-foreground leading-snug">
                             {entry.title}
                           </p>
-                          <p className="mt-1 truncate text-[11px] text-muted-foreground" suppressHydrationWarning>
+                          <p className="mt-0.5 truncate text-[11px] text-muted-foreground" suppressHydrationWarning>
                             {formatDate(entry.date, locale)}
                           </p>
                         </div>
                       </div>
 
-                      {/* Mobile unsave row */}
-                      <div className="flex items-center border-t border-border/60 sm:hidden">
+                      {/* Action row */}
+                      <div className="flex items-center border-t border-border/60">
                         <button
                           onClick={(e) => { e.stopPropagation(); handleUnsave(entry.id, entry.share_id) }}
-                          className="flex flex-1 items-center justify-center gap-1 py-2.5 text-[11px] text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                          className="flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                          aria-label={t("unsave")}
                         >
-                          <BookmarkMinus className="size-3" />
+                          <BookmarkMinus className="size-3.5" />
+                          <span className="hidden sm:inline">{t("unsave")}</span>
                         </button>
                       </div>
                     </motion.div>
