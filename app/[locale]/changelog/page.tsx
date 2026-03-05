@@ -42,12 +42,13 @@ function getChangelogEntries(locale: string): ChangelogEntry[] {
     return []
   }
 
-  // Collect all unique slugs from both the base dir and the locale dir
-  const baseSlugs = fs.existsSync(baseDir)
-    ? fs.readdirSync(baseDir).filter((f) => f.endsWith(".md"))
+  // Collect unique slugs from both the root dir (pt-BR originals) AND the locale subdir
+  const rootSlugs = fs.readdirSync(baseDir).filter((f) => f.endsWith(".md"))
+  const localeSlugs = fs.existsSync(localeDir)
+    ? fs.readdirSync(localeDir).filter((f) => f.endsWith(".md"))
     : []
 
-  const slugs = Array.from(new Set(baseSlugs))
+  const slugs = Array.from(new Set([...rootSlugs, ...localeSlugs]))
 
   const entries: ChangelogEntry[] = slugs.map((file) => {
     const slug = file.replace(".md", "")
