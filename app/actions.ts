@@ -128,6 +128,34 @@ export async function sendNotification(title: string, body: string) {
   }
 }
 
+// ── Feedback ─────────────────────────────────────────────────────────────────
+
+export async function submitFeedback(
+  message: string
+): Promise<{ success: boolean; error?: string }> {
+  const trimmed = message.trim()
+  if (!trimmed) return { success: false, error: "Message is empty" }
+
+  try {
+    const supabase = await getSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const { error } = await supabase.from("feedback").insert({
+      user_id: user?.id ?? null,
+      message: trimmed,
+      metadata: {
+        user_agent: null, // not available server-side without headers API
+      },
+    })
+
+    if (error) return { success: false, error: error.message }
+    return { success: true }
+  } catch (err) {
+    console.error("submitFeedback error:", err)
+    return { success: false, error: String(err) }
+  }
+}
+
 // ── Share resolution ────────────────────────────────────────────────────────
 
 export interface ResolvedCountdown {

@@ -90,8 +90,6 @@ Copy `.env.local.example` (or create `.env.local`) and fill in the values:
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role key (server only) |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | ✅ | VAPID public key for Web Push |
 | `VAPID_PRIVATE_KEY` | ✅ | VAPID private key for Web Push (server only) |
-| `KV_REST_API_URL` | ✅ | Upstash Redis REST URL |
-| `KV_REST_API_TOKEN` | ✅ | Upstash Redis REST token (server only) |
 | `NEXT_PUBLIC_GTM_ID` | ⬜ | Google Tag Manager container ID (e.g. `GTM-XXXXXXX`) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | ⬜ | Google Analytics 4 Measurement ID (e.g. `G-XXXXXXXXXX`) |
 

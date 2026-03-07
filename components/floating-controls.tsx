@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import { useTheme } from "next-themes"
-import { Globe, Sun, Moon, Monitor, Check, ScrollText, Share2, UserRound, LogOut, X } from "lucide-react"
+import { Globe, Sun, Moon, Monitor, Check, ScrollText, Share2, UserRound, LogOut, X, MessageSquare } from "lucide-react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "motion/react"
 import { SettingsIcon, type SettingsIconHandle } from "@/components/ui/settings"
@@ -14,6 +14,7 @@ import { usePushNotifications } from "@/hooks/use-push-notifications"
 import { useActiveCountdown } from "@/lib/active-countdown-context"
 import { useAuth } from "@/lib/auth-context"
 import { ShareModal } from "@/components/share-modal"
+import { FeedbackModal } from "@/components/feedback-modal"
 import type { CountdownEntry } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
 
@@ -45,6 +46,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
   const { isAnonymous, userEmail, signOut, userId } = useAuth()
   const [shareOpen, setShareOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   function changeLocale(newLocale: string) {
     const pathWithoutLocale = pathname.replace(new RegExp(`^/${locale}`), "") || "/"
@@ -213,6 +215,15 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                 <span>Changelog</span>
               </Link>
 
+              {/* Feedback */}
+              <button
+                onClick={() => { setFeedbackOpen(true); setMenuOpen(false) }}
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+              >
+                <MessageSquare className="size-3.5" />
+                <span>{t("feedback")}</span>
+              </button>
+
               <Separator className="my-2.5" />
 
               {/* Accent color */}
@@ -299,6 +310,13 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
               onShareGenerated?.(updated)
             }}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Feedback modal */}
+      <AnimatePresence>
+        {feedbackOpen && (
+          <FeedbackModal onClose={() => setFeedbackOpen(false)} />
         )}
       </AnimatePresence>
     </div>
