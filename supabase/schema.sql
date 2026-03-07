@@ -41,6 +41,15 @@ create table if not exists public.push_subscriptions (
   updated_at   timestamptz not null default now()
 );
 
+-- 5. feedback table
+create table if not exists public.feedback (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid references auth.users(id) on delete set null,
+  message    text not null,
+  metadata   jsonb,
+  created_at timestamptz not null default now()
+);
+
 -- ============================================================
 -- Row Level Security
 -- ============================================================
@@ -49,6 +58,7 @@ alter table public.countdowns        enable row level security;
 alter table public.push_subscriptions enable row level security;
 alter table public.user_preferences   enable row level security;
 alter table public.saved_countdowns   enable row level security;
+alter table public.feedback            enable row level security;
 
 -- countdowns: owner can do everything
 create policy "countdowns_owner_all"
@@ -80,6 +90,12 @@ create policy "saved_countdowns_owner_all"
   for all
   using  (user_id = auth.uid())
   with check (user_id = auth.uid());
+
+-- feedback: anyone can insert (anonymous included); no read policy (admin-only reads)
+create policy "feedback_insert"
+  on public.feedback
+  for insert
+  with check (true);
 
 -- ============================================================
 -- Enable Anonymous Sign-In

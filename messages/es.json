@@ -127,6 +127,7 @@
     "language": "Idioma",
     "accentColor": "Color de acento",
     "theme": "Tema",
+    "feedback": "Enviar comentarios",
     "themes": {
       "light": "Claro",
       "dark": "Oscuro",
@@ -169,6 +170,16 @@
     "skip": "Continuar sin cuenta",
     "errorPrefix": "Error: ",
     "orDivider": "o"
+  },
+  "feedback": {
+    "title": "Enviar comentarios",
+    "prompt": "¿Qué tienes en mente?",
+    "placeholder": "Cuéntanos qué piensas, reporta un error o sugiere una mejora...",
+    "send": "Enviar comentarios",
+    "sending": "Enviando...",
+    "thanks": "¡Gracias!",
+    "thanksSub": "Tus comentarios nos ayudan a mejorar Momentto.",
+    "error": "Algo salió mal. Por favor, inténtalo de nuevo."
   },
   "onboarding": {
     "skip": "Omitir",

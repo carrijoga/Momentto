@@ -25,7 +25,6 @@ Use `pnpm` or `yarn` interchangeably with the same script names.
 - **UI primitives**: Radix UI (shadcn/ui convention via `components/ui/`)
 - **Animations**: Motion (Framer Motion v11)
 - **Backend**: Supabase (Postgres + Auth + Storage)
-- **Cache/rate-limit**: Upstash Redis (`@upstash/redis`)
 - **Push notifications**: Web Push + VAPID keys
 - **i18n**: next-intl (locales: `en`, `pt-BR`)
 - **PWA**: next-pwa (service worker generated into `public/sw.js`)
@@ -54,7 +53,6 @@ lib/
   sync.ts               Sync logic between IndexedDB and Supabase
   countdowns.ts         Countdown CRUD helpers
   types.ts              Shared TypeScript types
-  redis.ts              Upstash Redis client
   analytics.ts          GA4 event helpers
   *-context.tsx         React contexts (auth, accent color, connectivity, active countdown)
 hooks/                  Custom React hooks
@@ -82,8 +80,6 @@ Copy `.env.local.example` to `.env.local` and fill in:
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Service role key (server only) |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Yes | VAPID public key for Web Push |
 | `VAPID_PRIVATE_KEY` | Yes | VAPID private key (server only) |
-| `KV_REST_API_URL` | Yes | Upstash Redis REST URL |
-| `KV_REST_API_TOKEN` | Yes | Upstash Redis REST token (server only) |
 | `NEXT_PUBLIC_GTM_ID` | No | Google Tag Manager container ID |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | GA4 Measurement ID |
 

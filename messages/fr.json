@@ -127,6 +127,7 @@
     "language": "Langue",
     "accentColor": "Couleur d'accent",
     "theme": "Thème",
+    "feedback": "Envoyer un avis",
     "themes": {
       "light": "Clair",
       "dark": "Sombre",
@@ -169,6 +170,16 @@
     "skip": "Continuer sans compte",
     "errorPrefix": "Erreur : ",
     "orDivider": "ou"
+  },
+  "feedback": {
+    "title": "Envoyer un avis",
+    "prompt": "Qu'avez-vous en tête ?",
+    "placeholder": "Dites-nous ce que vous pensez, signalez un bug ou suggérez une amélioration...",
+    "send": "Envoyer l'avis",
+    "sending": "Envoi...",
+    "thanks": "Merci !",
+    "thanksSub": "Votre avis nous aide à améliorer Momentto.",
+    "error": "Une erreur est survenue. Veuillez réessayer."
   },
   "onboarding": {
     "skip": "Passer",

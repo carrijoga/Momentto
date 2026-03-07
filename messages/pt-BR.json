@@ -127,6 +127,7 @@
     "language": "Idioma",
     "accentColor": "Cor de destaque",
     "theme": "Tema",
+    "feedback": "Enviar feedback",
     "themes": {
       "light": "Claro",
       "dark": "Escuro",
@@ -228,6 +229,16 @@
     "footer": {
       "rights": "Todos os direitos reservados."
     }
+  },
+  "feedback": {
+    "title": "Enviar feedback",
+    "prompt": "O que você tem em mente?",
+    "placeholder": "Conte o que achou, reporte um bug ou sugira uma melhoria...",
+    "send": "Enviar feedback",
+    "sending": "Enviando...",
+    "thanks": "Obrigado!",
+    "thanksSub": "Seu feedback nos ajuda a melhorar o Momentto.",
+    "error": "Algo deu errado. Por favor, tente novamente."
   },
   "onboarding": {
     "skip": "Pular",

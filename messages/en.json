@@ -127,6 +127,7 @@
     "language": "Language",
     "accentColor": "Accent color",
     "theme": "Theme",
+    "feedback": "Send feedback",
     "themes": {
       "light": "Light",
       "dark": "Dark",
@@ -228,6 +229,16 @@
     "footer": {
       "rights": "All rights reserved."
     }
+  },
+  "feedback": {
+    "title": "Send feedback",
+    "prompt": "What's on your mind?",
+    "placeholder": "Tell us what you think, report a bug, or suggest an improvement...",
+    "send": "Send feedback",
+    "sending": "Sending...",
+    "thanks": "Thank you!",
+    "thanksSub": "Your feedback helps us improve Momentto.",
+    "error": "Something went wrong. Please try again."
   },
   "onboarding": {
     "skip": "Skip",

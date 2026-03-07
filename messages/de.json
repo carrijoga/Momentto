@@ -127,6 +127,7 @@
     "language": "Sprache",
     "accentColor": "Akzentfarbe",
     "theme": "Design",
+    "feedback": "Feedback senden",
     "themes": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -169,6 +170,16 @@
     "skip": "Ohne Konto fortfahren",
     "errorPrefix": "Fehler: ",
     "orDivider": "oder"
+  },
+  "feedback": {
+    "title": "Feedback senden",
+    "prompt": "Was hast du auf dem Herzen?",
+    "placeholder": "Sag uns, was du denkst, melde einen Fehler oder schlage eine Verbesserung vor...",
+    "send": "Feedback senden",
+    "sending": "Wird gesendet...",
+    "thanks": "Danke!",
+    "thanksSub": "Dein Feedback hilft uns, Momentto zu verbessern.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
   "onboarding": {
     "skip": "Überspringen",
