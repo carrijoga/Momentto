@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la /c/Users/VIBE/source/repos/carrijoga/mytrip/app/[locale]/login/)",
+      "Bash(ls -la /c/Users/VIBE/source/repos/carrijoga/mytrip/app/[locale]/)"
+    ]
+  }
+}

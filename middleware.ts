@@ -16,6 +16,7 @@ export async function middleware(request: NextRequest) {
   // Routes that must stay outside [locale] — never apply locale prefix
   if (
     pathname.startsWith("/auth/") ||
+    pathname.startsWith("/admin") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/api/")
   ) {

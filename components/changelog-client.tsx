@@ -87,6 +87,70 @@ function formatDate(dateStr: string, locale: string): string {
   })
 }
 
+function parseVersion(content: string): {
+  version: string
+  title: string
+  isPatch: boolean
+} | null {
+  const match = content.match(/^# v(\d+\.\d+\.(\d+))(?:\s*-\s*(.+))?/m)
+  if (!match) return null
+  return {
+    version: match[1],
+    title: match[3]?.trim() ?? "",
+    isPatch: parseInt(match[2], 10) > 0,
+  }
+}
+
+interface PatchRowProps {
+  version: string
+  title: string
+  date: string
+  locale: string
+  index: number
+}
+
+function PatchRow({ version, title, date, locale, index }: PatchRowProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+        delay: index * 0.08,
+      }}
+      className="relative pl-8 sm:pl-10"
+    >
+      {/* Timeline dot — smaller, muted */}
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 400,
+          damping: 20,
+          delay: index * 0.08 + 0.1,
+        }}
+        className="absolute left-0 top-2.5 size-3 rounded-full border border-border bg-muted sm:size-3.5"
+      />
+
+      {/* Mini flat card */}
+      <div className="rounded-xl bg-muted/40 px-4 py-3">
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-xs text-muted-foreground">v{version}</span>
+          {title && (
+            <span className="text-sm font-medium text-foreground/70">{title}</span>
+          )}
+        </div>
+        <time className="mt-1 block text-xs text-muted-foreground">
+          {formatDate(date, locale)}
+        </time>
+      </div>
+    </motion.div>
+  )
+}
+
 export function ChangelogClient({ entries }: ChangelogClientProps) {
   const t = useTranslations("changelog")
   const locale = useLocale()
@@ -122,6 +186,21 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
 
           <div className="flex flex-col gap-10">
             {entries.map((entry, index) => {
+              const parsed = parseVersion(entry.content)
+
+              if (parsed?.isPatch) {
+                return (
+                  <PatchRow
+                    key={entry.slug}
+                    version={parsed.version}
+                    title={parsed.title}
+                    date={entry.date}
+                    locale={locale}
+                    index={index}
+                  />
+                )
+              }
+
               return (
                 <motion.div
                   key={entry.slug}
