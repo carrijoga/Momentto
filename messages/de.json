@@ -88,7 +88,10 @@
     "savedEmptyDescription": "Speichere Countdowns von Freunden, um sie hier zu verfolgen. Öffne einen Freigabelink und tippe auf Speichern.",
     "unsave": "Aus Gespeicherten entfernen",
     "linkRevoked": "Ein geteilter Countdown wurde entfernt (Link widerrufen)",
-    "shared": "Geteilt"
+    "shared": "Geteilt",
+    "nextUp": "Als nächstes",
+    "otherMoments": "Andere Momente",
+    "viewDetails": "Details anzeigen"
   },
   "share": {
     "title": "Countdown teilen",
@@ -207,6 +210,95 @@
         "title": "Als App installieren",
         "description": "Füge Momentto zu deinem Startbildschirm hinzu und greife jederzeit offline auf deine Countdowns zu."
       }
+    }
+  },
+  "landing": {
+    "nav": {
+      "cta": "App öffnen"
+    },
+    "hero": {
+      "tagline": "Jeder besondere Moment verdient es, mit Vorfreude erwartet zu werden.",
+      "sub": "Erstelle schöne Countdowns für deine Reisen, Hochzeiten, Abschlüsse und alles, was das Leben feierenswert macht.",
+      "cta": "Kostenlos starten",
+      "badge": "Einfach. Schnell. Kostenlos.",
+      "noAccount": "Kein Konto nötig — jetzt starten"
+    },
+    "demo": {
+      "label": "Traumurlaub",
+      "daysLabel": "Tage",
+      "hoursLabel": "Std",
+      "minutesLabel": "Min",
+      "secondsLabel": "Sek",
+      "live": "Live",
+      "progress": "Fortschritt",
+      "progressValue": "12% erreicht",
+      "shared": "Geteilt mit 3 Personen"
+    },
+    "useCases": {
+      "trips": "Reisen",
+      "weddings": "Hochzeiten",
+      "graduations": "Abschlüsse",
+      "parties": "Feiern",
+      "birthdays": "Geburtstage",
+      "concerts": "Konzerte",
+      "achievements": "Erfolge",
+      "events": "Events"
+    },
+    "sections": {
+      "features": "Funktionen",
+      "howItWorks": "So funktioniert es"
+    },
+    "features": {
+      "title": "Alles, was du brauchst, um den Countdown zu starten",
+      "item0": {
+        "title": "Jede Gelegenheit",
+        "description": "Reisen, Hochzeiten, Abschlüsse, Feiern, Babys — wenn es Vorfreude verdient, hat Momentto eine Kategorie dafür."
+      },
+      "item1": {
+        "title": "Mit allen teilen",
+        "description": "Erstelle einen öffentlichen Link und lass Freunde und Familie den Countdown in Echtzeit verfolgen."
+      },
+      "item2": {
+        "title": "Benachrichtigt bleiben",
+        "description": "Aktiviere Push-Benachrichtigungen und verpasse nie den Moment — erhalte einen Alarm, wenn dein Event beginnt."
+      },
+      "item3": {
+        "title": "Funktioniert offline",
+        "description": "Als PWA installiert funktioniert Momentto auch ohne Internet. Deine Countdowns sind immer verfügbar."
+      }
+    },
+    "howItWorks": {
+      "title": "In 30 Sekunden startklar",
+      "step0": {
+        "title": "Kategorie wählen",
+        "description": "Wähle aus Reisen, Hochzeiten, Abschlüssen, Feiern und vielem mehr."
+      },
+      "step1": {
+        "title": "Datum festlegen",
+        "description": "Gib den Eventnamen und das genaue Datum ein — die Uhrzeit ist optional."
+      },
+      "step2": {
+        "title": "Verfolgen und teilen",
+        "description": "Dein Live-Countdown ist bereit. Teile ihn per Link oder installiere die App auf deinem Startbildschirm."
+      }
+    },
+    "howItWorksDemoItems": {
+      "item0Title": "Reise nach Europa",
+      "item0Date": "15. Jun. 2025",
+      "item1Title": "Annas Hochzeit",
+      "item1Date": "22. Aug. 2025",
+      "item2Title": "Uni-Abschluss",
+      "item2Date": "12. Dez. 2025",
+      "newCountdown": "Neuer Countdown"
+    },
+    "cta": {
+      "title": "Bereit mit dem Zählen anzufangen?",
+      "sub": "Schließe dich Tausenden von Menschen an, die auf ihren nächsten großen Moment warten.",
+      "button": "Meinen Countdown erstellen",
+      "disclaimer": "Kostenlos für immer · Kein Konto nötig · Funktioniert offline"
+    },
+    "footer": {
+      "rights": "Alle Rechte vorbehalten."
     }
   }
 }

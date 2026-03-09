@@ -2,11 +2,16 @@
 
 import { useRef, useState, useEffect } from "react"
 import type { ElementType } from "react"
-import { motion } from "motion/react"
+import { motion, useScroll, useMotionValueEvent } from "motion/react"
 import { useLocale, useTranslations } from "next-intl"
 import Link from "next/link"
 import NumberFlow from "@number-flow/react"
 import { AirplaneIcon, type AirplaneIconHandle } from "@/components/ui/airplane"
+import { BlurText } from "@/components/ui/blur-text"
+import { GradientText } from "@/components/ui/gradient-text"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { ScrollFloat } from "@/components/ui/scroll-float"
+import { cn } from "@/lib/utils"
 import {
   ArrowRight,
   Plane,
@@ -66,28 +71,28 @@ interface ScatteredIcon {
 }
 
 const scattered: ScatteredIcon[] = [
-  { Icon: Star,          top: "8%",    left: "12%",  size: 30, opacity: 0.08, duration: 7,  delay: 0   },
-  { Icon: Sparkles,      top: "5%",    left: "35%",  size: 26, opacity: 0.07, duration: 9,  delay: 0.6 },
-  { Icon: Sun,           top: "5%",    right: "35%", size: 26, opacity: 0.06, duration: 8,  delay: 1.4 },
-  { Icon: Rocket,        top: "8%",    right: "12%", size: 30, opacity: 0.08, duration: 10, delay: 0.3 },
-  { Icon: Plane,         top: "22%",   left: "6%",   size: 32, opacity: 0.08, duration: 8,  delay: 2.0 },
-  { Icon: Heart,         top: "18%",   left: "20%",  size: 28, opacity: 0.07, duration: 11, delay: 1.0 },
-  { Icon: GraduationCap, top: "18%",   right: "20%", size: 28, opacity: 0.07, duration: 9,  delay: 3.0 },
-  { Icon: Music,         top: "22%",   right: "6%",  size: 32, opacity: 0.08, duration: 7,  delay: 1.8 },
-  { Icon: Flame,         top: "42%",   left: "5%",   size: 30, opacity: 0.07, duration: 10, delay: 0.5 },
-  { Icon: Compass,       top: "38%",   left: "18%",  size: 26, opacity: 0.06, duration: 12, delay: 4.0 },
-  { Icon: Zap,           top: "42%",   right: "5%",  size: 30, opacity: 0.07, duration: 9,  delay: 2.5 },
-  { Icon: Camera,        top: "38%",   right: "18%", size: 26, opacity: 0.06, duration: 8,  delay: 1.2 },
-  { Icon: Gift,          bottom: "22%",left: "6%",   size: 32, opacity: 0.08, duration: 11, delay: 3.5 },
-  { Icon: Umbrella,      bottom: "18%",left: "20%",  size: 28, opacity: 0.07, duration: 8,  delay: 0.8 },
-  { Icon: MapPin,        bottom: "18%",right: "20%", size: 28, opacity: 0.07, duration: 10, delay: 2.2 },
-  { Icon: Trophy,        bottom: "22%",right: "6%",  size: 32, opacity: 0.08, duration: 7,  delay: 1.6 },
-  { Icon: Clock,         bottom: "8%", left: "12%",  size: 30, opacity: 0.08, duration: 9,  delay: 4.5 },
-  { Icon: Calendar,      bottom: "5%", left: "35%",  size: 26, opacity: 0.06, duration: 11, delay: 0.4 },
-  { Icon: Cake,          bottom: "5%", right: "35%", size: 26, opacity: 0.06, duration: 8,  delay: 3.2 },
-  { Icon: PartyPopper,   bottom: "8%", right: "12%", size: 30, opacity: 0.08, duration: 10, delay: 1.5 },
-  { Icon: Smile,         top: "30%",   left: "32%",  size: 22, opacity: 0.05, duration: 13, delay: 5.0 },
-  { Icon: Star,          top: "62%",   right: "32%", size: 22, opacity: 0.05, duration: 9,  delay: 2.8 },
+  { Icon: Star,          top: "8%",    left: "12%",  size: 28, opacity: 0.07, duration: 7,  delay: 0   },
+  { Icon: Sparkles,      top: "5%",    left: "35%",  size: 24, opacity: 0.06, duration: 9,  delay: 0.6 },
+  { Icon: Sun,           top: "5%",    right: "35%", size: 24, opacity: 0.05, duration: 8,  delay: 1.4 },
+  { Icon: Rocket,        top: "8%",    right: "12%", size: 28, opacity: 0.07, duration: 10, delay: 0.3 },
+  { Icon: Plane,         top: "22%",   left: "6%",   size: 30, opacity: 0.07, duration: 8,  delay: 2.0 },
+  { Icon: Heart,         top: "18%",   left: "20%",  size: 26, opacity: 0.06, duration: 11, delay: 1.0 },
+  { Icon: GraduationCap, top: "18%",   right: "20%", size: 26, opacity: 0.06, duration: 9,  delay: 3.0 },
+  { Icon: Music,         top: "22%",   right: "6%",  size: 30, opacity: 0.07, duration: 7,  delay: 1.8 },
+  { Icon: Flame,         top: "42%",   left: "5%",   size: 28, opacity: 0.06, duration: 10, delay: 0.5 },
+  { Icon: Compass,       top: "38%",   left: "18%",  size: 24, opacity: 0.05, duration: 12, delay: 4.0 },
+  { Icon: Zap,           top: "42%",   right: "5%",  size: 28, opacity: 0.06, duration: 9,  delay: 2.5 },
+  { Icon: Camera,        top: "38%",   right: "18%", size: 24, opacity: 0.05, duration: 8,  delay: 1.2 },
+  { Icon: Gift,          bottom: "22%",left: "6%",   size: 30, opacity: 0.07, duration: 11, delay: 3.5 },
+  { Icon: Umbrella,      bottom: "18%",left: "20%",  size: 26, opacity: 0.06, duration: 8,  delay: 0.8 },
+  { Icon: MapPin,        bottom: "18%",right: "20%", size: 26, opacity: 0.06, duration: 10, delay: 2.2 },
+  { Icon: Trophy,        bottom: "22%",right: "6%",  size: 30, opacity: 0.07, duration: 7,  delay: 1.6 },
+  { Icon: Clock,         bottom: "8%", left: "12%",  size: 28, opacity: 0.07, duration: 9,  delay: 4.5 },
+  { Icon: Calendar,      bottom: "5%", left: "35%",  size: 24, opacity: 0.05, duration: 11, delay: 0.4 },
+  { Icon: Cake,          bottom: "5%", right: "35%", size: 24, opacity: 0.05, duration: 8,  delay: 3.2 },
+  { Icon: PartyPopper,   bottom: "8%", right: "12%", size: 28, opacity: 0.07, duration: 10, delay: 1.5 },
+  { Icon: Smile,         top: "30%",   left: "32%",  size: 20, opacity: 0.04, duration: 13, delay: 5.0 },
+  { Icon: Star,          top: "62%",   right: "32%", size: 20, opacity: 0.04, duration: 9,  delay: 2.8 },
 ]
 
 // ── Demo countdown ────────────────────────────────────────────────────────────
@@ -124,7 +129,7 @@ function DemoCountdown() {
       initial={{ opacity: 0, y: 32, scale: 0.94 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 180, damping: 22, delay: 0.5 }}
-      className="w-full overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl shadow-black/10"
+      className="w-full overflow-hidden rounded-3xl border border-border/60 bg-card shadow-2xl shadow-primary/15"
     >
       {/* Card header */}
       <div className="border-b border-border/40 bg-secondary/30 px-5 py-4">
@@ -140,7 +145,7 @@ function DemoCountdown() {
           </div>
           <span className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
             <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-            Ao vivo
+            {t("demo.live")}
           </span>
         </div>
       </div>
@@ -168,8 +173,8 @@ function DemoCountdown() {
         {/* Progress bar */}
         <div className="mt-4">
           <div className="mb-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>Progresso</span>
-            <span>12% concluído</span>
+            <span>{t("demo.progress")}</span>
+            <span>{t("demo.progressValue")}</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
             <div className="h-full w-[12%] rounded-full bg-primary" />
@@ -180,7 +185,7 @@ function DemoCountdown() {
       {/* Shared pill */}
       <div className="flex items-center gap-2 border-t border-border/40 px-5 py-3 text-[11px] text-muted-foreground/70">
         <Share2 className="size-3 shrink-0 text-primary/60" />
-        <span className="truncate">Compartilhado com 3 pessoas</span>
+        <span className="truncate">{t("demo.shared")}</span>
       </div>
     </motion.div>
   )
@@ -205,15 +210,17 @@ function FeatureCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ type: "spring", stiffness: 200, damping: 25, delay: index * 0.08 }}
-      className="group flex flex-col gap-4 rounded-2xl border border-border/60 bg-card p-6 transition-all duration-200 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+      className="h-full"
     >
-      <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
-        <Icon className="size-5 text-primary" />
-      </div>
-      <div>
-        <h3 className="mb-1.5 text-sm font-semibold text-foreground">{title}</h3>
-        <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
-      </div>
+      <SpotlightCard className="group flex h-full flex-col gap-4 rounded-2xl border border-border/60 bg-card p-7 transition-all duration-200 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 transition-colors group-hover:from-primary/15 group-hover:to-primary/8">
+          <Icon className="size-5 text-primary" />
+        </div>
+        <div>
+          <h3 className="mb-1.5 text-sm font-semibold text-foreground">{title}</h3>
+          <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
+        </div>
+      </SpotlightCard>
     </motion.div>
   )
 }
@@ -241,18 +248,18 @@ function StepCard({
     >
       {/* Step number */}
       <div className="flex flex-col items-center">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-md shadow-primary/25">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20">
           {num}
         </div>
         {index < 2 && (
-          <div className="mt-2 h-full w-px bg-border/60" />
+          <div className="mt-2 h-full w-px bg-gradient-to-b from-border/60 to-transparent" />
         )}
       </div>
       {/* Content */}
-      <div className="pb-10">
+      <ScrollFloat delay={0.25 + index * 0.1} className="pb-10">
         <h3 className="mb-1.5 text-base font-semibold text-foreground">{title}</h3>
         <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
-      </div>
+      </ScrollFloat>
     </motion.div>
   )
 }
@@ -264,6 +271,10 @@ export function LandingPage() {
   const locale = useLocale()
   const heroAirplaneRef = useRef<AirplaneIconHandle>(null)
   const [sessionMotion, setSessionMotion] = useState<MotionType>(MOTION_TYPES[0])
+  const [scrolled, setScrolled] = useState(false)
+  const { scrollY } = useScroll()
+
+  useMotionValueEvent(scrollY, "change", (v) => setScrolled(v > 10))
 
   useEffect(() => {
     setSessionMotion(MOTION_TYPES[Math.floor(Math.random() * MOTION_TYPES.length)])
@@ -283,21 +294,26 @@ export function LandingPage() {
   ]
 
   const useCases = [
-    { icon: Plane,         label: "Viagens" },
-    { icon: Heart,         label: "Casamentos" },
-    { icon: GraduationCap, label: "Formaturas" },
-    { icon: PartyPopper,   label: "Festas" },
-    { icon: Cake,          label: "Aniversários" },
-    { icon: Music,         label: "Shows" },
-    { icon: Trophy,        label: "Conquistas" },
-    { icon: Gift,          label: "Eventos" },
+    { icon: Plane,         label: t("useCases.trips") },
+    { icon: Heart,         label: t("useCases.weddings") },
+    { icon: GraduationCap, label: t("useCases.graduations") },
+    { icon: PartyPopper,   label: t("useCases.parties") },
+    { icon: Cake,          label: t("useCases.birthdays") },
+    { icon: Music,         label: t("useCases.concerts") },
+    { icon: Trophy,        label: t("useCases.achievements") },
+    { icon: Gift,          label: t("useCases.events") },
   ]
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
 
       {/* ── Nav ──────────────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
+      <nav
+        className={cn(
+          "sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md transition-shadow duration-300",
+          scrolled && "shadow-sm shadow-black/5"
+        )}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-xl bg-primary/10">
@@ -307,7 +323,7 @@ export function LandingPage() {
           </div>
           <Link
             href={`/${locale}/app`}
-            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
+            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:opacity-90 hover:shadow-md hover:shadow-primary/20"
           >
             {t("nav.cta")}
             <ArrowRight className="size-3" />
@@ -317,6 +333,13 @@ export function LandingPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
       <section className="relative flex min-h-[calc(100dvh-49px)] flex-col items-center justify-center overflow-hidden px-4 py-16 sm:px-6">
+
+        {/* Glow orb */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/4 top-1/3 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/8 blur-3xl"
+        />
+
         {/* Background floating icons */}
         {scattered.map(({ Icon, top, left, right, bottom, size, opacity, duration, delay }, i) => (
           <motion.div
@@ -339,10 +362,12 @@ export function LandingPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3.5 py-1.5 ring-1 ring-primary/10"
             >
               <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-medium text-primary">Simples. Rápido. Gratuito.</span>
+              <GradientText className="text-xs font-medium">
+                {t("hero.badge")}
+              </GradientText>
             </motion.div>
 
             {/* Logo icon */}
@@ -357,14 +382,15 @@ export function LandingPage() {
               <AirplaneIcon ref={heroAirplaneRef} size={28} className="text-primary" />
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
-              className="mb-5 text-balance text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl"
-            >
-              {t("hero.tagline")}
-            </motion.h1>
+            {/* Headline — BlurText */}
+            <h1 className="mb-5 text-balance text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+              <BlurText
+                text={t("hero.tagline")}
+                initialDelay={0.1}
+                delay={0.07}
+                duration={0.5}
+              />
+            </h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -379,18 +405,18 @@ export function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.26 }}
-              className="flex flex-col items-center gap-3 sm:flex-row lg:items-start"
+              className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 lg:justify-start"
             >
               <Link
                 href={`/${locale}/app`}
-                className="group inline-flex items-center gap-2.5 rounded-2xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
+                className="group inline-flex items-center gap-2.5 rounded-2xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:opacity-90 hover:shadow-xl hover:shadow-primary/25 hover:-translate-y-0.5"
               >
                 {t("hero.cta")}
                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <CheckCircle2 className="size-3.5 text-primary/70" />
-                Sem criar conta — comece agora
+                {t("hero.noAccount")}
               </span>
             </motion.div>
 
@@ -423,26 +449,16 @@ export function LandingPage() {
       {/* ── Features ─────────────────────────────────────────────────────────── */}
       <section className="border-t border-border/50 px-4 py-20 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            className="mb-4 text-center"
-          >
+          <ScrollFloat className="mb-4 text-center">
             <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              Funcionalidades
+              {t("sections.features")}
             </span>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.05 }}
-            className="mb-12 text-center"
-          >
-            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">{t("features.title")}</h2>
-          </motion.div>
+          </ScrollFloat>
+          <ScrollFloat delay={0.05} className="mb-12 text-center">
+            <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+              {t("features.title")}
+            </h2>
+          </ScrollFloat>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {features.map(({ icon, title, description }, i) => (
@@ -458,26 +474,16 @@ export function LandingPage() {
           <div className="grid gap-16 lg:grid-cols-2 lg:gap-24 lg:items-center">
             {/* Left: steps */}
             <div>
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                className="mb-4"
-              >
+              <ScrollFloat className="mb-4">
                 <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-                  Como funciona
+                  {t("sections.howItWorks")}
                 </span>
-              </motion.div>
-              <motion.h2
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.05 }}
-                className="mb-10 text-balance text-3xl font-bold tracking-tight sm:text-4xl"
-              >
-                {t("howItWorks.title")}
-              </motion.h2>
+              </ScrollFloat>
+              <ScrollFloat delay={0.05} className="mb-10">
+                <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+                  {t("howItWorks.title")}
+                </h2>
+              </ScrollFloat>
 
               <div className="flex flex-col">
                 {steps.map(({ num, title, description }, i) => (
@@ -494,7 +500,7 @@ export function LandingPage() {
               transition={{ type: "spring", stiffness: 180, damping: 25, delay: 0.15 }}
               className="hidden lg:block"
             >
-              <div className="rounded-3xl border border-border/60 bg-card p-8">
+              <SpotlightCard className="rounded-3xl border border-border/60 bg-card p-8">
                 <div className="mb-6 flex items-center gap-2">
                   <span className="size-2.5 rounded-full bg-destructive/60" />
                   <span className="size-2.5 rounded-full bg-amber-400/60" />
@@ -508,8 +514,8 @@ export function LandingPage() {
                       <Plane className="size-4 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">Viagem para Europa</p>
-                      <p className="text-xs text-muted-foreground">15 jun. 2025</p>
+                      <p className="text-sm font-semibold text-foreground">{t("howItWorksDemoItems.item0Title")}</p>
+                      <p className="text-xs text-muted-foreground">{t("howItWorksDemoItems.item0Date")}</p>
                     </div>
                     <span className="text-2xl font-bold text-foreground tabular-nums">87</span>
                   </div>
@@ -518,8 +524,8 @@ export function LandingPage() {
                       <Heart className="size-4 text-pink-500" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">Casamento da Ana</p>
-                      <p className="text-xs text-muted-foreground">22 ago. 2025</p>
+                      <p className="text-sm font-semibold text-foreground">{t("howItWorksDemoItems.item1Title")}</p>
+                      <p className="text-xs text-muted-foreground">{t("howItWorksDemoItems.item1Date")}</p>
                     </div>
                     <span className="text-2xl font-bold text-foreground tabular-nums">155</span>
                   </div>
@@ -528,8 +534,8 @@ export function LandingPage() {
                       <GraduationCap className="size-4 text-amber-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">Formatura de Med</p>
-                      <p className="text-xs text-muted-foreground">12 dez. 2025</p>
+                      <p className="text-sm font-semibold text-foreground">{t("howItWorksDemoItems.item2Title")}</p>
+                      <p className="text-xs text-muted-foreground">{t("howItWorksDemoItems.item2Date")}</p>
                     </div>
                     <span className="text-2xl font-bold text-foreground tabular-nums">297</span>
                   </div>
@@ -538,10 +544,10 @@ export function LandingPage() {
                 <div className="mt-5 flex items-center justify-center">
                   <span className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground shadow-md shadow-primary/30">
                     <Star className="size-3" />
-                    Nova contagem
+                    {t("howItWorksDemoItems.newCountdown")}
                   </span>
                 </div>
-              </div>
+              </SpotlightCard>
             </motion.div>
           </div>
         </div>
@@ -549,40 +555,38 @@ export function LandingPage() {
 
       {/* ── CTA banner ───────────────────────────────────────────────────────── */}
       <section className="border-t border-border/50 px-4 py-20 sm:px-6 sm:py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          className="mx-auto max-w-3xl"
-        >
-          {/* CTA card */}
-          <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-primary/5 px-8 py-14 text-center sm:px-16">
-            {/* Subtle background tint */}
-            <div className="pointer-events-none absolute inset-0 bg-primary/3" />
+        <ScrollFloat className="mx-auto max-w-3xl">
+          <SpotlightCard className="relative rounded-3xl border border-primary/20 bg-primary/5 px-8 py-14 text-center sm:px-16">
+            {/* Mesh gradient blobs */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-24 -left-24 size-64 rounded-full bg-primary/15 blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-24 -right-24 size-64 rounded-full bg-accent/20 blur-3xl"
+            />
 
-            <div className="relative">
-              <div className="mb-5 inline-flex size-14 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
-                <Sparkles className="size-6 text-primary" />
-              </div>
-              <h2 className="mb-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-                {t("cta.title")}
-              </h2>
-              <p className="mb-8 text-base text-muted-foreground">{t("cta.sub")}</p>
-              <Link
-                href={`/${locale}/app`}
-                className="group inline-flex items-center gap-2.5 rounded-2xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5"
-              >
-                {t("cta.button")}
-                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </Link>
-
-              <p className="mt-5 text-xs text-muted-foreground/60">
-                Grátis para sempre · Sem criar conta · Funciona offline
-              </p>
+            <div className="mb-5 inline-flex size-14 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
+              <Sparkles className="size-6 text-primary" />
             </div>
-          </div>
-        </motion.div>
+            <h2 className="mb-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+              {t("cta.title")}
+            </h2>
+            <p className="mb-8 text-base text-muted-foreground">{t("cta.sub")}</p>
+            <Link
+              href={`/${locale}/app`}
+              className="group inline-flex items-center gap-2.5 rounded-2xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25"
+            >
+              {t("cta.button")}
+              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
+
+            <p className="mt-5 text-xs text-muted-foreground/60">
+              {t("cta.disclaimer")}
+            </p>
+          </SpotlightCard>
+        </ScrollFloat>
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────────────────── */}

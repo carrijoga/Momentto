@@ -17,6 +17,7 @@ import { ShareModal } from "@/components/share-modal"
 import { FeedbackModal } from "@/components/feedback-modal"
 import type { CountdownEntry } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
 
 const themes = [
   { value: "light", Icon: Sun },
@@ -139,24 +140,28 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="absolute bottom-16 right-0 w-64 overflow-hidden rounded-2xl border border-border bg-card/95 p-3 shadow-xl backdrop-blur-xl"
+              className="absolute bottom-16 right-0 w-68 overflow-hidden rounded-2xl border border-border/50 shadow-2xl"
             >
+            <SpotlightCard className="rounded-2xl bg-card/95 p-3 backdrop-blur-xl">
               {/* Account */}
               {isAnonymous ? (
                 <Link
                   href={`/${locale}/login`}
                   onClick={() => setMenuOpen(false)}
-                  className="mb-2 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+                  className="mb-2 flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
                 >
                   <UserRound className="size-3.5" />
                   {t("signIn")}
                 </Link>
               ) : (
                 <>
-                  <p className="mb-2 truncate text-xs font-medium text-foreground">{userEmail}</p>
+                  <div className="mb-1 flex items-center gap-2 rounded-lg bg-primary/8 px-2.5 py-1.5">
+                    <UserRound className="size-3.5 text-primary" />
+                    <p className="truncate text-xs font-semibold text-foreground">{userEmail}</p>
+                  </div>
                   <button
                     onClick={() => { signOut(); setMenuOpen(false) }}
-                    className="mb-2 flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+                    className="mb-1 flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
                   >
                     <LogOut className="size-3.5" />
                     {t("signOut")}
@@ -170,7 +175,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                   <button
                     onClick={subscription ? unsubscribeFromPush : subscribeToPush}
                     disabled={loading}
-                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground disabled:opacity-50"
+                    className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium transition-all disabled:opacity-50 ${subscription ? "text-primary hover:bg-primary/8" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
                   >
                     <BellIcon className={subscription ? "text-primary" : ""} size={14} />
                     {subscription ? t("notificationsOn") : t("notificationsOff")}
@@ -178,12 +183,12 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                 </>
               )}
 
-              <Separator className="my-2.5" />
+              <Separator className="my-2" />
 
               {/* Language */}
-              <div className="mb-2.5">
-                <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Globe className="size-3.5" />
+              <div className="mb-2">
+                <p className="mb-2 flex items-center gap-1.5 px-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                  <Globe className="size-3" />
                   {t("language")}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -191,9 +196,9 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                     <button
                       key={loc}
                       onClick={() => changeLocale(loc)}
-                      className={`rounded-lg px-2 py-1.5 text-xs font-medium transition-all ${
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
                         locale === loc
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
                           : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
                       }`}
                     >
@@ -203,43 +208,41 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                 </div>
               </div>
 
-              <Separator className="my-2.5" />
+              <Separator className="my-2" />
 
-              {/* Changelog */}
+              {/* Changelog + Feedback */}
               <Link
                 href={`/${locale}/changelog`}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
               >
                 <ScrollText className="size-3.5" />
                 <span>Changelog</span>
               </Link>
-
-              {/* Feedback */}
               <button
                 onClick={() => { setFeedbackOpen(true); setMenuOpen(false) }}
-                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
               >
                 <MessageSquare className="size-3.5" />
                 <span>{t("feedback")}</span>
               </button>
 
-              <Separator className="my-2.5" />
+              <Separator className="my-2" />
 
               {/* Accent color */}
-              <div className="mb-2.5">
-                <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+              <div className="mb-2">
+                <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
                   {t("accentColor")}
                 </p>
                 <div className="grid grid-cols-4 gap-1.5">
                   {colors.map((color) => (
                     <motion.button
                       key={color.hue}
-                      whileHover={{ scale: 1.15 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.12 }}
+                      whileTap={{ scale: 0.88 }}
                       title={color.labelEn}
                       onClick={() => setAccentHue(color.hue, userId)}
-                      className="group relative flex h-7 w-full items-center justify-center rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="group relative flex h-8 w-full items-center justify-center rounded-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       style={{ backgroundColor: color.swatch }}
                       aria-label={color.labelEn}
                     >
@@ -251,7 +254,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                             exit={{ scale: 0 }}
                             transition={{ type: "spring", stiffness: 500, damping: 30 }}
                           >
-                            <Check className="size-3 text-white drop-shadow" />
+                            <Check className="size-3.5 text-white drop-shadow" />
                           </motion.span>
                         )}
                       </AnimatePresence>
@@ -260,21 +263,21 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                 </div>
               </div>
 
-              <Separator className="my-2.5" />
+              <Separator className="my-2" />
 
               {/* Theme */}
               <div>
-                <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
                   {t("theme")}
                 </p>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-0.5">
                   {themes.map(({ value, Icon }) => (
                     <button
                       key={value}
                       onClick={() => setTheme(value)}
-                      className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all ${
+                      className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium transition-all ${
                         theme === value
-                          ? "bg-primary/10 text-primary"
+                          ? "bg-primary/8 text-primary"
                           : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                       }`}
                     >
@@ -294,6 +297,7 @@ export function FloatingControls({ currentView = "list", onShareGenerated }: Flo
                   ))}
                 </div>
               </div>
+            </SpotlightCard>
             </motion.div>
           </>
         )}

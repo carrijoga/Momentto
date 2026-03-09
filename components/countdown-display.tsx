@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useRef } from "react"
 import { sendNotification } from "@/app/actions"
+import { BlurText } from "@/components/ui/blur-text"
+import { GradientText } from "@/components/ui/gradient-text"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
 
 interface TimeLeft {
   months: number
@@ -103,11 +106,11 @@ function TimeUnit({ value, label, index }: { value: number; label: string; index
       }}
       className="flex flex-col items-center"
     >
-      <div className="relative flex size-20 items-center justify-center rounded-2xl bg-card border border-border border-primary font-mono font-bold tabular-nums tracking-tight text-foreground sm:size-28 ">
+      <SpotlightCard className="relative flex size-20 items-center justify-center rounded-2xl bg-card border border-border font-mono font-bold tabular-nums tracking-tight text-foreground sm:size-28">
         <span className="text-3xl sm:text-5xl">
           <NumberFlow value={value} format={{ minimumIntegerDigits: 2 }} />
         </span>
-      </div>
+      </SpotlightCard>
       <span className="mt-2.5 text-xs font-medium uppercase tracking-widest text-muted-foreground sm:text-sm">
         {label}
       </span>
@@ -223,13 +226,19 @@ export function CountdownDisplay({
         </div>
       )}
 
-      <div className="w-full max-w-3xl">
+      {/* Glow orb */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed left-1/2 top-1/2 size-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/6 blur-3xl"
+      />
+
+      <div className="relative w-full max-w-3xl">
         {/* Top bar */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="mb-12 flex items-center justify-between"
+          className="mb-6 flex items-center justify-between"
         >
           <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-primary">
             <CategoryIcon id={category} />
@@ -278,90 +287,104 @@ export function CountdownDisplay({
           </div>
         </motion.div>
 
-        {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
-          className="mb-2 text-center"
-        >
-          <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
-            {title}
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground">{formattedDate}</p>
-        </motion.div>
+        {/* Glass card */}
+        <SpotlightCard className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/60 px-6 py-10 shadow-2xl backdrop-blur-sm">
+          {/* Inner glow blobs */}
+          <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-primary/8 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-10 -left-10 size-40 rounded-full bg-primary/6 blur-2xl" />
 
-        {/* Countdown or Finished */}
-        {isFinished ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
-            className="mt-12 text-center"
-          >
-            <div
-              className="mb-6 inline-flex size-20 items-center justify-center rounded-full bg-primary/15"
-              onMouseEnter={() => partyRef.current?.startAnimation()}
+          {/* Days-left pill */}
+          {!isFinished && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.05 }}
+              className="mb-8 flex justify-center"
             >
-              <PartyPopperIcon ref={partyRef} size={40} className="text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              {t("bigDay")}
-            </h2>
-            <p className="mt-2 text-muted-foreground">
-              {t("enjoy")}
-            </p>
-          </motion.div>
-        ) : (
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
-            {timeUnits.map((unit, i) => (
-              <div key={unit.label} className="contents">
-                <TimeUnit value={unit.value} label={unit.label} index={i} />
-                {i < timeUnits.length - 1 && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.08 + 0.04, duration: 0.3 }}
-                    className="hidden text-3xl font-light text-muted-foreground sm:block"
-                  >
-                    :
-                  </motion.span>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              <span className="rounded-full border border-primary/20 bg-primary/8 px-4 py-1 text-xs font-semibold tracking-wide text-primary">
+                {totalDaysRemaining} {totalDaysRemaining === 1 ? t("day") : t("days")} · {t("remaining")}
+              </span>
+            </motion.div>
+          )}
 
-        {/* Progress bar */}
-        {!isFinished && (
+          {/* Title */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.5 }}
-            className="mt-14"
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
+            className="mb-2 text-center"
           >
-            <div className="flex flex-col items-center gap-3">
-              <span className="text-sm text-muted-foreground">
-                {t("remaining")}{" "}
-                <span className="font-semibold text-foreground">
-                  {totalDaysRemaining}{" "}
-                  {totalDaysRemaining === 1 ? t("day") : t("days")}
-                </span>
-              </span>
-              <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-secondary">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 1, ease: [0.4, 0, 0.2, 1], delay: 0.6 }}
-                  className="h-full rounded-full bg-primary"
-                />
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {Math.round(progressPercent)}% {t("elapsed")}
-              </span>
-            </div>
+            <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
+              <BlurText text={title} initialDelay={0.1} delay={0.06} duration={0.45} />
+            </h1>
+            <p className="mt-3 text-sm text-muted-foreground">{formattedDate}</p>
           </motion.div>
-        )}
+
+          {/* Countdown or Finished */}
+          {isFinished ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
+              className="mt-12 text-center"
+            >
+              <div
+                className="mb-6 inline-flex size-20 items-center justify-center rounded-full bg-primary/15 ring-4 ring-primary/20 animate-pulse"
+                onMouseEnter={() => partyRef.current?.startAnimation()}
+              >
+                <PartyPopperIcon ref={partyRef} size={40} className="text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold sm:text-3xl">
+                <GradientText>{t("bigDay")}</GradientText>
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                {t("enjoy")}
+              </p>
+            </motion.div>
+          ) : (
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+              {timeUnits.map((unit, i) => (
+                <div key={unit.label} className="contents">
+                  <TimeUnit value={unit.value} label={unit.label} index={i} />
+                  {i < timeUnits.length - 1 && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: i * 0.08 + 0.04, duration: 0.3 }}
+                      className="hidden text-3xl font-light text-muted-foreground sm:block"
+                    >
+                      :
+                    </motion.span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Progress bar */}
+          {!isFinished && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.5 }}
+              className="mt-12"
+            >
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-1.5 w-full max-w-md overflow-hidden rounded-full bg-secondary">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 1, ease: [0.4, 0, 0.2, 1], delay: 0.6 }}
+                    className="h-full rounded-full bg-linear-to-r from-primary/70 to-primary"
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {Math.round(progressPercent)}% {t("elapsed")}
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </SpotlightCard>
       </div>
 
       {/* Footer — hidden in public mode to avoid overlap with the fixed action bar */}

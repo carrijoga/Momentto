@@ -88,7 +88,10 @@
     "savedEmptyDescription": "Guarda cuentas regresivas de amigos para seguirlas aquí. Visita un enlace compartido y toca Guardar.",
     "unsave": "Quitar de guardados",
     "linkRevoked": "Una cuenta regresiva compartida fue eliminada (enlace revocado)",
-    "shared": "Compartida"
+    "shared": "Compartida",
+    "nextUp": "Siguiente",
+    "otherMoments": "Otros momentos",
+    "viewDetails": "Ver detalles"
   },
   "share": {
     "title": "Compartir cuenta regresiva",
@@ -207,6 +210,93 @@
         "title": "Instala como app",
         "description": "Agrega Momentto a tu pantalla de inicio y accede a tus cuentas regresivas sin conexión."
       }
-    }
-  }
+    }  },
+  "landing": {
+    "nav": {
+      "cta": "Abrir app"
+    },
+    "hero": {
+      "tagline": "Cada momento especial merece ser esperado con emoción.",
+      "sub": "Crea hermosas cuentas regresivas para tus viajes, bodas, graduaciones y todo lo que hace que la vida valga la pena celebrar.",
+      "cta": "Empezar gratis",
+      "badge": "Simple. Rápido. Gratis.",
+      "noAccount": "Sin crear cuenta — empieza ahora"
+    },
+    "demo": {
+      "label": "Viaje de Ensueño",
+      "daysLabel": "días",
+      "hoursLabel": "hrs",
+      "minutesLabel": "min",
+      "secondsLabel": "seg",
+      "live": "En vivo",
+      "progress": "Progreso",
+      "progressValue": "12% completado",
+      "shared": "Compartido con 3 personas"
+    },
+    "useCases": {
+      "trips": "Viajes",
+      "weddings": "Bodas",
+      "graduations": "Graduaciones",
+      "parties": "Fiestas",
+      "birthdays": "Cumpleaños",
+      "concerts": "Conciertos",
+      "achievements": "Logros",
+      "events": "Eventos"
+    },
+    "sections": {
+      "features": "Funcionalidades",
+      "howItWorks": "Cómo funciona"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para contar los días hasta lo que importa",
+      "item0": {
+        "title": "Cualquier ocasión",
+        "description": "Viajes, bodas, graduaciones, fiestas, bebés — si merece ser esperado, Momentto tiene una categoría para ello."
+      },
+      "item1": {
+        "title": "Comparte con todos",
+        "description": "Genera un enlace público y permite que tus amigos y familia sigan la cuenta en tiempo real."
+      },
+      "item2": {
+        "title": "Manténte notificado",
+        "description": "Activa las notificaciones push y nunca te pierdas el momento — recibe una alerta justo cuando llegue tu evento."
+      },
+      "item3": {
+        "title": "Funciona sin conexión",
+        "description": "Instalado como PWA, Momentto funciona incluso sin internet. Tus cuentas siempre están disponibles."
+      }
+    },
+    "howItWorks": {
+      "title": "Listo en 30 segundos",
+      "step0": {
+        "title": "Elige una categoría",
+        "description": "Selecciona entre viajes, bodas, graduaciones, fiestas y mucho más."
+      },
+      "step1": {
+        "title": "Establece la fecha",
+        "description": "Ingresa el nombre del evento y la fecha exacta — la hora es opcional."
+      },
+      "step2": {
+        "title": "Observa y comparte",
+        "description": "Tu cuenta regresiva en vivo está lista. Compártela con un enlace o instala la app en tu pantalla de inicio."
+      }
+    },
+    "howItWorksDemoItems": {
+      "item0Title": "Viaje a Europa",
+      "item0Date": "15 jun. 2025",
+      "item1Title": "Boda de Ana",
+      "item1Date": "22 ago. 2025",
+      "item2Title": "Graduación de Med.",
+      "item2Date": "12 dic. 2025",
+      "newCountdown": "Nueva cuenta regresiva"
+    },
+    "cta": {
+      "title": "¿Listo para empezar a contar?",
+      "sub": "Únete a miles de personas celebrando su próximo gran momento.",
+      "button": "Crear mi cuenta regresiva",
+      "disclaimer": "Gratis para siempre · Sin crear cuenta · Funciona sin conexión"
+    },
+    "footer": {
+      "rights": "Todos los derechos reservados."
+    }  }
 }

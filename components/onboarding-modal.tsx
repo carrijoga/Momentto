@@ -4,6 +4,9 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { Calendar, Clock, Share2, Bell, Smartphone, ArrowRight } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { BlurText } from "@/components/ui/blur-text"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { ScrollFloat } from "@/components/ui/scroll-float"
 
 const STEPS = ["create", "view", "share", "notify", "install"] as const
 type Step = (typeof STEPS)[number]
@@ -65,16 +68,17 @@ export function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
 
       {/* Panel */}
       <motion.div
-        className="relative z-10 w-full max-w-sm overflow-hidden rounded-t-3xl bg-background pb-safe shadow-2xl sm:rounded-3xl"
+        className="relative z-10 w-full max-w-sm overflow-hidden rounded-t-3xl shadow-2xl sm:rounded-3xl"
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
+      <SpotlightCard className="rounded-t-3xl bg-background pb-safe sm:rounded-3xl">
         {/* Progress bar */}
         <div className="h-1 w-full bg-muted">
           <motion.div
-            className="h-full bg-primary"
+            className="h-full bg-linear-to-r from-primary/70 to-primary"
             animate={{ width: `${((stepIndex + 1) / total) * 100}%` }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
@@ -104,7 +108,7 @@ export function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
             >
               {/* Icon */}
               <motion.div
-                className="mb-6 flex size-20 items-center justify-center rounded-[24px] bg-primary/10 ring-1 ring-primary/20 shadow-lg shadow-primary/10"
+                className="mb-6 flex size-20 items-center justify-center rounded-[24px] bg-primary/10 ring-4 ring-primary/10 shadow-xl shadow-primary/15"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.05 }}
@@ -114,11 +118,11 @@ export function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
 
               {/* Text */}
               <h2 className="mb-3 text-xl font-bold text-foreground">
-                {t(`steps.${currentStep}.title`)}
+                <BlurText text={t(`steps.${currentStep}.title`)} duration={0.35} delay={0.06} initialDelay={0.05} />
               </h2>
-              <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+              <ScrollFloat className="max-w-xs text-sm leading-relaxed text-muted-foreground" delay={0.08} duration={0.4}>
                 {t(`steps.${currentStep}.description`)}
-              </p>
+              </ScrollFloat>
             </motion.div>
           </AnimatePresence>
 
@@ -167,6 +171,7 @@ export function OnboardingModal({ open, onComplete }: OnboardingModalProps) {
             </motion.button>
           </div>
         </div>
+      </SpotlightCard>
       </motion.div>
     </div>
   )

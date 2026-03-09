@@ -7,6 +7,9 @@ import { useTranslations } from "next-intl"
 import { useLocale } from "next-intl"
 import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { GradientText } from "@/components/ui/gradient-text"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { ScrollFloat } from "@/components/ui/scroll-float"
 
 interface ChangelogEntry {
   slug: string
@@ -158,6 +161,9 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
   return (
     <div className="flex min-h-dvh flex-col items-center p-4 pb-20 sm:p-6">
       <div className="w-full max-w-2xl">
+        {/* Glow orb */}
+        <div aria-hidden="true" className="pointer-events-none fixed left-1/2 top-0 size-96 -translate-x-1/2 rounded-full bg-primary/6 blur-3xl" />
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -16 }}
@@ -172,8 +178,8 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
             <ArrowLeft className="size-3.5" />
             {t("back")}
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Changelog
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <GradientText>Changelog</GradientText>
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {t("description")}
@@ -238,14 +244,16 @@ export function ChangelogClient({ entries }: ChangelogClientProps) {
                   </div>
 
                   {/* Card */}
-                  <div className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={markdownComponents}
-                    >
-                      {entry.content}
-                    </ReactMarkdown>
-                  </div>
+                  <ScrollFloat delay={index * 0.04} duration={0.45}>
+                    <SpotlightCard className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={markdownComponents}
+                      >
+                        {entry.content}
+                      </ReactMarkdown>
+                    </SpotlightCard>
+                  </ScrollFloat>
                 </motion.div>
               )
             })}

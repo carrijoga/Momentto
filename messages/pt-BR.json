@@ -88,7 +88,10 @@
     "savedEmptyDescription": "Salve contadores de amigos para acompanhá-los aqui. Visite um link de compartilhamento e toque em Salvar.",
     "unsave": "Remover dos salvos",
     "linkRevoked": "Um contador compartilhado foi removido (link revogado)",
-    "shared": "Compartilhado"
+    "shared": "Compartilhado",
+    "nextUp": "Próximo",
+    "otherMoments": "Outros momentos",
+    "viewDetails": "Ver detalhes"
   },
   "share": {
     "title": "Compartilhar contagem",
@@ -178,14 +181,20 @@
     "hero": {
       "tagline": "Todo momento especial merece ser aguardado com emoção.",
       "sub": "Crie contagens regressivas para viagens, casamentos, formaturas e tudo que faz a vida valer a pena celebrar.",
-      "cta": "Comece gratuitamente"
+      "cta": "Comece gratuitamente",
+      "badge": "Simples. Rápido. Gratuito.",
+      "noAccount": "Sem criar conta — comece agora"
     },
     "demo": {
       "label": "Viagem dos Sonhos",
       "daysLabel": "dias",
       "hoursLabel": "hrs",
       "minutesLabel": "min",
-      "secondsLabel": "seg"
+      "secondsLabel": "seg",
+      "live": "Ao vivo",
+      "progress": "Progresso",
+      "progressValue": "12% concluído",
+      "shared": "Compartilhado com 3 pessoas"
     },
     "features": {
       "title": "Tudo que você precisa para contar os dias até o que importa",
@@ -221,10 +230,34 @@
         "description": "Sua contagem ao vivo está pronta. Compartilhe com um link ou instale o app na sua tela inicial."
       }
     },
+    "useCases": {
+      "trips": "Viagens",
+      "weddings": "Casamentos",
+      "graduations": "Formaturas",
+      "parties": "Festas",
+      "birthdays": "Aniversários",
+      "concerts": "Shows",
+      "achievements": "Conquistas",
+      "events": "Eventos"
+    },
+    "sections": {
+      "features": "Funcionalidades",
+      "howItWorks": "Como funciona"
+    },
+    "howItWorksDemoItems": {
+      "item0Title": "Viagem para Europa",
+      "item0Date": "15 jun. 2025",
+      "item1Title": "Casamento da Ana",
+      "item1Date": "22 ago. 2025",
+      "item2Title": "Formatura de Med",
+      "item2Date": "12 dez. 2025",
+      "newCountdown": "Nova contagem"
+    },
     "cta": {
       "title": "Pronto para começar a contar?",
       "sub": "Junte-se a milhares de pessoas celebrando seu próximo grande momento.",
-      "button": "Criar minha contagem"
+      "button": "Criar minha contagem",
+      "disclaimer": "Grátis para sempre · Sem criar conta · Funciona offline"
     },
     "footer": {
       "rights": "Todos os direitos reservados."

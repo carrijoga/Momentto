@@ -9,6 +9,8 @@ import { useTranslations } from "next-intl"
 import { useLocale } from "next-intl"
 import { AirplaneIcon } from "@/components/ui/airplane"
 import { sendGAEvent } from "@/lib/analytics"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { BlurText } from "@/components/ui/blur-text"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -76,25 +78,28 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center bg-background px-4">
+      {/* Glow orb */}
+      <div aria-hidden="true" className="pointer-events-none fixed left-1/2 top-1/3 size-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/8 blur-3xl" />
+
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="w-full max-w-sm space-y-8"
+        className="relative w-full max-w-sm space-y-8"
       >
         {/* Logo / heading */}
-        <div className="flex flex-col items-center gap-3 text-center">
+        <div className="flex flex-col items-center gap-4 text-center">
           <motion.div
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="flex size-14 items-center justify-center rounded-2xl border border-border bg-card shadow-sm"
+            className="flex size-16 items-center justify-center rounded-2xl border border-border bg-card shadow-xl shadow-primary/10 ring-4 ring-primary/8"
           >
-            <AirplaneIcon size={28} className="text-primary" />
+            <AirplaneIcon size={30} className="text-primary" />
           </motion.div>
           <div className="space-y-1">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              {t("headline")}
+              <BlurText text={t("headline")} duration={0.35} delay={0.06} initialDelay={0.05} />
             </h1>
             <p className="text-sm text-muted-foreground">{t("sub")}</p>
           </div>
@@ -108,8 +113,9 @@ export default function LoginPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm"
+              className="overflow-hidden rounded-2xl shadow-xl"
             >
+            <SpotlightCard className="rounded-2xl border border-border bg-card p-6">
               <div className="space-y-1 text-center">
                 <p className="text-sm font-medium text-foreground">{t("checkInbox")}</p>
                 <p className="text-xs text-muted-foreground">{t("checkInboxSub", { email: sentTo })}</p>
@@ -120,6 +126,7 @@ export default function LoginPage() {
               >
                 {t("backToLogin")}
               </button>
+            </SpotlightCard>
             </motion.div>
           ) : (
             <motion.div
@@ -128,8 +135,9 @@ export default function LoginPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm"
+              className="overflow-hidden rounded-2xl shadow-xl"
             >
+            <SpotlightCard className="rounded-2xl border border-border bg-card p-6">
               {/* Google */}
               <button
                 onClick={handleGoogleSignIn}
@@ -171,7 +179,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={submitting || !email.trim()}
-                  className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 >
                   {submitting ? t("sending") : t("emailButton")}
                 </button>
@@ -191,6 +199,7 @@ export default function LoginPage() {
                   </motion.p>
                 )}
               </AnimatePresence>
+            </SpotlightCard>
             </motion.div>
           )}
         </AnimatePresence>

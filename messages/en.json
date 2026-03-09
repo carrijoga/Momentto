@@ -88,7 +88,10 @@
     "savedEmptyDescription": "Save countdowns from friends to follow them here. Visit a share link and tap Save.",
     "unsave": "Remove from saved",
     "linkRevoked": "A shared countdown was removed (link revoked)",
-    "shared": "Shared"
+    "shared": "Shared",
+    "nextUp": "Next up",
+    "otherMoments": "Other moments",
+    "viewDetails": "View details"
   },
   "share": {
     "title": "Share countdown",
@@ -178,14 +181,20 @@
     "hero": {
       "tagline": "Every special moment deserves to be eagerly awaited.",
       "sub": "Create beautiful countdowns for your trips, weddings, graduations and everything that makes life worth celebrating.",
-      "cta": "Start for free"
+      "cta": "Start for free",
+      "badge": "Simple. Fast. Free.",
+      "noAccount": "No account needed — start now"
     },
     "demo": {
       "label": "Dream Vacation",
       "daysLabel": "days",
       "hoursLabel": "hrs",
       "minutesLabel": "min",
-      "secondsLabel": "sec"
+      "secondsLabel": "sec",
+      "live": "Live",
+      "progress": "Progress",
+      "progressValue": "12% complete",
+      "shared": "Shared with 3 people"
     },
     "features": {
       "title": "Everything you need to count down to what matters",
@@ -221,10 +230,34 @@
         "description": "Your live countdown is ready. Share it with a link or install the app on your home screen."
       }
     },
+    "useCases": {
+      "trips": "Trips",
+      "weddings": "Weddings",
+      "graduations": "Graduations",
+      "parties": "Parties",
+      "birthdays": "Birthdays",
+      "concerts": "Concerts",
+      "achievements": "Achievements",
+      "events": "Events"
+    },
+    "sections": {
+      "features": "Features",
+      "howItWorks": "How it works"
+    },
+    "howItWorksDemoItems": {
+      "item0Title": "Trip to Europe",
+      "item0Date": "Jun 15, 2025",
+      "item1Title": "Ana's Wedding",
+      "item1Date": "Aug 22, 2025",
+      "item2Title": "Med Graduation",
+      "item2Date": "Dec 12, 2025",
+      "newCountdown": "New countdown"
+    },
     "cta": {
       "title": "Ready to start counting?",
       "sub": "Join thousands of people celebrating their next big moment.",
-      "button": "Create my countdown"
+      "button": "Create my countdown",
+      "disclaimer": "Free forever · No account needed · Works offline"
     },
     "footer": {
       "rights": "All rights reserved."

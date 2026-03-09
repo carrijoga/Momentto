@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "motion/react"
 import { X, Loader2, Send, CheckCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { submitFeedback } from "@/app/actions"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
+import { BlurText } from "@/components/ui/blur-text"
 
 interface FeedbackModalProps {
   onClose: () => void
@@ -47,75 +49,88 @@ export function FeedbackModal({ onClose }: FeedbackModalProps) {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: "spring", stiffness: 350, damping: 30 }}
-        className="w-full max-w-sm rounded-t-3xl border border-border bg-background p-6 shadow-xl sm:rounded-3xl"
+        className="w-full max-w-sm overflow-hidden rounded-t-3xl shadow-2xl sm:rounded-3xl"
       >
-        {/* Header */}
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-foreground">{t("title")}</h2>
-          <button
-            onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
+        <SpotlightCard className="relative rounded-t-3xl bg-background p-6 sm:rounded-3xl">
+          {/* Inner glow orb */}
+          <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-12 size-40 rounded-full bg-primary/8 blur-2xl" />
 
-        <AnimatePresence mode="wait">
-          {success ? (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center gap-3 py-6"
+          {/* Header */}
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-base font-semibold text-foreground">
+              <BlurText text={t("title")} duration={0.3} delay={0.05} />
+            </h2>
+            <button
+              onClick={onClose}
+              className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              <CheckCircle className="size-10 text-primary" />
-              <p className="text-center text-sm font-medium text-foreground">{t("thanks")}</p>
-              <p className="text-center text-xs text-muted-foreground">{t("thanksSub")}</p>
-            </motion.div>
-          ) : (
-            <motion.div key="form" className="flex flex-col gap-4">
-              <p className="text-sm text-muted-foreground">{t("prompt")}</p>
+              <X className="size-4" />
+            </button>
+          </div>
 
-              <div className="relative">
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value.slice(0, MAX_LENGTH))}
-                  placeholder={t("placeholder")}
-                  rows={4}
-                  className="w-full resize-none rounded-xl border border-border bg-secondary/40 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-                <span className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/50">
-                  {message.length}/{MAX_LENGTH}
-                </span>
-              </div>
-
-              {error && (
-                <p className="text-xs text-destructive">{error}</p>
-              )}
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleSubmit}
-                disabled={!message.trim() || loading}
-                className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/25 transition hover:opacity-90 disabled:opacity-50"
+          <AnimatePresence mode="wait">
+            {success ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-3 py-6"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    {t("sending")}
-                  </>
-                ) : (
-                  <>
-                    <Send className="size-4" />
-                    {t("send")}
-                  </>
+                <motion.div
+                  className="flex size-16 items-center justify-center rounded-full bg-primary/10 ring-4 ring-primary/15 shadow-xl shadow-primary/15"
+                  animate={{ scale: [1, 1.06, 1] }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  <CheckCircle className="size-8 text-primary" />
+                </motion.div>
+                <p className="text-center text-sm font-medium text-foreground">{t("thanks")}</p>
+                <p className="text-center text-xs text-muted-foreground">{t("thanksSub")}</p>
+              </motion.div>
+            ) : (
+              <motion.div key="form" className="flex flex-col gap-4">
+                <p className="text-sm text-muted-foreground">{t("prompt")}</p>
+
+                <div className="relative">
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value.slice(0, MAX_LENGTH))}
+                    placeholder={t("placeholder")}
+                    rows={4}
+                    className="w-full resize-none rounded-xl border border-border bg-secondary/40 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <span className="absolute bottom-2 right-3 text-[10px] text-muted-foreground/50">
+                    {message.length}/{MAX_LENGTH}
+                  </span>
+                </div>
+
+                {error && (
+                  <p className="text-xs text-destructive">{error}</p>
                 )}
-              </motion.button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSubmit}
+                  disabled={!message.trim() || loading}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-90 disabled:opacity-50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      {t("sending")}
+                    </>
+                  ) : (
+                    <>
+                      <Send className="size-4" />
+                      {t("send")}
+                    </>
+                  )}
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </SpotlightCard>
       </motion.div>
     </motion.div>
   )

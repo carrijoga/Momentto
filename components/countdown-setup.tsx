@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { format } from "date-fns"
 import { ptBR, enUS } from "date-fns/locale"
-import { CalendarIcon, Clock, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star, House } from "lucide-react"
+import { CalendarIcon, Clock, Cake, Baby, Music, Trophy, Calendar as CalendarLucide, Star, House, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -16,6 +16,8 @@ import { HeartIcon, type HeartIconHandle } from "@/components/ui/heart"
 import { GraduationCapIcon, type GraduationCapIconHandle } from "@/components/ui/graduation-cap"
 import { PartyPopperIcon, type PartyPopperIconHandle } from "@/components/ui/party-popper"
 import { sendGAEvent } from "@/lib/analytics"
+import { BlurText } from "@/components/ui/blur-text"
+
 
 interface CountdownData {
   category: string
@@ -178,7 +180,7 @@ export function CountdownSetup({
           className="mb-10 text-center"
         >
           <h1 className="mb-2 text-4xl font-bold tracking-tight text-foreground">
-            {t("title")}
+            <BlurText text={t("title")} duration={0.4} delay={0.06} />
           </h1>
           <p className="text-muted-foreground">
             {step === 1 ? t("step1Sub") : t("step2Sub")}
@@ -190,21 +192,30 @@ export function CountdownSetup({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1, duration: 0.3 }}
-          className="mb-8 flex items-center justify-center gap-2"
+          className="mb-8 flex items-center justify-center"
         >
-          <motion.div
-            layout
-            className="h-1.5 w-12 rounded-full bg-primary"
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          />
-          <motion.div
-            layout
-            className={cn(
-              "h-1.5 w-12 rounded-full",
-              step === 2 ? "bg-primary" : "bg-secondary"
-            )}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          />
+          {/* Step 1 circle */}
+          <div className={cn(
+            "flex size-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all duration-300",
+            step >= 1 ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"
+          )}>
+            1
+          </div>
+          {/* Connector */}
+          <div className="relative h-0.5 w-14 overflow-hidden bg-secondary">
+            <motion.div
+              className="absolute inset-y-0 left-0 bg-primary"
+              animate={{ width: step === 2 ? "100%" : "0%" }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            />
+          </div>
+          {/* Step 2 circle */}
+          <div className={cn(
+            "flex size-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all duration-300",
+            step === 2 ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"
+          )}>
+            2
+          </div>
         </motion.div>
 
         {/* Step content with AnimatePresence */}
@@ -224,7 +235,7 @@ export function CountdownSetup({
                   const isSelected = selectedCategory === cat.id
                   const iconRef = getIconRef(cat.id)
                   return (
-                    <motion.button
+                    <motion.div
                       key={cat.id}
                       initial={{ opacity: 0, scale: 0.9, y: 8 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -236,31 +247,35 @@ export function CountdownSetup({
                       }}
                       whileHover={{ scale: 1.04 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={() => {
-                        setSelectedCategory(cat.id)
-                        const ref = iconRef.current as AirplaneIconHandle | null
-                        ref?.startAnimation?.()
-                        setDirection(1)
-                        setTimeout(() => setStep(2), 150)
-                      }}
-                      onMouseEnter={() => {
-                        const ref = iconRef.current as AirplaneIconHandle | null
-                        ref?.startAnimation?.()
-                      }}
-                      onMouseLeave={() => {
-                        const ref = iconRef.current as AirplaneIconHandle | null
-                        ref?.stopAnimation?.()
-                      }}
-                      className={cn(
-                        "group flex flex-col items-center gap-2.5 rounded-xl border p-4 transition-colors",
-                        isSelected
-                          ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/20"
-                          : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-sm"
-                      )}
                     >
-                      {getCategoryIcon(cat.id, iconRef, 24, isSelected)}
-                      <span className="text-xs font-medium">{cat.label}</span>
-                    </motion.button>
+                      <button
+                        type="button"
+                        className={cn(
+                          "group flex w-full flex-col items-center gap-2.5 rounded-xl border p-4 transition-colors cursor-pointer",
+                          isSelected
+                            ? "border-primary bg-primary/10 text-primary shadow-sm shadow-primary/20"
+                            : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-sm"
+                        )}
+                        onClick={() => {
+                          setSelectedCategory(cat.id)
+                          const ref = iconRef.current as AirplaneIconHandle | null
+                          ref?.startAnimation?.()
+                          setDirection(1)
+                          setTimeout(() => setStep(2), 150)
+                        }}
+                        onMouseEnter={() => {
+                          const ref = iconRef.current as AirplaneIconHandle | null
+                          ref?.startAnimation?.()
+                        }}
+                        onMouseLeave={() => {
+                          const ref = iconRef.current as AirplaneIconHandle | null
+                          ref?.stopAnimation?.()
+                        }}
+                      >
+                        {getCategoryIcon(cat.id, iconRef, 24, isSelected)}
+                        <span className="text-xs font-medium">{cat.label}</span>
+                      </button>
+                    </motion.div>
                   )
                 })}
               </div>
@@ -455,13 +470,14 @@ export function CountdownSetup({
                   onClick={handleSubmit}
                   disabled={!title.trim() || !date}
                   className={cn(
-                    "flex-[2] rounded-xl py-3.5 text-sm font-semibold transition-all",
+                    "flex-[2] flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
                     title.trim() && date
-                      ? "bg-primary text-primary-foreground hover:opacity-90"
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:opacity-90"
                       : "cursor-not-allowed bg-secondary text-muted-foreground"
                   )}
                 >
                   {t("start")}
+                  {title.trim() && date && <ArrowRight className="size-4" />}
                 </motion.button>
               </motion.div>
             </motion.div>

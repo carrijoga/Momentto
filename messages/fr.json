@@ -88,7 +88,10 @@
     "savedEmptyDescription": "Sauvegardez des comptes à rebours d'amis pour les suivre ici. Visitez un lien de partage et appuyez sur Enregistrer.",
     "unsave": "Retirer des sauvegardés",
     "linkRevoked": "Un compte à rebours partagé a été supprimé (lien révoqué)",
-    "shared": "Partagé"
+    "shared": "Partagé",
+    "nextUp": "Prochain",
+    "otherMoments": "Autres moments",
+    "viewDetails": "Voir les détails"
   },
   "share": {
     "title": "Partager le compte à rebours",
@@ -207,6 +210,93 @@
         "title": "Installez comme une app",
         "description": "Ajoutez Momentto à votre écran d'accueil et accédez à vos comptes à rebours hors ligne."
       }
-    }
-  }
+    }  },
+  "landing": {
+    "nav": {
+      "cta": "Ouvrir l'appli"
+    },
+    "hero": {
+      "tagline": "Chaque moment spécial mérite d'être attendu avec émotion.",
+      "sub": "Créez de beaux comptes à rebours pour vos voyages, mariages, remises de diplômes et tout ce qui rend la vie digne d'être célébrée.",
+      "cta": "Commencer gratuitement",
+      "badge": "Simple. Rapide. Gratuit.",
+      "noAccount": "Sans créer de compte — commencez maintenant"
+    },
+    "demo": {
+      "label": "Voyage de Rêve",
+      "daysLabel": "jours",
+      "hoursLabel": "hrs",
+      "minutesLabel": "min",
+      "secondsLabel": "sec",
+      "live": "En direct",
+      "progress": "Progression",
+      "progressValue": "12% terminé",
+      "shared": "Partagé avec 3 personnes"
+    },
+    "useCases": {
+      "trips": "Voyages",
+      "weddings": "Mariages",
+      "graduations": "Diplômes",
+      "parties": "Fêtes",
+      "birthdays": "Anniversaires",
+      "concerts": "Concerts",
+      "achievements": "Réussites",
+      "events": "Événements"
+    },
+    "sections": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche"
+    },
+    "features": {
+      "title": "Tout ce dont vous avez besoin pour attendre ce qui compte",
+      "item0": {
+        "title": "Toute occasion",
+        "description": "Voyages, mariages, diplômes, fêtes, bébés — si cela mérite d'être attendu, Momentto a une catégorie pour cela."
+      },
+      "item1": {
+        "title": "Partagez avec tous",
+        "description": "Générez un lien public et permettez à vos amis et famille de suivre le compte à rebours en temps réel."
+      },
+      "item2": {
+        "title": "Restez notifié",
+        "description": "Activez les notifications push et ne manquez jamais le moment — recevez une alerte juste quand votre événement arrive."
+      },
+      "item3": {
+        "title": "Fonctionne hors ligne",
+        "description": "Installé comme PWA, Momentto fonctionne même sans connexion. Vos comptes à rebours sont toujours disponibles."
+      }
+    },
+    "howItWorks": {
+      "title": "Opérationnel en 30 secondes",
+      "step0": {
+        "title": "Choisir une catégorie",
+        "description": "Choisissez parmi voyages, mariages, diplômes, fêtes et bien plus encore."
+      },
+      "step1": {
+        "title": "Définir la date",
+        "description": "Entrez le nom de l'événement et la date exacte — l'heure est optionnelle."
+      },
+      "step2": {
+        "title": "Suivre et partager",
+        "description": "Votre compte à rebours en direct est prêt. Partagez-le avec un lien ou installez l'appli sur votre écran d'accueil."
+      }
+    },
+    "howItWorksDemoItems": {
+      "item0Title": "Voyage en Europe",
+      "item0Date": "15 juin 2025",
+      "item1Title": "Mariage d'Ana",
+      "item1Date": "22 août 2025",
+      "item2Title": "Diplôme de Méd.",
+      "item2Date": "12 déc. 2025",
+      "newCountdown": "Nouveau compte à rebours"
+    },
+    "cta": {
+      "title": "Prêt à commencer le compte à rebours ?",
+      "sub": "Rejoignez des milliers de personnes qui célèbrent leur prochain grand moment.",
+      "button": "Créer mon compte à rebours",
+      "disclaimer": "Gratuit pour toujours · Sans créer de compte · Fonctionne hors ligne"
+    },
+    "footer": {
+      "rights": "Tous droits réservés."
+    }  }
 }
